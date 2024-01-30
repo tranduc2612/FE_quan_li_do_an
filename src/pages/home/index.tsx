@@ -3,18 +3,27 @@ import { useAppDispatch } from "~/redux/hook";
 import { logout } from "~/redux/slices/authSlice";
 import { getAllPosts, handlePosts } from "~/services/blogsApi";
 import { IPosts } from "~/types/IBlog";
+import classNames from "classnames/bind";
+import style from "./Home.module.scss"
+import { useNavigate } from "react-router-dom";
 
 
 const keyPost = '/api/user/123';
+const cx = classNames.bind(style);
+
 function Home() {
+    const navigate = useNavigate();
+
     const { data, error, isLoading } = useSWR<IPosts[]>(keyPost, getAllPosts, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
         revalidateOnReconnect: false
     })
+
     const dispatch = useAppDispatch();
     const handleLogout = () => {
         dispatch(logout())
+        navigate("/login");
     }
 
     if (error) return <div>Xảy ra lỗi</div>
@@ -28,13 +37,16 @@ function Home() {
         console.log(data);
         mutate(keyPost);
     }
-    return (<div>
-        <button onClick={handleClick}>Click</button>
-        <button type="button" onClick={handleLogout}>logout</button>
+    return (<div className={cx("xin_chao", {
+        active: true
+    })}>
+        <button className="bg-blue-700 ms-3 p-6 rounded-xl" onClick={handleClick}>Click</button>
+        <button className="bg-blue-700 ms-3 p-6 rounded-xl" type="button" onClick={handleLogout}>logout</button>
 
         {isLoading || !data ? <>Loading san pham</> : data.map((post) => {
             return <div key={Math.random()}>{post.id} {post.title}</div>
         })}
+
     </div>);
 }
 

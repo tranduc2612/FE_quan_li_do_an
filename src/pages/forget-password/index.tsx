@@ -3,42 +3,25 @@ import { Link, useNavigate } from "react-router-dom";
 import images from "~/assets";
 import BoxWrapper from "~/components/BoxWrap";
 import { useAppDispatch, useAppSelector } from "~/redux/hook";
-import { ILoginPayload, errorLogging, inforUser, isError, isLogin, logging, login, logout } from "~/redux/slices/authSlice";
+import { ILoginPayload, inforUser, isLogin, login, logout } from "~/redux/slices/authSlice";
 import { decrement, increment, selectCount } from "~/redux/slices/counterSlice";
+
 
 import InputCustom from "~/components/InputCustom";
 import ButtonCustom from "~/components/ButtonCustom";
-import Loading from "~/components/Loading";
 
-type IObjectField = {
-    value: string
-}
 
-type IStateForm = {
-    username: IObjectField,
-    password: IObjectField
-}
-
-function LoginPage() {
+function ForgetPassword() {
     const count = useAppSelector(selectCount);
     const isLoginUser = useAppSelector(isLogin);
-    const isLogging = useAppSelector(logging);
-    const isErrorLogin = useAppSelector(isError);
-    const errorLoginUser = useAppSelector(errorLogging);
-    console.log(errorLoginUser);
     const currentUser = useAppSelector(inforUser);
-    console.log(currentUser)
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const [formLogin, setFormLogin] = useState<ILoginPayload>({
         username: undefined,
         password: undefined
     })
-
-    // const [formLogin, setFormLogin] = useState<ILoginPayload>({
-    //     username: "",
-    //     password: ""
-    // })
 
     const handleDecrement = () => {
         console.log(currentUser);
@@ -52,9 +35,13 @@ function LoginPage() {
         dispatch(login(formLogin))
     }
 
-
-
+    const handleLogout = () => {
+        dispatch(logout())
+    }
     return (<div
+        // style={{
+        //     backgroundImage: `url(${images.background.background_default})`
+        // }}
         className={`w-screen h-screen relative overflow-hidden`}>
         <div className="w-full h-full z-10 ">
             <img className="w-full h-full" src={images.background.background_default} />
@@ -73,43 +60,19 @@ function LoginPage() {
 
                 <div className="title mt-5 mb-5 text-center text-2xl">
                     {/* <h2>Welcome to UTC! 👋🏻</h2> */}
-                    <h1 className="font-bold">HỆ THỐNG QUẢN LÝ ĐỒ ÁN</h1>
+                    <h1 className="font-bold">QUÊN MẬT KHẨU</h1>
                 </div>
 
                 <form className="form flex justify-center flex-col w-full mt-5 mb-5">
-                    <InputCustom
-                        label="Tài khoản"
-                        isError={isErrorLogin && errorLoginUser.typeError == "Error System" ? true : false}
-                        errorMessage={isErrorLogin && errorLoginUser.typeError == "Error System" ? errorLoginUser.messageError : ""}
-                        value={formLogin.username || ""}
-                        onChange={(value: string) => {
-                            setFormLogin({
-                                ...formLogin,
-                                username: value
-                            })
-                        }}
-                    />
-                    <InputCustom
-                        label="Mật khẩu"
-                        isError={isErrorLogin && errorLoginUser.typeError == "password" ? true : false}
-                        errorMessage={isErrorLogin && errorLoginUser.typeError == "password" ? errorLoginUser.messageError : ""}
-                        value={formLogin.password || ""}
-                        onChange={(value: string) => {
-                            setFormLogin({
-                                ...formLogin,
-                                password: value
-                            })
-                        }}
-                    />
-                    <Link to="/forget-password" className="mb-6 self-end">Quên mật khẩu</Link>
-                    <ButtonCustom label="Đăng nhập" onClick={handleLogin} />
+                    <InputCustom value={""} label="Tài khoản" />
+                    <InputCustom value={""} label="Email đăng ký" />
+                    <Link to="/forget-password" className="mb-6 self-start">Nhớ lại mật khẩu</Link>
+                    <ButtonCustom label="Gửi mã xác nhận" onClick={handleLogin} />
                 </form>
             </div>
         </BoxWrapper>
 
-        {
-            isLogging ? <Loading /> : <></>
-        }
+
 
         {/* <button onClick={handleDecrement}>Giảm</button>
         <button onClick={handleIncrement}>Tăng</button>
@@ -157,4 +120,4 @@ function LoginPage() {
     </div>);
 }
 
-export default LoginPage;
+export default ForgetPassword;

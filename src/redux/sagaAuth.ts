@@ -8,32 +8,38 @@ function* logger(action: PayloadAction) {
 }
 
 const fetchApiAuth = async (payload: ILoginPayload): Promise<AxiosResponse> => {
-  try {
-    const response = await axios.post('https://dummyjson.com/auth/login', { ...payload });
+  const response = await axios.post('https://dummyjson.com/auth/login', { ...payload });
     return response;
-  } catch (error) {
-    console.error('Error in fetchApiAuth:', error);
-    throw error;
-  }
 };
 
 function* handleLogin(payload: ILoginPayload) {
   try {
     const response: AxiosResponse = yield call(fetchApiAuth, payload);
-    if(response.data){
+    const dataRes = response.data;
+    if(dataRes){
       const dataUser: IUser = {
         ...response.data
       };
       yield put(loginSucces(dataUser));
       if(dataUser.token){
           localStorage.setItem('access_token',dataUser.token)
-        }
+       }
     }else{
-      yield put(loginFailed());
+
+      yield put(loginFailed({
+        typeError: "username",
+        messageError: dataRes.message
+      }));
     }
     console.log(payload, 'handle_login');
-  } catch (error) {
+  } catch (error: any) {
+
     // Handle error if needed
+    yield put(loginFailed({
+      typeError: "Error System",
+      messageError: error.message
+    }));
+
     console.error('Error in handleLogin:', error);
   }
 }
@@ -41,6 +47,7 @@ function* handleLogin(payload: ILoginPayload) {
 function* handleLogout() {
   console.log('handle_logout');
   localStorage.removeItem('access_token');
+  yield put(logout())
 }
 
 function* watchFlow() {
@@ -49,6 +56,7 @@ function* watchFlow() {
     if (!isLogin) {
       const action: PayloadAction<ILoginPayload> = yield take(login.type);
       yield call(handleLogin, action.payload);
+      continue
     }
 
     yield take(logout.type);

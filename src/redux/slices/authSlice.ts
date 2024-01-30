@@ -4,7 +4,17 @@ import { RootState } from "../store";
 interface IUserInfo{
     isLogin: boolean,
     logging: boolean,
+    isError: boolean,
+    loginError: {
+        messageError: string,
+        typeError: string,
+    }
     infoData?: IUser
+}
+
+export interface IErrorPayload{
+    typeError: string,
+    messageError: string,
 }
 
 export interface ILoginPayload{
@@ -15,6 +25,12 @@ export interface ILoginPayload{
 const initialUser: IUserInfo = {
     isLogin: false,
     logging: false,
+    isError: false,
+    loginError:{
+        messageError: "",
+        typeError:"",
+    },
+    
     infoData: {
         id: undefined,
         username: undefined,
@@ -57,13 +73,19 @@ const authSlice = createSlice({
             state.logging = false
             state.infoData = action.payload
         },
-        loginFailed(state){
+        loginFailed(state,action: PayloadAction<IErrorPayload>){
             state.isLogin = false
             state.logging = false
+            state.isError = true
+            state.loginError.messageError = action.payload.messageError
+            state.loginError.typeError = action.payload.typeError
             state.infoData = undefined
         },
         logout(state){
             state.infoData = undefined,
+            state.loginError.messageError = ""
+            state.loginError.typeError = ""
+            state.logging = false
             state.isLogin = false
         }
     },
@@ -84,7 +106,9 @@ const authSlice = createSlice({
 export const {login,logout,loginSucces,loginFailed} = authSlice.actions
 
 export const isLogin = (state:RootState) => state.auth.isLogin
-export const logging = (state:RootState) => state.auth.logging 
+export const isError = (state:RootState) => state.auth.isError
+export const logging = (state:RootState) => state.auth.logging
+export const errorLogging = (state:RootState) => state.auth.loginError 
 export const inforUser = (state:RootState) => state.auth.infoData 
 
 
