@@ -1,0 +1,20 @@
+.accordion_body {
+    padding-left: 2.3rem;
+    height: 0;
+    overflow: hidden;
+    transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275) .3s;
+
+    &.active {
+        padding: 1rem 2.3rem;
+        height: auto;
+    }
+}
+
+.accordion_icon {
+    transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275) .3s;
+    transform: rotate(180deg);
+
+    &.active {
+        transform: rotate(0deg);
+    }
+}

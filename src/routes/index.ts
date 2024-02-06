@@ -1,5 +1,5 @@
-import AuthLayout from "~/components/Layouts/AuthenLayout"
-import { ForgetPass, HomePage, LoginPage } from "~/pages"
+import { DefaultLayout,AuthLayout } from "~/components/Layouts"
+import { ForgetPass, HomePage, LoginPage, ProfilePage } from "~/pages"
 
 export const PUBLIC_ROUTER = [
     {
@@ -17,6 +17,12 @@ export const PUBLIC_ROUTER = [
 export const PRIVATE_ROUTER = [
     {
         path:"/",
-        page: HomePage
+        page: HomePage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/profile/:id",
+        page: ProfilePage,
+        layout: DefaultLayout
     }
 ]

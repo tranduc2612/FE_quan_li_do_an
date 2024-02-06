@@ -3,11 +3,12 @@ import { PRIVATE_ROUTER, PUBLIC_ROUTER } from "./routes"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useAppSelector } from "./redux/hook";
 import { isLogin, logging } from "./redux/slices/authSlice";
+import NotFound from "./pages/notfound";
+import { DefaultLayout } from "./components/Layouts";
 
 
 function App() {
   const isLoginUser = useAppSelector(isLogin);
-
 
   return (
     <>
@@ -32,15 +33,19 @@ function App() {
 
           {isLoginUser && PRIVATE_ROUTER.map((item, index) => {
             const Page = item.page;
+            const Layout = item.layout || DefaultLayout;
             return <Route
               key={index}
               path={item.path}
               element={
-                <Page />
+                <Layout>
+                  <Page />
+                </Layout>
+
               }
             />
           })}
-          <Route path="*" element={<>NotFound</>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </>

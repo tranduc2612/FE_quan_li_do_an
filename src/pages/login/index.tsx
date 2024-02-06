@@ -78,6 +78,7 @@ function LoginPage() {
 
                 <form className="form flex justify-center flex-col w-full mt-5 mb-5">
                     <InputCustom
+                        name={"account"}
                         label="Tài khoản"
                         isError={isErrorLogin && errorLoginUser.typeError == "Error System" ? true : false}
                         errorMessage={isErrorLogin && errorLoginUser.typeError == "Error System" ? errorLoginUser.messageError : ""}
@@ -90,6 +91,7 @@ function LoginPage() {
                         }}
                     />
                     <InputCustom
+                        name={"password"}
                         label="Mật khẩu"
                         isError={isErrorLogin && errorLoginUser.typeError == "password" ? true : false}
                         errorMessage={isErrorLogin && errorLoginUser.typeError == "password" ? errorLoginUser.messageError : ""}

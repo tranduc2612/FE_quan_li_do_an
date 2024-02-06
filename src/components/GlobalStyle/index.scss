@@ -7,6 +7,10 @@
 //     font-size: 62.5%;
 // }
 
+body {
+    // background-color: ;
+}
+
 * {
     font-family: 'Roboto', sans-serif;
     padding: 0;
@@ -17,6 +21,8 @@
 // a[href] {
 //     text-decoration: none;
 // }
+
+
 
 ul,
 li {
@@ -38,4 +44,19 @@ button,
 input {
     border: 1px solid transparent;
     outline: none;
+}
+
+::-webkit-scrollbar {
+    border-radius: 0;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #fcc808;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: #271756;
 }

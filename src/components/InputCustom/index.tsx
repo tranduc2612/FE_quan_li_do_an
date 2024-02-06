@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 type IProps = {
     label: string,
     value: string,
+    name: string,
     isError: boolean,
     errorMessage: string,
     onChange: (value: string) => void
@@ -47,6 +48,7 @@ const CssTextField = styled(TextField)({
 
 function InputCustom({
     label,
+    name,
     value,
     isError,
     errorMessage,
@@ -58,6 +60,7 @@ function InputCustom({
             id="standard-error-helper-text"
             error={isError}
             value={value}
+            name={name}
             helperText={errorMessage}
             label={label}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value)}
