@@ -50,10 +50,8 @@ export const refreshToken = createAsyncThunk(
         // check 
       const response:IUser = await new Promise((resolve) =>
       // --- Gọi API ---
-        
-        setTimeout(() => resolve({ 
-            lastName: ""
-         }), 1000)
+
+        setTimeout(() => resolve(JSON.parse(atob(token.split('.')[1]))), 1000)
       );
       return response;
     }

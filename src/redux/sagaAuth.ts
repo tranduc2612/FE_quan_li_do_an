@@ -20,6 +20,7 @@ function* handleLogin(payload: ILoginPayload) {
       const dataUser: IUser = {
         ...response.data
       };
+      console.log(dataUser);
       yield put(loginSucces(dataUser));
       if(dataUser.token){
           localStorage.setItem('access_token',dataUser.token)

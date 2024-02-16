@@ -1,5 +1,7 @@
 import { DefaultLayout,AuthLayout } from "~/components/Layouts"
-import { ForgetPass, HomePage, LoginPage, ProfilePage } from "~/pages"
+import { ForgetPass, HomePage, LoginPage, PlantPage, ProfilePage } from "~/pages"
+import DetailPlantDefault from "~/pages/plant/detail"
+import RegisterTopic from "~/pages/plant/detail/RegisterTopic"
 
 export const PUBLIC_ROUTER = [
     {
@@ -23,6 +25,21 @@ export const PRIVATE_ROUTER = [
     {
         path:"/profile/:id",
         page: ProfilePage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/plant",
+        page: PlantPage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/plant/detail/register-topic",
+        page: RegisterTopic,
+        layout: DefaultLayout
+    },
+    {
+        path:"/plant/detail",
+        page: DetailPlantDefault,
         layout: DefaultLayout
     }
 ]

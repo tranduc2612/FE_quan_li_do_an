@@ -6,6 +6,7 @@ import { IPosts } from "~/types/IBlog";
 import classNames from "classnames/bind";
 import style from "./Home.module.scss"
 import { useNavigate } from "react-router-dom";
+import BoxWrapper from "~/components/BoxWrap";
 
 
 const keyPost = '/api/user/123';
@@ -37,17 +38,24 @@ function Home() {
         console.log(data);
         mutate(keyPost);
     }
-    return (<div className={cx("xin_chao", {
-        active: true
-    })}>
-        <button className="bg-blue-700 ms-3 p-6 rounded-xl" onClick={handleClick}>Click</button>
-        <button className="bg-blue-700 ms-3 p-6 rounded-xl" type="button" onClick={handleLogout}>logout</button>
+    return (
+        <div>
+            <BoxWrapper classStyle={""}>
+            {/* <button className="bg-blue-700 ms-3 p-6 rounded-xl" onClick={handleClick}>Click</button>
+            <button className="bg-blue-700 ms-3 p-6 rounded-xl" type="button" onClick={handleLogout}>logout</button> */}
 
-        {isLoading || !data ? <>Loading san pham</> : data.map((post) => {
-            return <div key={Math.random()}>{post.id} {post.title}</div>
-        })}
+                {/* {isLoading || !data ? <>Loading san pham</> : data.map((post) => {
+                    return <div key={Math.random()}>{post.id} {post.title}</div>
+                })} */}
+                <div className="overflow-y-scroll h-32 text-[#333]">
+                    {isLoading || !data ? <>Loading san pham</> : data.map((post) => {
+                    return <div key={Math.random()}>{post.id} {post.title}</div>
+                })}
+                </div>
 
-    </div>);
+            </BoxWrapper>
+        </div>
+    );
 }
 
 export default Home;

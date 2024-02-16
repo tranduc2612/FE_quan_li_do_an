@@ -34,7 +34,7 @@ function Profile() {
 
 
     return (<>
-        <div className={"w-full mb-5 shadow-md-light rounded-md p-8"}>
+        <div className={"w-full mb-5 shadow-md-light rounded-md p-8 bg-[#fff] opacity-90"}>
             <div className="mb-8">
                 <h2 className={"font-bold text-[#333] text-xl"}>
                     Thông tin tài khoản

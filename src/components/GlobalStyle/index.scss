@@ -8,7 +8,10 @@
 // }
 
 body {
-    // background-color: ;
+    overflow: hidden;
+    background-image: url('../../assets/background/gtvt_bg.png');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 * {
@@ -48,15 +51,14 @@ input {
 
 ::-webkit-scrollbar {
     border-radius: 0;
-    width: 8px;
+    width: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: #fcc808;
+    background-color: #d9dce4;
 }
-
 ::-webkit-scrollbar-track {
     border-radius: 0;
-    background-color: #271756;
+    background-color: rgba(0, 0, 0, 0);
 }

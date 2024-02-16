@@ -56,7 +56,7 @@ function Navbar() {
     };
 
     return (<div className="flex justify-between h-12 ps-0 pe-10 py-5 mb-14">
-        <h1 className="text-[#333] font-bold text-xl">
+        <h1 className="text-[#333] font-bold text-3xl">
             HỆ THỐNG QUẢN LÝ ĐỒ ÁN
         </h1>
 

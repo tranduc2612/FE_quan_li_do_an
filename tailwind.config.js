@@ -13,7 +13,9 @@ export default {
       },
       colors: {
         'yellow-default': '#fcc808',
-        'gray-default': '#271756'
+        'gray-default': '#271756',
+        'light-blue': "#DEECFF",
+        'blue-primary': "#2074b0"
       },
     },
   },

@@ -2,13 +2,15 @@ import { ReactElement, useEffect, useState } from "react";
 import { PRIVATE_ROUTER, PUBLIC_ROUTER } from "./routes"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useAppSelector } from "./redux/hook";
-import { isLogin, logging } from "./redux/slices/authSlice";
+import { isLogin,inforUser } from "./redux/slices/authSlice";
 import NotFound from "./pages/notfound";
 import { DefaultLayout } from "./components/Layouts";
 
 
 function App() {
   const isLoginUser = useAppSelector(isLogin);
+  const ìnoUser = useAppSelector(inforUser);
+  console.log(ìnoUser)
 
   return (
     <>

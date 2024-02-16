@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import images from "~/assets";
-import BoxWrapper from "~/components/BoxWrap";
 import { useAppDispatch, useAppSelector } from "~/redux/hook";
 import { ILoginPayload, errorLogging, inforUser, isError, isLogin, logging, login, logout } from "~/redux/slices/authSlice";
 import { decrement, increment, selectCount } from "~/redux/slices/counterSlice";
@@ -66,7 +65,7 @@ function LoginPage() {
 
 
 
-        <BoxWrapper classStyle="absolute left-1/2 top-1/2 -translate-x-2/4 -translate-y-2/4 w-3/12 h-3/12 min-h-90 bg-white z-30 p-10 flex items-center">
+        <div className="shadow-default rounded-md absolute left-1/2 top-1/2 -translate-x-2/4 -translate-y-2/4 w-3/12 h-3/12 min-h-90 bg-white z-30 p-10 flex items-center">
             <div className="box__authen flex justify-center items-center flex-col">
 
                 <img className="w-4/12 mt-5 mb-5" src={images.logo.logo_default} alt="" />
@@ -107,7 +106,7 @@ function LoginPage() {
                     <ButtonCustom label="Đăng nhập" onClick={handleLogin} />
                 </form>
             </div>
-        </BoxWrapper>
+        </div>
 
         {
             isLogging ? <Loading /> : <></>

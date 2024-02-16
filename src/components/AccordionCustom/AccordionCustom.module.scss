@@ -1,12 +1,15 @@
 .accordion_body {
     padding-left: 2.3rem;
-    height: 0;
+    padding-top: 0rem;
+    padding-right: 0rem;
+    padding-bottom: 0rem;
+    max-height: 0;
     overflow: hidden;
-    transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275) .3s;
+    transition: all ease-in-out .5s;
 
     &.active {
         padding: 1rem 2.3rem;
-        height: auto;
+        max-height: 400px;
     }
 }
 
