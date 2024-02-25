@@ -6,6 +6,7 @@ type PropsType = {
     children: ReactElement
 }
 
+
 function GlobalStyle({ children }: PropsType) {
     return (<>
         {children}

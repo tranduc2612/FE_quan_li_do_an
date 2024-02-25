@@ -1,21 +1,28 @@
+import { IconButton, InputAdornment } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
+import { useState } from 'react';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 type IProps = {
+    id:string,
     label: string,
-    value: string,
+    value?: string,
     name: string,
-    isError: boolean,
-    errorMessage: string,
-    onChange: (value: string) => void
+    isError: boolean | undefined,
+    errorMessage: any,
+    type?:string,
+    onChange: any,
+    onBlur: any
 }
 
 const CssTextField = styled(TextField)({
     '&': {
         width: '100%',
     },
-    "#standard-error-helper-text-helper-text": {
-        margin: "0px",
-        fontSize: "0.89rem"
+    '& .MuiFormHelperText-root':{
+        fontSize:"0.89rem",
+        margin: '0px'
     },
     '& ~ &': {
         marginTop: '20px',
@@ -48,23 +55,38 @@ const CssTextField = styled(TextField)({
 
 function InputCustom({
     label,
+    id,
     name,
     value,
+    type = 'text',
     isError,
     errorMessage,
     onChange,
+    onBlur
 }: IProps) {
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+    };
 
     return (<>
         <CssTextField
-            id="standard-error-helper-text"
+            id={id}
             error={isError}
             value={value}
+            type={type}
             name={name}
             helperText={errorMessage}
             label={label}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value)}
-        />
+            onChange={onChange}
+            onBlur={onBlur}
+        >
+            
+        </CssTextField>
     </>);
 }
 

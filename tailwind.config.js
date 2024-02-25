@@ -15,10 +15,21 @@ export default {
         'yellow-default': '#fcc808',
         'gray-default': '#271756',
         'light-blue': "#DEECFF",
-        'blue-primary': "#2074b0"
+        'medium-blue': "#DEECFF",
+        'primary-blue': "#2074b0",
+        'text-color':"#333"
       },
+      gridColumn: {
+        'span-22': 'span 22 / span 22',
+        'span-23': 'span 23 / span 23',
+        'span-24': 'span 24 / span 24',
+      },
+      gridTemplateColumns: {
+        // Simple 16 column grid
+        '24': 'repeat(24, minmax(0, 1fr))',
+      }
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
 }
 

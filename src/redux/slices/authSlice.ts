@@ -1,5 +1,8 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import axios from "axios";
+import request, { BASE_URL_MEDIA } from "~/services/axios";
+import { BASE_URL } from "~/ultis/contants";
 
 interface IUserInfo{
     isLogin: boolean,
@@ -36,24 +39,41 @@ const initialUser: IUserInfo = {
         username: undefined,
         email: undefined,
         gender: undefined,
-        firstName: undefined,
-        lastName: undefined,
-        image: undefined,
-        token: undefined,
+        fullname: undefined,
+        role:undefined,
+        code:undefined,
+        avatar:undefined,
+        token:undefined,
     }
 }
 
 // --- Tạo thunk ---
 export const refreshToken = createAsyncThunk(
     'task/addTask',
-    async (token: string) => {
-        // check 
-      const response:IUser = await new Promise((resolve) =>
-      // --- Gọi API ---
+    async (refresh_token: any) => {
+        // check
+        const response:any = request.post('/Auth/refresh-token',refresh_token)
+            .then((res:any)=>{
+                const userData:IUser = res.returnObj;
+        
+                if(userData.token && userData.refreshToken){
+                    localStorage.setItem('access_token', userData.token)
+                    localStorage.setItem('refresh_token',userData.refreshToken)
+                }
+                console.log(userData);
+                return userData;
+            }).catch((error)=>{
+                console.log(error);
+                localStorage.clear();
 
-        setTimeout(() => resolve(JSON.parse(atob(token.split('.')[1]))), 1000)
-      );
-      return response;
+                return error
+            })
+            return response;
+    //   const response:IUser = await new Promise((resolve) =>
+    //   // --- Gọi API ---
+
+    //     setTimeout(() => resolve(JSON.parse(atob(token.split('.')[1]))), 1000)
+    //   );
     }
   );
   
@@ -95,9 +115,22 @@ const authSlice = createSlice({
            })
            .addCase(refreshToken.fulfilled, (state, action: PayloadAction<IUser>) => {
                 state.logging = false
-                state.isLogin = true
-                state.infoData = action.payload
-           });
+                if (action.payload.code != 'ERR_BAD_REQUEST') {
+                    state.isLogin = true
+                    state.infoData = action.payload
+                }
+                else {
+                    localStorage.clear();
+                }
+           })
+           .addCase(refreshToken.rejected, (state) => {
+                state.infoData = undefined,
+                state.loginError.messageError = ""
+                state.loginError.typeError = ""
+                state.logging = false
+                state.isLogin = false
+            })
+           
        }
 })
 

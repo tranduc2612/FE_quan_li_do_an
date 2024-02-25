@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-export const BASE_URL_MEDIA = 'https://jsonplaceholder.typicode.com/'
+export const BASE_URL_MEDIA = 'https://localhost:7274/api/'
 
 const request = axios.create({
     baseURL: BASE_URL_MEDIA,
@@ -7,7 +7,9 @@ const request = axios.create({
 
 // Add a request interceptor
 request.interceptors.request.use(function (config) {
-    console.log(config,"ádkasdlas")
+    const token = String(localStorage.getItem("access_token"));
+    config.headers.Authorization = "Bearer " + token;
+    config.headers["Content-Type"] = "application/json";
     // Do something before request is sent
     return config;
   }, function (error) {

@@ -10,12 +10,12 @@ type IProps = {
 
 function DefaulLayout({ children }: IProps) {
     return (<>
-        <div className="grid grid-cols-12">
-            <div className="side_bar h-full col-span-1 max-w-20 z-50">
+        <div className="grid grid-cols-24">
+            <div className="side_bar h-full col-span-1 max-w-16 z-50">
                 <SideBar />
             </div>
-            <div className="content container h-full col-span-11 z-50">
-                <div className="pb-8 mt-10 me-5 overflow-scroll h-screen">
+            <div className="content container h-full min-w-full col-span-23 z-50">
+                <div className="pb-8 px-4 mt-10 overflow-scroll h-screen">
                     {children}
                 </div>
             </div>

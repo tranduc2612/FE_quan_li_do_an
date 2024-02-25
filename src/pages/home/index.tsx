@@ -40,7 +40,7 @@ function Home() {
     }
     return (
         <div>
-            <BoxWrapper classStyle={""}>
+            <BoxWrapper className={""}>
             {/* <button className="bg-blue-700 ms-3 p-6 rounded-xl" onClick={handleClick}>Click</button>
             <button className="bg-blue-700 ms-3 p-6 rounded-xl" type="button" onClick={handleLogout}>logout</button> */}
 

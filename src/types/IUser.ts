@@ -3,8 +3,10 @@ interface IUser {
     username?: string,
     email?: string,
     gender?: string
-    firstName?: string,
-    lastName?: string,
-    image?:string,
+    fullname?: string,
+    role?:string,
+    code?:string,
+    avatar?:string,
     token?:string,
+    refreshToken?:string
 }

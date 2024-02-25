@@ -6,116 +6,197 @@ import AccordionCustom from "~/components/AccordionCustom";
 import InputCustom from "~/components/InputCustom";
 import { useState } from "react";
 import ButtonCustom from "~/components/ButtonCustom";
-
+import BoxWrapper from "~/components/BoxWrap";
+import { Popper,Box, TextField, OutlinedInput, Button } from "@mui/material";
+import HeaderPageTitle from "~/components/HeaderPageTitle";
+import { Pencil, TrashCanOutline } from "mdi-material-ui";
+import ModalCustom from "~/components/Modal";
+import { useFormik } from "formik";
+import * as yup from 'yup';
 
 const keyPost = '/api/user/123';
 const cx = classNames.bind(style);
 
+const validationSchema = yup.object({
+    password: yup
+      .string()
+      .required('Mật khẩu không được để trống'),
+    new_password: yup
+      .string()
+      .required('Mật khẩu không được để trống'),
+    new_password_2: yup
+      .string()
+      .required('Mật khẩu không được để trống')
+      .oneOf([yup.ref('new_password')], 'Mật khẩu không khớp'),
+    
+  });
+
 function Profile() {
-    const [currentPassword, setCurrentPassword] = useState({
-        value: "",
-        isError: false,
-        msg: ""
-    })
-    const [newPassword, setNewPassword] = useState({
-        value: "",
-        isError: false,
-        msg: ""
-    })
-    const [newPassword2, setNewPassword2] = useState({
-        value: "",
-        isError: false,
-        msg: ""
-    })
+    // const [showAccountModal,setShowAccountModal] = useState(false);
+    // const [showRoleModal,setRoleModal] = useState(false);
+
+    const formik = useFormik({
+        initialValues: {
+          password: "",
+          new_password:"",
+          new_password_2:""
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+          console.log(values);
+        },
+      });
 
     const navigate = useNavigate();
-
     const dispatch = useAppDispatch();
 
 
+
     return (<>
-        <div className={"w-full mb-5 shadow-md-light rounded-md p-8 bg-[#fff] opacity-90"}>
-            <div className="mb-8">
-                <h2 className={"font-bold text-[#333] text-xl"}>
-                    Thông tin tài khoản
-                </h2>
+        <HeaderPageTitle pageName="Trang cá nhân" />
+        <BoxWrapper className={" mb-5"}>
+            <div>
+                <div className="relative mb-8">
+                    <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
+                        Thông tin tài khoản
+                    </h2>
+                    {/* <ModalCustom 
+                        id={"1"} 
+                        className="" 
+                        title="Chỉnh sửa thông tin tài khoản" 
+                        open={showAccountModal} 
+                        handleSave={()=>{}} 
+                        handleClose={()=>{
+                            setShowAccountModal(false);
+                        }}>
+                        <div className="">
+                            <form action="">
+                                <div className="mb-6">
+                                    <InputCustom 
+                                        label={"Họ và tên"} 
+                                        value={""} 
+                                        name={""} 
+                                        isError={false} 
+                                        errorMessage={"sâdssasd"} 
+                                        onChange={function (value: string): void {
+                                            throw new Error("Function not implemented.");
+                                        }} 
+                                    />
+                                </div>
+                                
 
-                <div className={"grid grid-cols-9 mt-2"}>
-                    <div className={"col-span-3 m-2"}>
-                        <b>Họ và tên:</b> Trần Minh Đức
+
+
+                                <div className="mb-6">
+                                    <OutlinedInput placeholder="Please enter text" />
+                                </div>
+                            </form>    
+                        </div>
+                    </ModalCustom> */}
+
+
+                    <div className="absolute right-0 top-0 flex tools">
+                        <div className="flex items-center cursor-pointer p-2 rounded-full text-3xl me-2 hover:bg-gray-200"
+                            onClick={()=>{
+                                navigate("/profile/input/ductm")
+                                // setShowAccountModal(true);
+                            }}
+                        >
+                            <Pencil className="text-primary-blue" />
+                        </div>
                     </div>
 
-                    <div className={"col-span-3 m-2"}>
-                        <b>Ngày sinh:</b> 26/12/2002
-                    </div>
+                    <div className={"grid grid-cols-9"}>
+                        <div className={"col-span-3 m-2"}>
+                            <b>Họ và tên:</b> <span className={"text-text-color"}>Trần Minh Đức</span> 
+                        </div>
 
-                    <div className={"col-span-3 m-2"}>
-                        <b>Email:</b> mintduc2612@gmail.com
-                    </div>
+                        <div className={"col-span-3 m-2"}>
+                            <b>Ngày sinh:</b> <span className={"text-text-color"}>26/12/2002</span> 
+                        </div>
 
-                    <div className={"col-span-3 m-2"}>
-                        <b>Số điện thoại:</b> 0367218700
-                    </div>
+                        <div className={"col-span-3 m-2"}>
+                            <b>Email:</b> <span className={"text-text-color"}>mintduc2612@gmail.com</span> 
+                        </div>
 
-                    <div className={"col-span-3 m-2"}>
-                        <b>Vai trò:</b> Sinh viên
+                        <div className={"col-span-3 m-2"}>
+                            <b>Số điện thoại:</b> <span className={"text-text-color"}>0367218700</span> 
+                        </div>
+
+                        <div className={"col-span-3 m-2"}>
+                            <b>Vai trò:</b> <span className={"text-text-color"}>Sinh viên</span> 
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative mb-8">
+                    <h2 className={"font-bold text-primary-blue text-xl"}>
+                        Thông tin sinh viên
+                    </h2>
+
+                    <div className={"grid grid-cols-9 mt-2"}>
+                        <div className={"col-span-3 m-2"}>
+                            <b>Mã sinh viên:</b> <span className={"text-text-color"}>201210096</span>
+                        </div>
+
+                        <div className={"col-span-3 m-2"}>
+                            <b>Chuyên nghành:</b> <span className={"text-text-color"}>Công nghệ phần mềm</span> 
+                        </div>
+
+                        <div className={"col-span-3 m-2"}>
+                            <b>Trạng thái làm đồ án:</b> <span className={"text-text-color"}>Bảo lưu || Đang làm đồ án || Đã bảo vệ || chưa bảo vệ</span> 
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div className="mb-8">
-                <h2 className={"font-bold text-[#333] text-xl"}>
-                    Thông tin sinh viên
-                </h2>
-
-                <div className={"grid grid-cols-9 mt-2"}>
-                    <div className={"col-span-3 m-2"}>
-                        <b>Mã sinh viên:</b> 201210096
-                    </div>
-
-                    <div className={"col-span-3 m-2"}>
-                        <b>Chuyên nghành:</b> Công nghệ phần mềm
-                    </div>
-
-                    <div className={"col-span-3 m-2"}>
-                        <b>Trạng thái làm đồ án:</b> Bảo lưu || Đang làm đồ án || Đã bảo vệ || chưa bảo vệ
-                    </div>
-                </div>
-            </div>
-        </div>
+        </BoxWrapper>
 
         <AccordionCustom header={"Đổi mật khẩu"}>
-            <div>
+            <form onSubmit={formik.handleSubmit}>
                 <div className={"mb-4"}>
-                    <InputCustom label={"Mật khẩu hiện tại"} name={"currentPassword"} value={currentPassword.value} isError={currentPassword.isError} errorMessage={currentPassword.msg} onChange={(value) => {
-                        setCurrentPassword({
-                            ...currentPassword,
-                            value
-                        });
-                    }} />
-                    <InputCustom label={"Mật khẩu mới"} name={"newPassword"} value={newPassword.value} isError={newPassword.isError} errorMessage={newPassword.msg} onChange={(value) => {
-                        setNewPassword({
-                            ...currentPassword,
-                            value
-                        });
-                    }} />
-                    <InputCustom label={"Nhập lại mật khẩu mới"} name={"newPasswordAgain"} value={newPassword2.value} isError={newPassword2.isError} errorMessage={newPassword2.msg} onChange={(value) => {
-                        setNewPassword2({
-                            ...newPassword2,
-                            value
-                        });
-                    }} />
+                    <InputCustom
+                        id="password" 
+                        label={"Mật khẩu hiện tại"} 
+                        name={"password"}
+                        value={formik.values.password} 
+                        isError={formik.touched.password && Boolean(formik.errors.password)} 
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        errorMessage={formik.touched.password && formik.errors.password} 
+                    />
+                </div>
+
+                <div className={"mb-4"}>
+                    <InputCustom
+                        id="new_password" 
+                        label={"Mật khẩu mới"} 
+                        name={"new_password"}
+                        value={formik.values.new_password} 
+                        isError={formik.touched.new_password && Boolean(formik.errors.new_password)} 
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        errorMessage={formik.touched.new_password && formik.errors.new_password} 
+                    />
+                </div>
+
+                <div className={"mb-4"}>
+                    <InputCustom
+                        id="new_password_2" 
+                        label={"Nhập lại mật khẩu mới"} 
+                        name={"new_password_2"}
+                        value={formik.values.new_password_2} 
+                        isError={formik.touched.new_password_2 && Boolean(formik.errors.new_password_2)} 
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        errorMessage={formik.touched.new_password_2 && formik.errors.new_password_2} 
+                    />
                 </div>
 
 
 
-                <ButtonCustom label={"Đổi mật khẩu"} onClick={() => {
-                    console.log(currentPassword);
-                    console.log(newPassword);
-                    console.log(newPassword2);
-                }}></ButtonCustom>
+                <Button variant="contained" type="submit" fullWidth>Đổi mật khẩu</Button>
 
-            </div>
+            </form>
 
         </AccordionCustom>
     </>);

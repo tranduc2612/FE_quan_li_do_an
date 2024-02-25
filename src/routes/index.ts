@@ -1,7 +1,9 @@
 import { DefaultLayout,AuthLayout } from "~/components/Layouts"
 import { ForgetPass, HomePage, LoginPage, PlantPage, ProfilePage } from "~/pages"
-import DetailPlantDefault from "~/pages/plant/detail"
-import RegisterTopic from "~/pages/plant/detail/RegisterTopic"
+import DetailPlantDefault from "~/pages/plant/detail/News"
+import OutlinePage from "~/pages/plant/detail/Outline"
+import InputOutlinePage from "~/pages/plant/detail/Outline/input"
+import ProfileInput from "~/pages/profile/input"
 
 export const PUBLIC_ROUTER = [
     {
@@ -28,17 +30,32 @@ export const PRIVATE_ROUTER = [
         layout: DefaultLayout
     },
     {
+        path:"/profile/input/:id",
+        page: ProfileInput,
+        layout: DefaultLayout
+    },
+    {
         path:"/plant",
         page: PlantPage,
         layout: DefaultLayout
     },
     {
-        path:"/plant/detail/register-topic",
-        page: RegisterTopic,
+        path:"/plant/detail/outline/:id",
+        page: OutlinePage,
         layout: DefaultLayout
     },
     {
-        path:"/plant/detail",
+        path:"/plant/detail/outline/input",
+        page: InputOutlinePage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/plant/detail/outline/input/:id",
+        page: InputOutlinePage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/plant/detail/:id",
         page: DetailPlantDefault,
         layout: DefaultLayout
     }

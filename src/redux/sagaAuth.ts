@@ -8,7 +8,7 @@ function* logger(action: PayloadAction) {
 }
 
 const fetchApiAuth = async (payload: ILoginPayload): Promise<AxiosResponse> => {
-  const response = await axios.post('https://dummyjson.com/auth/login', { ...payload });
+  const response = await axios.post('https://localhost:7274/api/Auth/login', { ...payload });
     return response;
 };
 
@@ -17,27 +17,34 @@ function* handleLogin(payload: ILoginPayload) {
     const response: AxiosResponse = yield call(fetchApiAuth, payload);
     const dataRes = response.data;
     if(dataRes){
-      const dataUser: IUser = {
-        ...response.data
-      };
-      console.log(dataUser);
-      yield put(loginSucces(dataUser));
-      if(dataUser.token){
-          localStorage.setItem('access_token',dataUser.token)
-       }
+      if(!dataRes?.success){
+        yield put(loginFailed({
+          ...dataRes?.returnObj
+        }));
+      }else{
+        const dataUser: IUser = {
+          ...dataRes?.returnObj
+        };
+        yield put(loginSucces(dataUser));
+        if(dataUser.token){
+            localStorage.setItem('access_token',dataUser.token)
+        }
+        if(dataUser.refreshToken){
+          localStorage.setItem('refresh_token',dataUser.refreshToken)
+      }
+      }
     }else{
 
       yield put(loginFailed({
-        typeError: "username",
+        typeError: "System",
         messageError: dataRes.message
       }));
     }
-    console.log(payload, 'handle_login');
   } catch (error: any) {
 
     // Handle error if needed
     yield put(loginFailed({
-      typeError: "Error System",
+      typeError: "Error",
       messageError: error.message
     }));
 

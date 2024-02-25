@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import images from "~/assets";
 import { useAppDispatch, useAppSelector } from "~/redux/hook";
 import { ILoginPayload, errorLogging, inforUser, isError, isLogin, logging, login, logout } from "~/redux/slices/authSlice";
 import { decrement, increment, selectCount } from "~/redux/slices/counterSlice";
-
+import { useFormik } from "formik";
+import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
 import ButtonCustom from "~/components/ButtonCustom";
 import Loading from "~/components/Loading";
-
+import { Button } from "@mui/material";
+import { FormikHelpers } from 'formik';
 type IObjectField = {
     value: string
 }
@@ -18,8 +20,18 @@ type IStateForm = {
     password: IObjectField
 }
 
+const validationSchema = yup.object({
+    username: yup
+      .string()
+      .required('Tài khoản không được để trống'),
+    password: yup
+      .string()
+      .required('Mật khẩu không được để trống'),
+    
+  });
+
 function LoginPage() {
-    const count = useAppSelector(selectCount);
+    const [loadSubmit,setLoadSubmit] = useState(0);
     const isLoginUser = useAppSelector(isLogin);
     const isLogging = useAppSelector(logging);
     const isErrorLogin = useAppSelector(isError);
@@ -34,22 +46,22 @@ function LoginPage() {
         password: undefined
     })
 
-    // const [formLogin, setFormLogin] = useState<ILoginPayload>({
-    //     username: "",
-    //     password: ""
-    // })
+    useEffect(()=>{
+        formik.setErrors({[errorLoginUser.typeError]:errorLoginUser.messageError})
+    },[loadSubmit,errorLoginUser])
 
-    const handleDecrement = () => {
-        console.log(currentUser);
-        dispatch(decrement())
-    }
-    const handleIncrement = () => {
-        dispatch(increment())
-    }
-
-    const handleLogin = () => {
-        dispatch(login(formLogin))
-    }
+    const formik = useFormik({
+        initialValues: {
+            username:"",
+            password: "",
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values, { setSubmitting, setErrors, setStatus }) => {
+          dispatch(login(values));
+          setSubmitting(false);
+          setLoadSubmit(loadSubmit+1)
+        },
+    });
 
 
 
@@ -65,7 +77,7 @@ function LoginPage() {
 
 
 
-        <div className="shadow-default rounded-md absolute left-1/2 top-1/2 -translate-x-2/4 -translate-y-2/4 w-3/12 h-3/12 min-h-90 bg-white z-30 p-10 flex items-center">
+        <div className="shadow-default rounded-md absolute left-1/2 top-1/2 -translate-x-2/4 -translate-y-2/4 w-3/12 h-3/12 min-h-90 bg-white z-30 p-8 flex items-center">
             <div className="box__authen flex justify-center items-center flex-col">
 
                 <img className="w-4/12 mt-5 mb-5" src={images.logo.logo_default} alt="" />
@@ -75,35 +87,30 @@ function LoginPage() {
                     <h1 className="font-bold">HỆ THỐNG QUẢN LÝ ĐỒ ÁN</h1>
                 </div>
 
-                <form className="form flex justify-center flex-col w-full mt-5 mb-5">
+                <form className="form flex justify-center flex-col w-full mt-5 mb-5" onSubmit={formik.handleSubmit}>
                     <InputCustom
-                        name={"account"}
+                        id={"username"}
                         label="Tài khoản"
-                        isError={isErrorLogin && errorLoginUser.typeError == "Error System" ? true : false}
-                        errorMessage={isErrorLogin && errorLoginUser.typeError == "Error System" ? errorLoginUser.messageError : ""}
-                        value={formLogin.username || ""}
-                        onChange={(value: string) => {
-                            setFormLogin({
-                                ...formLogin,
-                                username: value
-                            })
-                        }}
+                        name={"username"}
+                        value={formik.values.username} 
+                        isError={formik.touched.username && Boolean(formik.errors.username)} 
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        errorMessage={formik.touched.username && formik.errors.username} 
                     />
+
                     <InputCustom
-                        name={"password"}
+                        id={"password"}
                         label="Mật khẩu"
-                        isError={isErrorLogin && errorLoginUser.typeError == "password" ? true : false}
-                        errorMessage={isErrorLogin && errorLoginUser.typeError == "password" ? errorLoginUser.messageError : ""}
-                        value={formLogin.password || ""}
-                        onChange={(value: string) => {
-                            setFormLogin({
-                                ...formLogin,
-                                password: value
-                            })
-                        }}
+                        name={"password"}
+                        value={formik.values.password} 
+                        isError={formik.touched.password && Boolean(formik.errors.password)} 
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        errorMessage={formik.touched.password && formik.errors.password} 
                     />
                     <Link to="/forget-password" className="mb-6 self-end">Quên mật khẩu</Link>
-                    <ButtonCustom label="Đăng nhập" onClick={handleLogin} />
+                    <Button variant="contained" type="submit">Đăng nhập</Button>
                 </form>
             </div>
         </div>

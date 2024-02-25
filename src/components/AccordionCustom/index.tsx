@@ -16,9 +16,11 @@ function AccordionCustom({ header, children }: IProps) {
         setActive(!active)
     }
 
-    return (<div className="shadow-md-light rounded-md">
-        <div className="accordion_header flex items-center justify-between rounded-md cursor-pointer ps-5 px-4 py-3 z-50" onClick={handleToggleContent}>
-            <span className="text-[#333] font-bold text-2xl">{header}</span>
+    return (<div className="relative shadow-md-light rounded-md">
+            <div className="absolute rounded-xl top-0 overlay w-full h-full  bg-[#fff] z-0 opacity-90" />
+
+        <div className="relative accordion_header flex items-center justify-between rounded-md cursor-pointer ps-5 px-4 py-3 z-50" onClick={handleToggleContent}>
+            <span className="text-primary-blue font-bold text-xl">{header}</span>
 
             <div className={cx("accordion_icon", "inline-block", {
                 active

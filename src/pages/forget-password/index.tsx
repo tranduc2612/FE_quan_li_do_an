@@ -53,7 +53,7 @@ function ForgetPassword() {
 
 
 
-        <BoxWrapper classStyle="absolute left-1/2 top-1/2 -translate-x-2/4 -translate-y-2/4 w-3/12 h-3/12 min-h-90 bg-white z-30 p-10 flex items-center">
+        <BoxWrapper className="absolute left-1/2 top-1/2 -translate-x-2/4 -translate-y-2/4 w-3/12 h-3/12 min-h-90 bg-white z-30 p-10 flex items-center">
             <div className="box__authen flex justify-center items-center flex-col">
 
                 <img className="w-4/12 mt-5 mb-5" src={images.logo.logo_default} alt="" />
