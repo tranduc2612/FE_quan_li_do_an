@@ -22,7 +22,8 @@ export interface IErrorPayload{
 
 export interface ILoginPayload{
     username?: string,
-    password?: string
+    password?: string,
+    role?: "STUDENT" | "TEACHER"
 }
 
 const initialUser: IUserInfo = {
@@ -36,7 +37,7 @@ const initialUser: IUserInfo = {
     
     infoData: {
         id: undefined,
-        username: undefined,
+        userName: undefined,
         email: undefined,
         gender: undefined,
         fullname: undefined,

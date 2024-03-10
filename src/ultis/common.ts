@@ -1,3 +1,24 @@
+const diacriticMap: { [key: string]: string } = {
+    'á': 'a',
+    'à': 'a',
+    'ả': 'a',
+    'ã': 'a',
+    'ạ': 'a',
+    'â': 'a',
+    'ấ': 'a',
+    'ầ': 'a',
+    'ẩ': 'a',
+    'ẫ': 'a',
+    'ậ': 'a',
+    'ă': 'a',
+    'ắ': 'a',
+    'ằ': 'a',
+    'ẳ': 'a',
+    'ẵ': 'a',
+    'ặ': 'a',
+    // Thêm các ánh xạ cho các ký tự tiếng Việt khác ở đây
+  };
+
 export function getCurrentUrl():string{
     const {
         host, hostname, href, origin, pathname, port, protocol, search
@@ -54,4 +75,28 @@ export function formatDateType2(date:any){
     }else{
         return `${day}/${month}/${data.getFullYear()}`;
     }
+}
+
+export function formatFullnameToUsername(fullname:string){
+    var AccentsMap = [
+        "aàảãáạăằẳẵắặâầẩẫấậ",
+        "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
+        "dđ", "DĐ",
+        "eèẻẽéẹêềểễếệ",
+        "EÈẺẼÉẸÊỀỂỄẾỆ",
+        "iìỉĩíị",
+        "IÌỈĨÍỊ",
+        "oòỏõóọôồổỗốộơờởỡớợ",
+        "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
+        "uùủũúụưừửữứự",
+        "UÙỦŨÚỤƯỪỬỮỨỰ",
+        "yỳỷỹýỵ",
+        "YỲỶỸÝỴ"    
+      ];
+      for (var i=0; i<AccentsMap.length; i++) {
+        var re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
+        var char = AccentsMap[i][0];
+        fullname = fullname.replace(re, char);
+      }
+      return fullname.replace(/\s/g, '');
 }

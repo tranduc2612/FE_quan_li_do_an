@@ -53,7 +53,7 @@ function OutlinePage() {
       ];
 
     return ( <>
-        <HeaderPageTitle pageName="Kế hoạch" pageChild="Đề cương đồ án" />
+        <HeaderPageTitle pageName="Đề cương đồ án"/>
         <BoxWrapper className={""}>
             <div>
                 <div className="flex justify-between w-full mb-5">
@@ -61,7 +61,7 @@ function OutlinePage() {
                             Quay lại
                     </Button>
                     <div>
-                        <div className="flex items-center p-2 rounded-full text-3xl me-2 hover:bg-gray-200" onClick={()=>{navigate("/plant/detail/outline/input")}}>
+                        <div className="flex items-center p-2 rounded-full text-3xl me-2 hover:bg-gray-200" onClick={()=>{navigate("/outline/input")}}>
                             <Pencil className="text-primary-blue cursor-pointer" />
                         </div>
                         {/* <Button onClick={()=>{navigate(-1)}} variant="contained" startIcon={<PrinterCheck />}>
@@ -137,14 +137,12 @@ function OutlinePage() {
                         <TableCustom
                             editMode={undefined}
                             hidePagination={true}
-                            initalRows={
-                                {
-                                    content: "",
-                                    timeStart: new Date(),
-                                    timeEnd: new Date(),
-                                    note: "",
-                                }
-                            }
+                            initalRows={{
+                                content: "",
+                                timeStart: new Date(),
+                                timeEnd: new Date(),
+                                note: "",
+                            }}
                             // editMode="row"
                             valueRows={initialRows}
                             columns={[
@@ -195,8 +193,7 @@ function OutlinePage() {
                                     renderEditCell: (props) => <><CustomEditComponent {...props} />
                                     </>
                                 },
-                            ]}                        
-                            /> 
+                            ]} pageSize={99} page={0}                            /> 
                     </div>
                           
                 </div>

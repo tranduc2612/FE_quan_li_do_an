@@ -5,12 +5,12 @@ import { useAppSelector } from "./redux/hook";
 import { isLogin,inforUser } from "./redux/slices/authSlice";
 import NotFound from "./pages/notfound";
 import { DefaultLayout } from "./components/Layouts";
-
+import { ToastContainer, toast } from 'react-toastify';
 
 function App() {
   const isLoginUser = useAppSelector(isLogin);
-  const ìnoUser = useAppSelector(inforUser);
-  console.log(ìnoUser)
+  const info = useAppSelector(inforUser);
+  console.log(info)
   return (
     <>
       <Router>
@@ -49,6 +49,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <ToastContainer className={"text-md font-medium text-[#333]"} />
     </>
   )
 }

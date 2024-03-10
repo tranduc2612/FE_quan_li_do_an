@@ -1,6 +1,6 @@
 import { Fetcher } from "swr";
 import request from "~/services/axios";
-import { IPosts } from "~/types/IBlog";
+import { IPosts } from "~/types/IBlogType";
 
 export const getAllPosts = async () => {
     const data:any = await request.get("/posts");

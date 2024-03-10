@@ -9,7 +9,7 @@ function* logger(action: PayloadAction) {
 
 const fetchApiAuth = async (payload: ILoginPayload): Promise<AxiosResponse> => {
   const response = await axios.post('https://localhost:7274/api/Auth/login', { ...payload });
-    return response;
+  return response;
 };
 
 function* handleLogin(payload: ILoginPayload) {

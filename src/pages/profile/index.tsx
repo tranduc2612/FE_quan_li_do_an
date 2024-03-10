@@ -28,7 +28,6 @@ const validationSchema = yup.object({
       .string()
       .required('Mật khẩu không được để trống')
       .oneOf([yup.ref('new_password')], 'Mật khẩu không khớp'),
-    
   });
 
 function Profile() {
@@ -49,7 +48,7 @@ function Profile() {
 
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
+      
 
 
     return (<>
@@ -190,6 +189,8 @@ function Profile() {
                         onBlur={formik.handleBlur}
                         errorMessage={formik.touched.new_password_2 && formik.errors.new_password_2} 
                     />
+
+                    
                 </div>
 
 

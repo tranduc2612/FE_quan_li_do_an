@@ -8,7 +8,7 @@ function InputOutlinePage() {
     const navigate = useNavigate();
 
     return ( <>
-        <HeaderPageTitle pageName="Kế hoạch" pageChild="Đề cương đồ án" />
+        <HeaderPageTitle pageName="Đề cương đồ án" />
         <BoxWrapper className={""}>
             <div>
                 <div className="flex justify-between w-full mb-5">

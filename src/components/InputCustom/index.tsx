@@ -80,9 +80,9 @@ function InputCustom({
             value={value}
             type={type}
             name={name}
-            helperText={errorMessage}
             label={label}
             onChange={onChange}
+            helperText={errorMessage}
             onBlur={onBlur}
         >
             

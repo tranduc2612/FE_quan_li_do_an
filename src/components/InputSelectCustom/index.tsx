@@ -11,7 +11,9 @@ type IProps = {
     name: string,
     onChange: any,
     onBlur: any,
-    children:any
+    children:any,
+    defaultValue?:any,
+    isError?: boolean
 }
 
 const CssTextField = styled(Select)({
@@ -28,7 +30,9 @@ function InputSelectCustom({
     children,
     onChange,
     onBlur,
-    placeholder
+    placeholder,
+    defaultValue,
+    isError
 }: IProps) {
 
     return (<>
@@ -44,6 +48,8 @@ function InputSelectCustom({
             onChange={onChange}
             placeholder={placeholder}
             onBlur={onBlur}
+            defaultValue={defaultValue}
+            error={isError}
         >
             {children}
         </CssTextField>

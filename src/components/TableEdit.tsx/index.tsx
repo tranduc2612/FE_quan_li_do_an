@@ -17,11 +17,13 @@ import {
   GridEventListener,
   GridRowId,
   GridRowModel,
-  GridRowEditStopReasons
+  GridRowEditStopReasons,
+  viVN,
+  GridPaginationModel
 } from '@mui/x-data-grid';
+import { Resistor } from 'mdi-material-ui';
 
 
-const roles = ['Market', 'Finance', 'Development'];
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -37,19 +39,64 @@ interface IProps{
     columns:GridColDef[],
     valueRows: GridRowsProp,
     initalRows: any,
-    hidePagination: boolean
+    hidePagination: boolean,
+    pageSize: number,
+    page:number,
+    dataFind?: any,
+    handleCallApi:(search:any)=>any
 }
 
 
 
-export default function TableCustom({valueRows,columns,editMode,initalRows,hidePagination}:IProps) {
-  const [rows, setRows] = React.useState(valueRows);
+export default function TableCustom({dataFind,columns,editMode,initalRows,hidePagination,pageSize,page,handleCallApi}:IProps) {
+  const [rows, setRows] = React.useState<any>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
-  
+  const mapPageToNextCursor = React.useRef<{ [page: number]: GridRowId }>({});
+
+  const [paginationModel, setPaginationModel] = React.useState({
+    pageSize: pageSize,
+    page: page,
+    total: 0
+  });
+
+  React.useEffect(()=>{
+    if(hanleFetchApi){
+      hanleFetchApi();
+    }
+  },[paginationModel.page])
+
+  const hanleFetchApi = () => {
+    handleCallApi({
+      pageSize: paginationModel.pageSize,
+      pageIndex:  paginationModel.page + 1,
+      ...dataFind
+    })
+    .then((res:any)=>{
+      console.log(res)
+      if(res.success && res.returnObj && res.returnObj.listResult) {
+        console.log(res.returnObj.listResult)
+        const dataMap = res.returnObj.listResult;
+        setPaginationModel({
+          ...paginationModel,
+          total: res.returnObj.totalPage
+        })
+        const newMap = dataMap.map((data:any,index:any)=>{
+            return {
+              id: rows.length * paginationModel.page + index + 1,
+              ...data,
+            }
+        })
+        console.log(newMap)
+        setRows(newMap)
+      }
+    })
+  }
+
   const styled = {
     "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
       outline: "none !important",
    },
+
    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
      py: 1,
    },
@@ -59,7 +106,6 @@ export default function TableCustom({valueRows,columns,editMode,initalRows,hideP
    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
      py: '22px',
    },
-   
   }
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -126,6 +172,30 @@ function EditToolbar(props: EditToolbarProps) {
     setRowModesModel(newRowModesModel);
   };
 
+  const handlePaginationModelChange = async (newPaginationModel: GridPaginationModel) => {
+    // We have the cursor, we can allow the page transition.
+    setPaginationModel({
+      ...paginationModel,
+      page:newPaginationModel.page
+    })
+    // if (
+    //   newPaginationModel.page === 0 ||
+    //   mapPageToNextCursor.current[newPaginationModel.page - 1]
+    // ) {
+    //   setPaginationModel(newPaginationModel);
+    // }
+    // setPaginationModel({
+    //   page: page++,
+    //   pageSize: pageSize,
+    // })
+    // const data = handleCallApi(newPaginationModel);
+    // if(data.indexPage){
+    //   setPaginationModel({
+    //     page: data.indexPage,
+    //     pageSize: pageSize,
+    //   })
+    // }
+  };
   
 
   
@@ -203,12 +273,22 @@ function EditToolbar(props: EditToolbarProps) {
         rows={rows}
         columns={columnsTable}
         editMode={editMode}
+        rowCount={paginationModel.total}
+        // rowLength= {10}
+        // maxColumns= {1}
+        // autoPageSize
+        paginationModel={paginationModel}
+        onPaginationModelChange={handlePaginationModelChange}
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         getRowHeight={() => 'auto'}
         hideFooterPagination={hidePagination}
+        pageSizeOptions={[5, 10, 25]}
+        paginationMode="server"
+        // onPaginationModelChange={handlePaginationModelChange}
+        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
         slots={editMode ? {
           toolbar: EditToolbar,
         } : {}}

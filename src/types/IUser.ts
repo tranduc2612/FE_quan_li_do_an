@@ -1,6 +1,6 @@
 interface IUser {
     id?: string,
-    username?: string,
+    userName?: string,
     email?: string,
     gender?: string
     fullname?: string,
@@ -8,5 +8,6 @@ interface IUser {
     code?:string,
     avatar?:string,
     token?:string,
-    refreshToken?:string
+    refreshToken?:string,
+    isAdmin?:string
 }

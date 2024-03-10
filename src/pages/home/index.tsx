@@ -2,7 +2,7 @@ import useSWR, { mutate } from "swr";
 import { useAppDispatch } from "~/redux/hook";
 import { logout } from "~/redux/slices/authSlice";
 import { getAllPosts, handlePosts } from "~/services/blogsApi";
-import { IPosts } from "~/types/IBlog";
+import { IPosts } from "~/types/IBlogType";
 import classNames from "classnames/bind";
 import style from "./Home.module.scss"
 import { useNavigate } from "react-router-dom";

@@ -9,7 +9,7 @@ import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
 import ButtonCustom from "~/components/ButtonCustom";
 import Loading from "~/components/Loading";
-import { Button } from "@mui/material";
+import { Button, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { FormikHelpers } from 'formik';
 type IObjectField = {
     value: string
@@ -27,7 +27,8 @@ const validationSchema = yup.object({
     password: yup
       .string()
       .required('Mật khẩu không được để trống'),
-    
+      role: yup
+        .string()
   });
 
 function LoginPage() {
@@ -41,11 +42,6 @@ function LoginPage() {
     console.log(currentUser)
     const dispatch = useAppDispatch();
 
-    const [formLogin, setFormLogin] = useState<ILoginPayload>({
-        username: undefined,
-        password: undefined
-    })
-
     useEffect(()=>{
         formik.setErrors({[errorLoginUser.typeError]:errorLoginUser.messageError})
     },[loadSubmit,errorLoginUser])
@@ -54,9 +50,10 @@ function LoginPage() {
         initialValues: {
             username:"",
             password: "",
+            role:"STUDENT"
         },
         validationSchema: validationSchema,
-        onSubmit: async (values, { setSubmitting, setErrors, setStatus }) => {
+        onSubmit: async (values:ILoginPayload, { setSubmitting, setErrors, setStatus }) => {
           dispatch(login(values));
           setSubmitting(false);
           setLoadSubmit(loadSubmit+1)
@@ -109,6 +106,17 @@ function LoginPage() {
                         onBlur={formik.handleBlur}
                         errorMessage={formik.touched.password && formik.errors.password} 
                     />
+                    <div>
+                        <RadioGroup
+                            row
+                            name="role"
+                            onChange={formik.handleChange}
+                            defaultValue="STUDENT"
+                        >
+                            <FormControlLabel value="STUDENT" control={<Radio />} label="Sinh viên"/>
+                            <FormControlLabel value="TEACHER" control={<Radio />} label="Giảng viên" />
+                        </RadioGroup>
+                    </div>
                     <Link to="/forget-password" className="mb-6 self-end">Quên mật khẩu</Link>
                     <Button variant="contained" type="submit">Đăng nhập</Button>
                 </form>

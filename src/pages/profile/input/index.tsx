@@ -90,7 +90,7 @@ function ProfileInput() {
 
                                     <div className={"col-span-3 m-2"}>
                                         {/* <b>Ngày sinh:</b> <span className={"text-text-color"}>26/12/2002</span>  */}
-                                        <TimePickerCustom label="Ngày tháng năm sinh" initialValue={""} name={"DOB"} type={"DatePicker"} onChange={
+                                        <TimePickerCustom label="Ngày tháng năm sinh" initialValue={new Date()} name={"DOB"} type={"DatePicker"} onChange={
                                             (value)=>{
                                                 console.log(value);
                                             }
