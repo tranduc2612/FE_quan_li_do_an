@@ -169,8 +169,8 @@ function ProfileInput() {
                                             id={"major"}
                                             name={"major"}
                                             value={majorValue}
-                                            placeholder="Chuyên nghành"
-                                            label="Chuyên nghành"
+                                            placeholder="Chuyên ngành"
+                                            label="Chuyên ngành"
                                             onChange={(value:any) => {
                                                 setMajorValue(value.target.value);
                                             } } 

@@ -4,7 +4,6 @@ import InputSelectCustom from "~/components/InputSelectCustom";
 import { Button, FormHelperText, MenuItem, TextField } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from "react";
 import { formatFullnameToUsername } from "~/ultis/common";
 import TimePickerCustom from "~/components/InputTimePicker";
@@ -23,6 +22,9 @@ import { IClassificationType } from "~/types/IClassificationType";
 import { getListClassification } from "~/services/classificationApi";
 import LoadingData from "~/components/LoadingData";
 import { toast } from "react-toastify";
+import { addTeacher } from "~/services/teacherApi";
+import { ITeacher } from "~/types/ITeacherType";
+import { IMajorType } from "~/types/IMajorType";
 
 
 const validationSchema = yup.object({
@@ -30,21 +32,18 @@ const validationSchema = yup.object({
       .string()
       .required('Họ tên không được để trống')
       .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u,"Họ tên không được chứa kí tự đặc biệt"),
-    semester: yup
+    education: yup
       .string()
-      .required('Học kỳ không được để trống'),
+      .required('Học vấn không được để trống'),
     status: yup
       .string()
       .required('Trạng thái không được để trống'),
-    student_code: yup
+    major: yup
         .string()
-        .required('Mã sinh viên không được để trống'),
-    class: yup
+        .required('Chuyên ngành không được để trống'),
+    teacher_code: yup
         .string()
-        .required('Lớp không được để trống'),
-    schoolYear: yup
-        .string()
-        .required('Khóa không được để trống'),
+        .required('Mã giảng viên không được để trống'),
     phone: yup
         .string()
         .required('Số điện thoại không được để trống')
@@ -56,89 +55,62 @@ const validationSchema = yup.object({
 
   });
 
-  type IProp = {
-    setSwitchPageInput:(switchPage:boolean)=>void,
-    switchPageInput:boolean,
-    userSelect:IStudent,
-    setUserSelect:(student:IStudent)=>void
-  }
 
 
-function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserSelect}:IProp) {
+function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
     const [dateOfBirth,setDateOfBirth] = useState<any>(dayjs(new Date()));
     const [loading,setLoading] = useState(true);
     const infoUser = useAppSelector(inforUser);
     const [semesterOption,setSemesterOption] = useState<ISemester[]>();
     const [statusOption,setstatusOption] = useState<IClassificationType[]>();
-    const [initData,setInitData] = useState({
-        username:"",
-        fullname:"",
-        student_code: "",
-        status: "",
-        semester: "",
-        class: "",
-        schoolYear:"",
-        phone:"",
-        email:""
-  })
+    const [majorOptions,setMajorOptions] = useState<IMajorType[]>();
+
+    const [initData,setInitData] = useState()
 
 
     useEffect(()=>{
-        Promise.all([getListSemester(
-            {
-                semesterId: "",
-                nameSemester: ""
-            }
-        ),getListClassification({
+        Promise.all([getListClassification({
             typeCode: "STATUS_SYSTEM"
+        }),
+        getListMajor({
+            majorId:"",
+            majorName:""
         })])
         .then((responses:IResponse<any>[]) => {
         
-            const semesterRes = responses[0];
-            const statusRes = responses[1];
-            if(semesterRes.success && semesterRes.returnObj && semesterRes.returnObj.length > 0){
-                setSemesterOption(semesterRes.returnObj);
-                formik.values.semester = semesterRes ? semesterRes.returnObj[0].semesterId : ""
-                // formik.setValues({
-                //     ...formik.values,
-                //     semester: semesterRes ? semesterRes.returnObj[0].semesterId : "",
-                // });
-            }
+            const statusRes = responses[0];
+            const majorState:IResponse<IMajorType[]> = responses[1];
 
             if(statusRes.success && statusRes.returnObj && statusRes.returnObj.length > 0){
                 setstatusOption(statusRes.returnObj)
-                // formik.setValues({
-                //     ...formik.values,
-                //     status: !statusRes ? "" : statusRes.returnObj[0].code,
-                //   });
                 formik.values.status = statusRes ? statusRes.returnObj[0].code : "" 
             }
+            if(majorState.success && majorState.returnObj && majorState.returnObj.length > 0){
+                setMajorOptions(majorState.returnObj)
+                formik.values.major = majorState ? majorState.returnObj[0].majorId : "" 
+            }
+
+            formik.values.isAdmin = "0" 
             
             setLoading(false)
-          })
-        .then(()=>{
-            if(userSelect.userName){
-                const student:IStudent = userSelect;
-                formik.values.fullname = student.fullName || "";
-                setDateOfBirth(dayjs(student.dob)),
-                formik.values.phone = student.phone || "",
-                formik.values.email = student.email || "",
-                formik.values.status = student.status || "",
-                formik.values.student_code = student.studentCode || "",
-                formik.values.class = student.className || "",
-                formik.values.schoolYear = student.schoolYearName || "",
-                formik.values.semester = student?.project?.semester?.semesterId || ""
-            }
-        })  
+          })  
     },[]);
 
-    
-
     const formik = useFormik({
-        initialValues: initData,
+        initialValues: {
+            username:"",
+            fullname:"",
+            teacher_code: "",
+            status: "",
+            phone:"",
+            email:"",
+            education: "",
+            major:"",
+            isAdmin:""
+      },
         validationSchema: validationSchema,
         onSubmit: async (values,{ setSubmitting, setErrors, setStatus }) => {
-            const dataSubmit: IStudent = {
+            const dataSubmit: ITeacher = {
                 passwordText: `${dateOfBirth.$D}/${dateOfBirth.$M+1}/${dateOfBirth.$y}`,
                 fullName: values.fullname,
                 dob: new Date(dateOfBirth.$y,dateOfBirth.$M,dateOfBirth.$D+1),
@@ -148,12 +120,10 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 createdAt: new Date(),
                 createdBy: infoUser?.userName || "",
                 status: values.status,
-                studentCode: values.student_code,
-                className: values.class,
-                schoolYearName: values.schoolYear,
-                semesterId: values.semester
+                teacherCode: values.teacher_code,
+                isAdmin: values.isAdmin
             }
-            const data = await addStudent(dataSubmit);
+            const data = await addTeacher(dataSubmit);
             if(data.success){
                 setSwitchPageInput(false);
                 toast.success(data.msg)
@@ -176,31 +146,10 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
         <form action="" onSubmit={formik.handleSubmit}>
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12">
-                            <InputSelectCustom
-                                id={"semester"}
-                                name={"semester"}
-                                value={formik.values.semester} 
-                                onChange={formik.handleChange}
-                                placeholder="Học kỳ"
-                                label="Học kỳ"
-                                onBlur={undefined}
-                                isError={formik.touched.semester && Boolean(formik.errors.semester)}
-                            >
-                            {
-                                semesterOption && semesterOption.map(x=>{
-                                    return <MenuItem key={x.semesterId} value={x.semesterId}>{x.nameSemester}</MenuItem>
-                                })
-                            }
-                                {/* <MenuItem value={"2_2025_2026"}>Học kỳ 2 năm 2025-2026</MenuItem> */}
-                            </InputSelectCustom>
-                            <span className="text-red-600">{formik.errors.semester}</span>
-                        </div>
-
-                        <div className="col-span-12">
                             <TextField 
                                 id="username" 
                                 label="Tài khoản"
-                                value={formik.values.semester +"_"+ formatFullnameToUsername(formik.values.fullname) +"_"+ formik.values.student_code}
+                                value={formatFullnameToUsername(formik.values.fullname) +"_"+ formik.values.teacher_code}
                                 name="username"
                                 variant="outlined"
                                 InputProps={{
@@ -214,14 +163,14 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
 
                         <div className="col-span-12">
                             <InputCustom
-                                id={"student_code"}
-                                label="Mã sinh viên"
-                                name={"student_code"}
-                                value={formik.values.student_code} 
+                                id={"teacher_code"}
+                                label="Mã giảng viên"
+                                name={"teacher_code"}
+                                value={formik.values.teacher_code} 
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                isError={formik.touched.student_code && Boolean(formik.errors.student_code)} 
-                                errorMessage={formik.touched.student_code && formik.errors.student_code} 
+                                isError={formik.touched.teacher_code && Boolean(formik.errors.teacher_code)} 
+                                errorMessage={formik.touched.teacher_code && formik.errors.teacher_code} 
                             />
                         </div>
 
@@ -277,7 +226,7 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 />
                         </div>
 
-                        {/* <div className="col-span-12">
+                        <div className="col-span-12">
                             <InputSelectCustom
                                 id={"major"}
                                 name={"major"}
@@ -287,34 +236,39 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 label="Chuyên ngành"
                                 onBlur={undefined}
                             >
-                                <MenuItem value={"CNPM"}>Công nghệ phần mềm</MenuItem>
-                                <MenuItem value={"TTNT"}>Trí tuệ nhân tạo</MenuItem>
+                                    {
+                                        majorOptions && majorOptions.map((x)=>{
+                                            return <MenuItem key={x.majorId} value={x.majorId}>{x.majorName}</MenuItem>
+                                        })
+                                    }
                             </InputSelectCustom>
-                        </div> */}
+                        </div>
 
                         <div className="col-span-12">
-                            <InputCustom
-                                id={"schoolYear"}
-                                label="Khóa"
-                                name={"schoolYear"}
-                                value={formik.values.schoolYear} 
-                                isError={formik.touched.schoolYear && Boolean(formik.errors.schoolYear)} 
+                            <InputSelectCustom
+                                id={"isAdmin"}
+                                name={"isAdmin"}
                                 onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                errorMessage={formik.touched.schoolYear && formik.errors.schoolYear} 
-                            />
+                                value={formik.values.isAdmin}
+                                placeholder="Quyền"
+                                label="Quyền"
+                                onBlur={undefined}
+                            >
+                                <MenuItem value={"0"}>Giảng viên</MenuItem>
+                                <MenuItem value={"1"}>Quản trị viên</MenuItem>
+                            </InputSelectCustom>
                         </div>
 
                         <div className="col-span-12">
                             <InputCustom
-                                id={"class"}
-                                label="Lớp"
-                                name={"class"}
-                                value={formik.values.class} 
-                                isError={formik.touched.class && Boolean(formik.errors.class)} 
+                                id={"education"}
+                                label="Học vấn"
+                                name={"education"}
+                                value={formik.values.education} 
+                                isError={formik.touched.education && Boolean(formik.errors.education)} 
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                errorMessage={formik.touched.class && formik.errors.class} 
+                                errorMessage={formik.touched.education && formik.errors.education} 
                             />
                         </div>
 
@@ -344,11 +298,8 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                     <div className="flex justify-end mt-5">
                         <div className="flex">
                             <div className="me-2">
-                                <Button type="submit" variant="contained" startIcon={userSelect?.userName ? <CheckIcon /> : <AddIcon />}>
-                                    
-                                    {
-                                        userSelect?.userName ? "Lưu" : "Tạo"
-                                    }
+                                <Button type="submit" variant="contained" startIcon={<CheckIcon />}>
+                                    Lưu
                                 </Button>
                             </div>
                             <div>
@@ -367,4 +318,4 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
     </div> );
 }
 
-export default RegisterStudent;
+export default RegisterTeacher;

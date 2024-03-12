@@ -139,7 +139,7 @@ function Profile() {
                         </div>
 
                         <div className={"col-span-3 m-2"}>
-                            <b>Chuyên nghành:</b> <span className={"text-text-color"}>Công nghệ phần mềm</span> 
+                            <b>Chuyên ngành:</b> <span className={"text-text-color"}>Công nghệ phần mềm</span> 
                         </div>
 
                         <div className={"col-span-3 m-2"}>

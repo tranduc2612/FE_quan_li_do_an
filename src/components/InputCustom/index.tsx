@@ -30,7 +30,7 @@ const CssTextField = styled(TextField)({
     },
     '& label': {
         zIndex: '99',
-        color: '#333',
+        color: '#b8b8ba',
 
     },
     '& label.Mui-focused': {
