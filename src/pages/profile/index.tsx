@@ -150,7 +150,7 @@ function Profile() {
             </div>
         </BoxWrapper>
 
-        <AccordionCustom header={"Đổi mật khẩu"}>
+        <AccordionCustom header={"Đổi mật khẩu"} size="xl">
             <form onSubmit={formik.handleSubmit}>
                 <div className={"mb-4"}>
                     <InputCustom

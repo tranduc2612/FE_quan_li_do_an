@@ -84,6 +84,7 @@ function InputCustom({
             onChange={onChange}
             helperText={errorMessage}
             onBlur={onBlur}
+            fullWidth
         >
             
         </CssTextField>

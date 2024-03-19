@@ -6,7 +6,7 @@ import FormControl from '@mui/material/FormControl';
 type IProps = {
     id:string,
     label: string,
-    value?: string,
+    value?: any,
     placeholder: string
     name: string,
     onChange: any,

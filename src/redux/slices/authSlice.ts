@@ -40,7 +40,7 @@ const initialUser: IUserInfo = {
         userName: undefined,
         email: undefined,
         gender: undefined,
-        fullname: undefined,
+        fullName: undefined,
         role:undefined,
         code:undefined,
         avatar:undefined,

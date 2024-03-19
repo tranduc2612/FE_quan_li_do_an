@@ -5,6 +5,9 @@ import OutlinePage from "~/pages/outline"
 import InputOutlinePage from "~/pages/outline/input"
 import ProfileInput from "~/pages/profile/input"
 import PageMannger from "~/pages/manager"
+import SemesterPage from "~/pages/semester"
+import SemesterInput from "~/pages/semester/input"
+import DetailSemesterPage from "~/pages/semester/detail"
 
 export const PUBLIC_ROUTER = [
     {
@@ -60,9 +63,28 @@ export const PRIVATE_ROUTER = [
         page: DetailPlantDefault,
         layout: DefaultLayout
     },
+    
+]
+
+export const ADMIN_ROUTER = [
     {
         path:"/manager",
         page: PageMannger,
         layout: DefaultLayout
-    }
+    },
+    {
+        path:"/semester",
+        page: SemesterPage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/semester/detail/:id",
+        page: DetailSemesterPage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/semester/input",
+        page: SemesterInput,
+        layout: DefaultLayout
+    },
 ]

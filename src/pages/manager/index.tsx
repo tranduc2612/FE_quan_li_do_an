@@ -1,18 +1,21 @@
 import { useState } from "react";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
 import SidebarAdmin from "~/components/SidebarAdmin";
-import {AccountSchool,HumanMaleBoard,InvoiceClock,ChevronLeft,ChevronRight}  from 'mdi-material-ui'
+import {AccountSchool,HumanMaleBoard,InvoiceClock,ChevronLeft,ChevronRight,FormatListGroup}  from 'mdi-material-ui'
 import { FC } from "react"
 import BoxWrapper from "~/components/BoxWrap";
 import StudentManager from "./student";
 import TeacherMannager from "./teacher";
-import ProjectPlant from "./project-plant";
-
-
+import TemplateFile from "./template-file";
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+import GroupReviewOutlineManager from "./group-review-outline";
 export enum EnumPage{
     STUDENT,
     TEACHER,
-    PROJECT_PLANT
+    GROUP_REVIEW_OUTLINE,
+    TEMPLATE_FILE,
+    PARAM_SYSTEM
 }
 
 export interface IPageProps {
@@ -41,10 +44,22 @@ function PageMannger() {
             page:TeacherMannager
         },
         {
-            id:EnumPage.PROJECT_PLANT,
-            title:"Quản lý kế hoạch khoa",
-            icon: InvoiceClock,
-            page: ProjectPlant
+            id:EnumPage.GROUP_REVIEW_OUTLINE,
+            title:"Quản lý nhóm đọc duyệt",
+            icon: FormatListGroup,
+            page:GroupReviewOutlineManager
+        },
+        {
+            id:EnumPage.TEMPLATE_FILE,
+            title:"Quản lý biểu mẫu",
+            icon: TextSnippetIcon,
+            page: TemplateFile
+        },
+        {
+            id:EnumPage.PARAM_SYSTEM,
+            title:"Cấu hình tham số hệ thống",
+            icon: ViewHeadlineIcon,
+            page: TemplateFile
         }
     ]);
     const [expand,setExpand] = useState(true);
@@ -66,23 +81,22 @@ function PageMannger() {
                             <ChevronLeft className="absolute !w-8 !h-8 -right-2 top-3 bg-white rounded-full z-10"/> : 
                             <ChevronRight className="absolute !w-8 !h-8 -right-2 top-3 bg-white rounded-full z-10"/>
                         }
-                        
                     </div>
                   
 
                 </div>
                 <div className={`transition-all ease-in-out col-span-11 ${expand ? "col-span-9" : "col-span-11"}`}>
-                    <BoxWrapper className="max-h-full">
+                    {/* <BoxWrapper className="max-h-full"> */}
                         <div>
                             {pageItem.map(item=>{
-                                const Page = item.page;
+                                const Page:any = item.page;
                                 if(item.id === currentPage){
                                     return <Page key={item.id} setCurrentPage={setCurrentPage} />
                                 }
                                 return <div key={item.id}></div>
                             })}
                         </div>
-                    </BoxWrapper>
+                    {/* </BoxWrapper> */}
                 </div>
             </div>
         </div> 

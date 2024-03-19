@@ -1,3 +1,5 @@
+import dayjs,{ Dayjs,isDayjs } from 'dayjs';
+
 const diacriticMap: { [key: string]: string } = {
     'á': 'a',
     'à': 'a',
@@ -77,6 +79,19 @@ export function formatDateType2(date:any){
     }
 }
 
+export function formatDateTypeDateOnly(date:any){
+    if(!date) return null;
+    let data = new Date(date);
+    let current = new Date();
+    let hour = data.getHours() > 9 ? data.getHours() : `0${data.getHours()}`;
+    let minute =
+        data.getMinutes() > 9 ? data.getMinutes() : `0${data.getMinutes()}`;
+    let day = data.getDate() > 9 ? data.getDate() : `0${data.getDate()}`;
+    let month =
+        data.getMonth() + 1 > 9 ? data.getMonth() + 1 : `0${data.getMonth() + 1}`;
+    return `${day}/${month}/${data.getFullYear()}`;
+}
+
 export function formatFullnameToUsername(fullname:string){
     var AccentsMap = [
         "aàảãáạăằẳẵắặâầẩẫấậ",
@@ -100,3 +115,52 @@ export function formatFullnameToUsername(fullname:string){
       }
       return fullname.replace(/\s/g, '');
 }
+
+export function convertDayjsToDateTime(date:Dayjs){
+    if(!date || !isDayjs(date)){
+        return null;
+    }
+    const specificDate = new Date(date.year(),date.month(),date.date())
+    specificDate.setHours(date.hour() + date.utcOffset() / 60);       
+    specificDate.setMinutes(date.minute());    
+    specificDate.setSeconds(date.second());
+    return specificDate
+}
+
+export function convertDayjsToDate(date:Dayjs){
+    if(!date || !isDayjs(date)){
+        return null;
+    }
+    const specificDate = new Date(date.year(),date.month(),date.date()+1)
+    return specificDate
+}
+/*
+1 = fromDate nhỏ hơn toDate
+-1  = fromDate lớn hơn toDate
+0  = fromDate và toDate bằng nhau
+**/
+
+export function validateFromDateAndToDate(from:Date,to:Date){
+    if (from < to) {
+        return true; // fromDate nhỏ hơn toDate
+    } else if (from > to) {
+        return false; // fromDate lớn hơn toDate
+    } else {
+        return false; // fromDate và toDate bằng nhau
+    }
+}
+
+export function isCurrentTimeInRange(fromDate:Date, toDate:Date) {
+    if(!fromDate && !toDate){
+        return 
+    }
+    const currentTime = new Date(); // Lấy thời gian hiện tại
+  
+    if (toDate < currentTime) {
+        return -1; // toDate đã qua thời gian hiện tại
+      } else if (fromDate <= currentTime && toDate >= currentTime) {
+        return 0; // Thời gian hiện tại đang nằm trong khoảng
+      } else {
+        return 1; // Đang ở trong tương lai
+      }
+  }

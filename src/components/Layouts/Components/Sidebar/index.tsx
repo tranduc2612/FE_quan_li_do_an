@@ -1,4 +1,4 @@
-import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog } from 'mdi-material-ui'
+import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog,School } from 'mdi-material-ui'
 import { NavLink, useNavigate } from 'react-router-dom';
 import images from '~/assets';
 import { useAppDispatch, useAppSelector } from '~/redux/hook';
@@ -46,6 +46,12 @@ function SideBar({userName}:Iprops) {
             url:'/manager',
             title:"Quản trị",
             icon: Cog,
+            isAdmin: 1
+        },
+        {
+            url:'/semester',
+            title:"Quản lý học kỳ",
+            icon: School,
             isAdmin: 1
         },
     ]

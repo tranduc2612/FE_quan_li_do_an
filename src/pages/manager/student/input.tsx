@@ -15,7 +15,7 @@ import { inforUser } from "~/redux/slices/authSlice";
 import dayjs from "dayjs";
 import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
-import { getListSemester } from "~/services/semester";
+import { getListSemester } from "~/services/semesterApi";
 import { getListMajor } from "~/services/majorApi";
 import { IResponse } from "~/types/IResponse";
 import { ISemester } from "~/types/ISemesterType";
@@ -53,6 +53,13 @@ const validationSchema = yup.object({
         .string()
         .required('Email không được để trống')
         .email("Email không đúng định dạng"),
+    address: yup
+        .string()
+        .required('Địa chỉ không được để trống'),
+    gpa: yup
+        .string()
+        .required('Điểm GPA không được để trống')
+        .matches(/^([0-3](\.\d{1,2})?|4(\.0{1,2})?|5(\.0{1,2})?)$/, 'Điểm GPA không hợp lệ'),  
 
   });
 
@@ -79,7 +86,10 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
         class: "",
         schoolYear:"",
         phone:"",
-        email:""
+        email:"",
+        address:"",
+        gender: 0,
+        gpa: ""
   })
 
 
@@ -151,7 +161,10 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 studentCode: values.student_code,
                 className: values.class,
                 schoolYearName: values.schoolYear,
-                semesterId: values.semester
+                semesterId: values.semester,
+                address: values.address,
+                gender: values.gender,
+                gpa: Number(values.gpa),
             }
             const data = await addStudent(dataSubmit);
             if(data.success){
@@ -265,16 +278,47 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                         </div>
 
                         <div className="col-span-12">
-                            <TimePickerCustom label="Ngày tháng năm sinh" 
-                                initialValue={new Date()} 
-                                name={"DOB"} 
+                            <InputCustom
+                                id={"address"}
+                                label="Địa chỉ"
+                                name={"address"}
+                                value={formik.values.address} 
+                                isError={formik.touched.address && Boolean(formik.errors.address)} 
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                errorMessage={formik.touched.address && formik.errors.address} 
+                            />
+                        </div>
+
+                        <div className="col-span-12">
+                            <InputSelectCustom
+                                id={"gender"}
+                                name={"gender"}
+                                onChange={formik.handleChange}
+                                value={formik.values.gender}
+                                placeholder="Giới tính"
+                                label="Giới tính"
+                                onBlur={undefined}
+                                isError={formik.touched.gender && Boolean(formik.errors.gender)}
+
+                            >
+                                <MenuItem value={0}>Nam</MenuItem>
+                                <MenuItem value={1}>Nữ</MenuItem>
+                            </InputSelectCustom>
+                                <span className="text-red-600">{formik.errors.gender}</span>
+                        </div>
+
+                        <div className="col-span-12">
+                            <TimePickerCustom label="Ngày tháng năm sinh"
+                            // initialValue={new Date()} 
+                                name={"DOB"}
                                 type={"DatePicker"}
                                 disableFuture={true}
-                                maxDate={dayjs()} 
-                                onChange={(e)=>{
+                                maxDate={dayjs()}
+                                onChange={(e) => {
                                     setDateOfBirth(e);
-                                }} 
-                                />
+                                } } 
+                                value={dateOfBirth}                                />
                         </div>
 
                         {/* <div className="col-span-12">
@@ -315,6 +359,19 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 errorMessage={formik.touched.class && formik.errors.class} 
+                            />
+                        </div>
+
+                        <div className="col-span-12">
+                            <InputCustom
+                                id={"gpa"}
+                                label="Điểm GPA"
+                                name={"gpa"}
+                                value={formik.values.gpa} 
+                                isError={formik.touched.gpa && Boolean(formik.errors.gpa)} 
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                errorMessage={formik.touched.gpa && formik.errors.gpa} 
                             />
                         </div>
 

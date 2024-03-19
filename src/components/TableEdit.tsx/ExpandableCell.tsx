@@ -5,8 +5,12 @@ function ExpandableCell({ value }: GridRenderCellParams) {
     const [expanded, setExpanded] = React.useState(false);
   
     return (
-      <div className="break-words w-full">
-        {expanded ? value : value.toString().slice(0, 200)}
+      <div className="text-base p-3 break-words w-full">
+        <span style={{
+          whiteSpace: "pre-wrap"
+        }}>
+          {expanded ? value : value.toString().slice(0, 200)}
+        </span>
         {value.length > 200 && (
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
           <span

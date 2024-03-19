@@ -1,20 +1,45 @@
 .accordion_body {
-    padding-left: 2.3rem;
+    padding-left: 0rem;
     padding-top: 0rem;
     padding-right: 0rem;
     padding-bottom: 0rem;
     max-height: 0;
-    overflow: hidden;
-    transition: all ease-in-out .5s;
+    transition: all ease-out 0.7s;
 
-    &.active {
-        padding: 1rem 2.3rem;
+    &.xl{
+        // padding: 1rem 2.3rem;
         max-height: 400px;
+    }
+    &.xxl{
+        // padding: 1rem 2.3rem;
+        max-height: 600px;
+    }
+    &.xxxl{
+        // padding: 1rem 2.3rem;
+        max-height: 1000px;
+    }
+
+    &::-webkit-scrollbar {
+        border-radius: 0;
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #2074b0;
+    }
+    &::-webkit-scrollbar-track {
+        border-radius: 0;
+        background-color: rgba(0, 0, 0, 0);
     }
 }
 
+
+
+
+
 .accordion_icon {
-    transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275) .3s;
+    transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275) .9s;
     transform: rotate(180deg);
 
     &.active {

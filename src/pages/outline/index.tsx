@@ -134,7 +134,7 @@ function OutlinePage() {
                         
                     </div>
                     <div className={"px-32"}>
-                        <TableCustom
+                        {/* <TableCustom
                             editMode={undefined}
                             hidePagination={true}
                             initalRows={{
@@ -193,7 +193,9 @@ function OutlinePage() {
                                     renderEditCell: (props) => <><CustomEditComponent {...props} />
                                     </>
                                 },
-                            ]} pageSize={99} page={0}                            /> 
+                            ]} pageSize={99} page={0} handleCallApi={function (search: any) {
+                                throw new Error("Function not implemented.");
+                            }}                            />  */}
                     </div>
                           
                 </div>

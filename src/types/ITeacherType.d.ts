@@ -12,5 +12,7 @@ export interface ITeacher {
     isAdmin?:string,
     teacherCode?: string,
     majorId?: string,
-    education?:string
+    education?:string,
+    address?: string,
+    gender?:number
 }

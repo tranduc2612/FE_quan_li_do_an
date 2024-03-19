@@ -14,7 +14,7 @@ import { inforUser } from "~/redux/slices/authSlice";
 import dayjs from "dayjs";
 import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
-import { getListSemester } from "~/services/semester";
+import { getListSemester } from "~/services/semesterApi";
 import { getListMajor } from "~/services/majorApi";
 import { IResponse } from "~/types/IResponse";
 import { ISemester } from "~/types/ISemesterType";
@@ -35,6 +35,9 @@ const validationSchema = yup.object({
     education: yup
       .string()
       .required('Học vấn không được để trống'),
+    address: yup
+      .string()
+      .required('Địa chỉ không được để trống'),
     status: yup
       .string()
       .required('Trạng thái không được để trống'),
@@ -106,7 +109,9 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
             email:"",
             education: "",
             major:"",
-            isAdmin:""
+            isAdmin:"",
+            address:"",
+            gender:0
       },
         validationSchema: validationSchema,
         onSubmit: async (values,{ setSubmitting, setErrors, setStatus }) => {
@@ -121,7 +126,9 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
                 createdBy: infoUser?.userName || "",
                 status: values.status,
                 teacherCode: values.teacher_code,
-                isAdmin: values.isAdmin
+                isAdmin: values.isAdmin,
+                address: values.address,
+                gender: values.gender
             }
             const data = await addTeacher(dataSubmit);
             if(data.success){
@@ -189,6 +196,37 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
 
                         <div className="col-span-12">
                             <InputCustom
+                                id={"address"}
+                                label="Địa chỉ"
+                                name={"address"}
+                                value={formik.values.address} 
+                                isError={formik.touched.address && Boolean(formik.errors.address)} 
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                errorMessage={formik.touched.address && formik.errors.address} 
+                            />
+                        </div>
+
+                        <div className="col-span-12">
+                            <InputSelectCustom
+                                id={"gender"}
+                                name={"gender"}
+                                onChange={formik.handleChange}
+                                value={formik.values.gender}
+                                placeholder="Giới tính"
+                                label="Giới tính"
+                                onBlur={undefined}
+                                isError={formik.touched.gender && Boolean(formik.errors.gender)}
+
+                            >
+                                <MenuItem value={0}>Nam</MenuItem>
+                                <MenuItem value={1}>Nữ</MenuItem>
+                            </InputSelectCustom>
+                                <span className="text-red-600">{formik.errors.gender}</span>
+                        </div>
+
+                        <div className="col-span-12">
+                            <InputCustom
                                 id={"phone"}
                                 label="Số điện thoại"
                                 name={"phone"}
@@ -214,7 +252,8 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
                         </div>
 
                         <div className="col-span-12">
-                            <TimePickerCustom label="Ngày tháng năm sinh" 
+                            <TimePickerCustom label="Ngày tháng năm sinh"
+                                value={dateOfBirth} 
                                 initialValue={new Date()} 
                                 name={"DOB"} 
                                 type={"DatePicker"}

@@ -3,5 +3,6 @@ export interface ISemester{
     nameSemester?: string,
     fromDate?: Datetime,
     toDate?: Datetime,
-    scheduleSemesterId?: string
+    scheduleSemesterId?: string,
+    createdBy?: string
 }

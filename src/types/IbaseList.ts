@@ -1,5 +1,5 @@
 export interface IBaseList<T>{
-    totalPage: number,
+    totalItem: number,
     pageIndex: number,
     listResult: T[]
 }

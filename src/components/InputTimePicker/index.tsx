@@ -7,7 +7,6 @@ import { styled } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { viVN } from '@mui/x-date-pickers/locales';
 type IProps={
-    initialValue?:Date,
     label:string,
     name:string,
     defaultValue?:Dayjs,
@@ -15,6 +14,7 @@ type IProps={
     maxDate?:Dayjs,
     disableFuture?:boolean,
     disablePast?:boolean,
+    value: Dayjs | null,
     type: "DateTimePicker" | "DatePicker",
     onChange: (newValue: any)=>void
 }
@@ -30,7 +30,7 @@ const CssDatePicker = styled(DatePicker)({
 });
 
 function TimePickerCustom(props:IProps) {
-    const {type,initialValue,onChange,name,label,defaultValue,minDate,maxDate,disablePast,disableFuture} = props
+    const {type,onChange,name,label,defaultValue,minDate,maxDate,disablePast,disableFuture,value} = props
 
     const [error, setError] = useState<DateValidationError | DateTimeValidationError | null>(null);
 
@@ -50,14 +50,6 @@ function TimePickerCustom(props:IProps) {
         }
       }, [error]);
 
-
-    const [value,setValue] = useState<Dayjs | null>(()=>{
-        if(initialValue){
-            return dayjs(initialValue)
-        }
-
-        return dayjs(new Date().toUTCString())
-    })
 
     if(type === "DateTimePicker"){
         return ( <>
@@ -82,7 +74,6 @@ function TimePickerCustom(props:IProps) {
                         },
                     }}
                     onChange={(newValue) => {
-                        setValue(newValue);
                         onChange(newValue);
                     }}
             />
@@ -113,8 +104,8 @@ function TimePickerCustom(props:IProps) {
                 disablePast={disablePast}
 
                 onChange={(newValue:any) => {
-                    setValue(newValue);
-                    onChange(newValue); 
+                    console.log(newValue)
+                    onChange(newValue);
                 }}
             />
         )
