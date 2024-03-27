@@ -9,9 +9,9 @@ function ExpandableCell({ value }: GridRenderCellParams) {
         <span style={{
           whiteSpace: "pre-wrap"
         }}>
-          {expanded ? value : value.toString().slice(0, 200)}
+          {expanded ? value : value?.toString().slice(0, 200)}
         </span>
-        {value.length > 200 && (
+        {value?.length > 200 && (
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
           <span
             className="cursor-pointer text-xs underline text-primary-blue"

@@ -30,7 +30,7 @@ function DetailSemesterPage() {
         </BoxWrapper> */}
 
         <div className="mb-5">
-            <AccordionCustom header={<>
+            <AccordionCustom inititalToggle={true} header={<>
                     <div className="mb-5">
                         <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
                                 Quay lại
@@ -47,13 +47,13 @@ function DetailSemesterPage() {
         </div>
 
         <div className="mb-5">
-            <AccordionCustom header={"Danh sách nhóm đọc duyệt"} size={"xxl"}>
+            <AccordionCustom inititalToggle={true} header={"Danh sách nhóm đọc duyệt"} size={"xxl"}>
                 <GroupOutlineReview />
             </AccordionCustom>
         </div>
 
         <div className="mb-5">
-            <AccordionCustom header={"Danh sách hội đồng bảo vệ"} size={"xxxl"}>
+            <AccordionCustom inititalToggle={true} header={"Danh sách hội đồng bảo vệ"} size={"xxxl"}>
                 <h1>Hello</h1>
             </AccordionCustom>
         </div>

@@ -13,7 +13,8 @@ type IProps = {
     onBlur: any,
     children:any,
     defaultValue?:any,
-    isError?: boolean
+    isError?: boolean,
+    readOnly?:boolean
 }
 
 const CssTextField = styled(Select)({
@@ -32,9 +33,11 @@ function InputSelectCustom({
     onBlur,
     placeholder,
     defaultValue,
-    isError
+    isError,
+    readOnly
 }: IProps) {
-
+    
+    console.log(placeholder)
     return (<>
     <FormControl 
             fullWidth>
@@ -50,6 +53,7 @@ function InputSelectCustom({
             onBlur={onBlur}
             defaultValue={defaultValue}
             error={isError}
+            readOnly={readOnly}
         >
             {children}
         </CssTextField>

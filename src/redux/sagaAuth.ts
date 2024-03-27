@@ -2,6 +2,7 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { call, fork, put, take } from 'redux-saga/effects';
 import { ILoginPayload, login, loginFailed, loginSucces, logout } from './slices/authSlice';
 import axios, { AxiosResponse } from 'axios'; // Import AxiosResponse
+import { IUser } from '~/types/IUser';
 // worker Saga: will be fired on USER_FETCH_REQUESTED actions
 function* logger(action: PayloadAction) {
   console.log('log_saga', action);

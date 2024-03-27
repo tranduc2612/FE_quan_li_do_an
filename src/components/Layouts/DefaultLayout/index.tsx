@@ -11,12 +11,12 @@ type IProps = {
 }
 
 function DefaulLayout({ children }: IProps) {
-    const userName = useAppSelector(inforUser)?.userName;
+    const info = useAppSelector(inforUser);
 
     return (<>
         <div className="grid grid-cols-22">
             <div className="side_bar h-full col-span-1 max-w-20 z-50">
-                <SideBar userName={userName} />
+                <SideBar userName={info?.userName} />
 
             </div>
             <div className="content container h-full min-w-full col-span-21 z-50">

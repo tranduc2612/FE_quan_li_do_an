@@ -163,4 +163,70 @@ export function isCurrentTimeInRange(fromDate:Date, toDate:Date) {
       } else {
         return 1; // Đang ở trong tương lai
       }
-  }
+}
+
+export function renderRole(role:string){
+    if(role === "STUDENT"){
+        return "Sinh viên"
+    }
+    if(role === "TEACHER"){
+        return "Sinh viên"
+    }
+    return "Chưa xác định"
+}
+
+export function renderGender(gender?:number){
+    if(gender === 1){
+        return "Nữ"
+    }
+    if(gender === 0){
+        return "Nam"
+    }
+    return "Chưa xác định"
+}
+
+function caculatorTime(date: string): string {
+    const dateNow: Date = new Date();
+    const createdDate: Date = new Date(date);
+    
+    if(createdDate > dateNow) {
+        return "";
+    }
+
+    // Tính số giây trước
+    const numberSecond: number = Math.floor((dateNow.getTime() - createdDate.getTime()) / 1000);
+  
+    if (numberSecond < 60) {
+      return numberSecond + " giây trước";
+    }
+  
+    // Tính số phút trước
+    const numberMinus: number = Math.floor(numberSecond / 60);
+    if (numberMinus < 60) {
+      return numberMinus + " phút trước";
+    }
+  
+    // Tính số giờ trước
+    const numberHour: number = Math.floor(numberMinus / 60);
+    if (numberHour < 24) {
+      return numberHour + " giờ trước";
+    }
+  
+    // Tính số ngày trước
+    const numberDay: number = Math.floor(numberHour / 24);
+    if (numberDay < 30) {
+      return numberDay + " ngày trước";
+    }
+  
+    // Tính số tháng trước
+    const numberMonth: number = Math.floor(numberDay / 30);
+    return numberMonth + " tháng trước";
+}
+
+export function dateShowNotification(fromDate:any, toDate:any){
+    const timeCaculator = caculatorTime(fromDate);
+    const strFromDate = formatDateTypeDateOnly(fromDate);
+    const strToDate = formatDateTypeDateOnly(toDate);
+
+    return `${timeCaculator} (${strFromDate} - ${strToDate})` 
+}

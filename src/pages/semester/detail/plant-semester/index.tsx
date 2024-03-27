@@ -50,7 +50,7 @@ const randomRole = () => {
 //   }
 // ];
 
-interface EditToolbarProps {
+export interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
   setRowModesModel: (
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
@@ -87,7 +87,7 @@ const [flagEdit,setFlagEdit] = useState(false);
                             createdByName: item?.createdByNavigation?.fullName,
                             implementer: item?.implementer,
                             content: item?.content,
-                            note: item?.note,
+                            note: item?.note
                         }
                         initialRowsData.push(value);
                     })
@@ -192,9 +192,10 @@ const [flagEdit,setFlagEdit] = useState(false);
     const updatedRow:any = { ...newRow, isNew: false };
     console.log(updatedRow)
     const semesterId = id;
-    let check = false;
     const fromDate = updatedRow.fromDate;
     const toDate = updatedRow.toDate;
+    console.log(info?.userName)
+
     const result = validateFromDateAndToDate(fromDate,toDate);
     if(!result) {
         toast.warn("Thời gian không hợp lệ !")
@@ -211,6 +212,7 @@ const [flagEdit,setFlagEdit] = useState(false);
         content: updatedRow?.content,
         note: updatedRow?.note,
     }
+
     updateScheduleSemester(req)
         .then((res:IResponse<any>)=>{
             if(res.success){
@@ -363,9 +365,6 @@ const [flagEdit,setFlagEdit] = useState(false);
                 toolbar: { setRows, setRowModesModel },
             }}
         />
-
-
-    
     </div> );
 }
 

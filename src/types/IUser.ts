@@ -1,15 +1,30 @@
-interface IUser {
+import { IMajorType } from "./IMajorType";
+import { IProjecType } from "./IProjectType";
+
+export interface IUser {
     id?: string,
     userName?: string,
     email?: string,
-    gender?: string
+    gender?: number,
+    age?: number,
+    phone?: number,
+    dob?: string,
+    address?: string,
+    gpa?: string,
+    className?:string,
+    schoolYearName?:string,
+    studentCode?: string,
+    teacherCode?: string,
+    education?: string,
     fullName?: string,
-    role?:string,
+    role?: "TEACHER" | "STUDENT" | "ALL" | "ADMIN",
     code?:string,
     avatar?:string,
     token?:string,
     refreshToken?:string,
-    isAdmin?:string,
+    isAdmin?:number,
     isDelete?: number,
-    status?:string
+    status?:string,
+    project?:IProjecType,
+    major?: IMajorType
 }

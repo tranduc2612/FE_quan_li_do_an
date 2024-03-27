@@ -1,7 +1,7 @@
 import BoxWrapper from "~/components/BoxWrap";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
 import { Button, InputLabel, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Pencil,PrinterCheck } from "mdi-material-ui";
 import * as yup from 'yup';
 import EditIcon from '@mui/icons-material/Edit';
@@ -19,10 +19,11 @@ import { EditToolbarProps } from "../semester/detail/plant-semester";
 import { randomId } from "@mui/x-data-grid-generator";
 import { toast } from "react-toastify";
 import { validateFromDateAndToDate } from "~/ultis/common";
-import { addProjectOutline, getProjectOutline } from "~/services/projectOutlineApi";
+import { addProjectOutline, getProjectOutline, updateProjectOutline } from "~/services/projectOutlineApi";
 import { IProjectOutline } from "~/types/IProjectOutline";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
+import { IResponse } from "~/types/IResponse";
 
 
 
@@ -41,21 +42,15 @@ const validationSchema = yup.object({
      .required('Kết quả mông đợi không được để trống')
   });
 
-function InputOutlinePage() {
+function EditOutlinePage() {
     const navigate = useNavigate();
+    const {id} = useParams();
+    const [data,setData] = useState<IProjectOutline>();
     const info = useAppSelector(inforUser)
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [rows, setRows] = useState<GridRowsProp>([]);
     const [flagEdit,setFlagEdit] = useState(false);
-
-    useEffect(()=>{
-      getProjectOutline(info?.userName || "")
-      .then((res)=>{
-          if(res.success && res.returnObj){
-            navigate("/outline/"+info?.userName)
-          }
-      })
-    },[])
+    const [total, setTotal] = useState(0);
 
     const formik = useFormik({
         initialValues: {
@@ -79,7 +74,7 @@ function InputOutlinePage() {
                 techProject: formik.values.techProject,
                 plantOutline: plantOutlineConvert
             }
-            addProjectOutline(req)
+            updateProjectOutline(req)
             .then((res)=>{
                 if(res.success){
                     navigate("/outline/"+info?.userName)
@@ -93,11 +88,48 @@ function InputOutlinePage() {
         },
     });
 
+    useEffect(()=>{
+        getProjectOutline(info?.userName || "")
+        .then((res:IResponse<IProjectOutline>)=>{
+            if(res.returnObj === null || info?.userName !== id){
+                navigate("/outline/"+id)
+            }else{
+                formik.values.nameProject = res.returnObj?.nameProject || ""
+                formik.values.techProject = res.returnObj?.techProject || ""
+                formik.values.expectResult = res.returnObj?.expectResult || ""
+                formik.values.contentProject = res.returnObj?.contentProject || ""
+                formik.values.plantOutline = res.returnObj?.plantOutline || ""
+                if(res.returnObj.plantOutline){
+                    const plant = JSON.parse(res.returnObj.plantOutline);
+                    const mapPlant = plant.map((item:any)=>{
+                        return {
+                            ...item,
+                            fromDate: new Date(item?.fromDate),
+                            toDate: new Date(item?.toDate),
+                        }
+                    })
+                    setRows(mapPlant)
+                    setTotal(plant.length)
+                }
+                setData(res.returnObj);
+                // if(data?.plantOutline){
+                //     const plants = JSON.parse(data?.plantOutline);
+                //     if(plants.length > 0){
+                //         // setRows([...plants])
+                //         setTotal(plants.length)
+                //     }
+                // }
+            }
+        })
+    },[])
+
+    
+
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
           event.defaultMuiPrevented = true;
         }
-    };
+      };
     
     function EditToolbar(props: EditToolbarProps) {
         const { setRows, setRowModesModel } = props;
@@ -277,8 +309,8 @@ function InputOutlinePage() {
                             Quay lại
                     </Button>
                     <div>
-                        <Button variant="contained" type="submit" startIcon={<Add />}>
-                            Thêm mới
+                        <Button variant="contained" type="submit" startIcon={<EditIcon />}>
+                            Chỉnh sửa
                         </Button>
                         {/* <Button onClick={()=>{navigate(-1)}} variant="contained" startIcon={<PrinterCheck />}>
                             In
@@ -419,4 +451,4 @@ function InputOutlinePage() {
     </> );
 }
 
-export default InputOutlinePage;
+export default EditOutlinePage;

@@ -11,12 +11,12 @@ type IProps = {
 }
 
 function ManagerLayout({ children }: IProps) {
-    const infoUser = useAppSelector(inforUser)?.username;
+    const infoUser = useAppSelector(inforUser);
 
     return (<>
         <div className="grid grid-cols-22">
             <div className="side_bar h-full col-span-1 max-w-20 z-50">
-                <SideBar userName={infoUser} />
+                <SideBar />
             </div>
             <div className="content container h-full min-w-full col-span-21 z-50">
                 <div className="pb-8 px-4 mt-10 overflow-scroll h-screen">

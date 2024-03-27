@@ -1,30 +1,25 @@
-import { useFormik } from "formik";
-import { IPageProps } from "..";
-import InputSelectCustom from "~/components/InputSelectCustom";
-import { Button, FormHelperText, MenuItem, TextField } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { useEffect, useState } from "react";
-import { formatFullnameToUsername } from "~/ultis/common";
-import TimePickerCustom from "~/components/InputTimePicker";
-import { addStudent } from "~/services/studentApi";
-import { IStudent } from "~/types/IStudentType";
-import { useAppSelector } from "~/redux/hook";
-import { inforUser } from "~/redux/slices/authSlice";
+import { Button, MenuItem, TextField } from "@mui/material";
 import dayjs from "dayjs";
+import { useFormik } from "formik";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
-import { getListSemester } from "~/services/semesterApi";
-import { getListMajor } from "~/services/majorApi";
-import { IResponse } from "~/types/IResponse";
-import { ISemester } from "~/types/ISemesterType";
-import { IClassificationType } from "~/types/IClassificationType";
-import { getListClassification } from "~/services/classificationApi";
+import InputSelectCustom from "~/components/InputSelectCustom";
+import TimePickerCustom from "~/components/InputTimePicker";
 import LoadingData from "~/components/LoadingData";
-import { toast } from "react-toastify";
+import { useAppSelector } from "~/redux/hook";
+import { inforUser } from "~/redux/slices/authSlice";
+import { getListClassification } from "~/services/classificationApi";
+import { getListMajor } from "~/services/majorApi";
 import { addTeacher } from "~/services/teacherApi";
-import { ITeacher } from "~/types/ITeacherType";
+import { IClassificationType } from "~/types/IClassificationType";
 import { IMajorType } from "~/types/IMajorType";
+import { IResponse } from "~/types/IResponse";
+import { ITeacher } from "~/types/ITeacherType";
+import { formatFullnameToUsername } from "~/ultis/common";
 
 
 const validationSchema = yup.object({
@@ -64,7 +59,6 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
     const [dateOfBirth,setDateOfBirth] = useState<any>(dayjs(new Date()));
     const [loading,setLoading] = useState(true);
     const infoUser = useAppSelector(inforUser);
-    const [semesterOption,setSemesterOption] = useState<ISemester[]>();
     const [statusOption,setstatusOption] = useState<IClassificationType[]>();
     const [majorOptions,setMajorOptions] = useState<IMajorType[]>();
 
@@ -254,7 +248,6 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
                         <div className="col-span-12">
                             <TimePickerCustom label="Ngày tháng năm sinh"
                                 value={dateOfBirth} 
-                                initialValue={new Date()} 
                                 name={"DOB"} 
                                 type={"DatePicker"}
                                 disableFuture={true}

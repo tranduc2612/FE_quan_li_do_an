@@ -15,7 +15,7 @@ import { ISemester } from "~/types/ISemesterType";
 import { IClassificationType } from "~/types/IClassificationType";
 import { getListMajor } from "~/services/majorApi";
 import { IMajorType } from "~/types/IMajorType";
-import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useNavigate, useParams } from 'react-router-dom';
 import ModalCustom from "~/components/Modal";
 import { toast } from "react-toastify";
@@ -141,6 +141,7 @@ function GroupOutlineReview() {
             renderCell:({row})=>{
                 return <>
                     <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
+                            e.stopPropagation();
                             setOpenModalAssign(true);
                             setGroupSelected(row)
                     }}>
@@ -174,7 +175,7 @@ function GroupOutlineReview() {
         
         {
             field: 'teacherCode',
-            headerName: 'Mã sinh viên',
+            headerName: 'Mã giảng viên',
             width: 120,
             editable: true,
         },
@@ -202,7 +203,6 @@ function GroupOutlineReview() {
             width: 200,
             editable: true,
             renderCell:({row})=>{
-                console.log(row)
                 return <>{row?.groupReviewOutline  ? row?.groupReviewOutlineId : "Chưa được gán"}</>
             }
         },
@@ -284,7 +284,7 @@ function GroupOutlineReview() {
                     const totalItem = newMap.length;
                     setTotalTeacher(totalItem)
                     setRowsTeacher([...newMap])
-                    const checked = newMap.filter((item:any,index:any)=>item.groupReviewOutlineId == groupSelected?.groupReviewOutlineId).map((r,index) => index+1)
+                    const checked = newMap.filter((item:any,index:any)=>item.groupReviewOutlineId == groupSelected?.groupReviewOutlineId).map((r,index) => r.id)
                     setRowsTeacherChecked([...checked])
                 }
               }
@@ -462,6 +462,11 @@ function GroupOutlineReview() {
                                 localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
                                 onPaginationModelChange={handlePaginationModelChange}
                                 onCellClick={({row})=>{
+                                    const idSemester = id;
+                                    const idGroup = row?.groupReviewOutlineId;
+                                    if(idSemester && idGroup){
+                                        navigate(`/semester/detail/group-reivew/${idSemester}/${idGroup}`);
+                                    }
                                 }}
                                 initialState={{
                                 pagination: {
@@ -542,37 +547,6 @@ function GroupOutlineReview() {
                         <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
                             Thêm giảng viên vào nhóm xét duyệt
                         </h2>
-                            
-                            <div>
-                                <div className="grid grid-cols-12">
-                                    <div className="col-span-6">
-                                        <TextField 
-                                            id="outlined-basic" 
-                                            label="Tên giáo viên hướng dẫn" 
-                                            variant="outlined"
-                                            value={valueSearchTeacher} 
-                                            onChange={(e)=>{
-                                                setValueSearchTeacher(e.target.value)
-                                            }}
-                                            fullWidth
-                                        />
-                                    </div>
-                                </div>
-                                <div className="mt-4">
-                                    <Button variant="outlined" onClick={
-                                        ()=>{
-                                            handleFetchApiTeacherList()
-                                        }
-                                    }>Tìm kiếm</Button>
-                                    <Button variant="text" onClick={()=>{
-                                        setValueSearchTeacher("");
-                                    }}>
-                                        <RefreshIcon />
-                                    </Button>
-                                </div>
-                                
-                            </div>
-
                             <div className="mt-5">
                                 {
                                     loadingData ? <LoadingData /> : 
@@ -596,6 +570,13 @@ function GroupOutlineReview() {
                                             },
                                         },
                                     }}
+                                    slots={{ toolbar: GridToolbar }}
+                                    slotProps={{
+                                        toolbar: {
+                                            printOptions: { disableToolbarButton: true },
+                                            csvOptions: { disableToolbarButton: true },
+                                        }}
+                                    }
                                     pageSizeOptions={[5]}
                                 />
                                 }

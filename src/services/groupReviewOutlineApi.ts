@@ -1,6 +1,7 @@
 import { Fetcher } from "swr";
 import request from "~/services/axios";
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
+import { IProjectOutline } from "~/types/IProjectOutline";
 import { IResponse } from "~/types/IResponse";
 import { ITeaching } from "~/types/ITeachingType";
 import { IBaseList } from "~/types/IbaseList";
@@ -9,6 +10,20 @@ export interface AssignGroupReviewTeaching{
     groupReviewOutlineId?: string,
     usernameTeaching?: string[],
     semesterTeachingId?: string
+}
+
+export interface AssignGroupReviewProjectOutline{
+    groupReviewOutlineId?: string,
+    usernameProjectOutline?: string[],
+    semesterTeachingId?: string
+}
+
+export interface ReqListProjectOutlineModel{
+    semesterId: string
+    groupReviewOutlineId?: string,
+    UserName?: string,
+    nameProject?:string,
+    isGetAll?:number
 }
 
 export const getListReviewOutline = async (dataReq:any): Promise<IResponse<IBaseList<IGroupReviewOutline>>> => {
@@ -25,6 +40,20 @@ export const getListTeachingSemester = async (dataReq:any): Promise<IResponse<IT
     return data;
 }
 
+export const getListProjectOutlineByGroupId = async (dataReq:ReqListProjectOutlineModel): Promise<IResponse<IProjectOutline[]>> => {
+    const data: IResponse<IProjectOutline[]> = await request.post("/GroupReviewOutline/get-list-project-outline-by-groupid",{
+        ...dataReq
+    });
+    return data;
+}
+
+export const getGroupReview = async (id: string): Promise<IResponse<IGroupReviewOutline>> => {
+    const data: IResponse<IGroupReviewOutline> = await request.get("/GroupReviewOutline/get-group-review-outline-by-id?id="+id,{
+        
+    });
+    return data;
+}
+
 export const getListReviewOutlineSemester = async (dataReq:any): Promise<IResponse<IGroupReviewOutline[]>> => {
     const data: IResponse<IGroupReviewOutline[]> = await request.post("/GroupReviewOutline/get-list-group-review-outline-semester",{
         ...dataReq
@@ -34,6 +63,13 @@ export const getListReviewOutlineSemester = async (dataReq:any): Promise<IRespon
 
 export const assginGroupReviewToTeaching = async (dataReq: AssignGroupReviewTeaching): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.post("/GroupReviewOutline/assign-group-review-outline-to-teaching",{
+        ...dataReq
+    });
+    return data;
+}
+
+export const assginGroupReviewToProjectOutline = async (dataReq: AssignGroupReviewProjectOutline): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.post("/GroupReviewOutline/assign-group-review-outline-to-project-outline",{
         ...dataReq
     });
     return data;

@@ -99,6 +99,7 @@ function LoginPage() {
                     <InputCustom
                         id={"password"}
                         label="Mật khẩu"
+                        // type="password"
                         name={"password"}
                         value={formik.values.password} 
                         isError={formik.touched.password && Boolean(formik.errors.password)} 

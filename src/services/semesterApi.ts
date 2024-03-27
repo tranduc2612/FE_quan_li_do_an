@@ -7,10 +7,13 @@ import { ISemester } from "~/types/ISemesterType";
 import { IStudent } from "~/types/IStudentType";
 import { IBaseList } from "~/types/IbaseList";
 
+export const getSemester = async (id:string): Promise<IResponse<ISemester>> => {
+    const data: IResponse<ISemester> = await request.get("/Semester/get-semester?idSemester="+id);
+    return data;
+}
 
-
-export const getListSemester = async (dataReq:ISemester): Promise<IResponse<IBaseList<ISemester>>> => {
-    const data: IResponse<IBaseList<ISemester>> = await request.post("/Semester/get-list-semester",{
+export const getListSemester = async (dataReq:ISemester): Promise<IResponse<ISemester[]>> => {
+    const data: IResponse<ISemester[]> = await request.post("/Semester/get-list-semester",{
         ...dataReq
     });
     return data;

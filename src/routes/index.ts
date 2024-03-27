@@ -1,6 +1,6 @@
 import { DefaultLayout,AuthLayout } from "~/components/Layouts"
-import { ForgetPass, HomePage, LoginPage, PlantPage, ProfilePage } from "~/pages"
-import DetailPlantDefault from "~/pages/plant/detail/News"
+import { ForgetPass, HomePage, LoginPage, ProfilePage } from "~/pages"
+import ScheduleSemester from "~/pages/schedule-semester/detail/News"
 import OutlinePage from "~/pages/outline"
 import InputOutlinePage from "~/pages/outline/input"
 import ProfileInput from "~/pages/profile/input"
@@ -8,6 +8,13 @@ import PageMannger from "~/pages/manager"
 import SemesterPage from "~/pages/semester"
 import SemesterInput from "~/pages/semester/input"
 import DetailSemesterPage from "~/pages/semester/detail"
+import GroupReviewOutlineDetail from "~/pages/semester/detail/group-outline-review/detail"
+import EditOutlinePage from "~/pages/outline/edit"
+import ManageStudentMentor from "~/pages/manage-student-mentor"
+import ScheduleWeek from "~/pages/schedule-week"
+import ScheduleSemesterPage from "~/pages/schedule-semester"
+import ScheduleWeekInput from "~/pages/schedule-week/input"
+import ScheduleWeekDetail from "~/pages/schedule-week/detail"
 
 export const PUBLIC_ROUTER = [
     {
@@ -24,11 +31,6 @@ export const PUBLIC_ROUTER = [
 
 export const PRIVATE_ROUTER = [
     {
-        path:"/",
-        page: HomePage,
-        layout: DefaultLayout
-    },
-    {
         path:"/profile/:id",
         page: ProfilePage,
         layout: DefaultLayout
@@ -39,8 +41,28 @@ export const PRIVATE_ROUTER = [
         layout: DefaultLayout
     },
     {
-        path:"/plant",
-        page: PlantPage,
+        path:"/schedule-semester",
+        page: ScheduleSemesterPage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/schedule-week/:idSemester",
+        page: ScheduleWeek,
+        layout: DefaultLayout
+    },
+    {
+        path:"/schedule-semester/detail/:id",
+        page: ScheduleSemester,
+        layout: DefaultLayout
+    },
+    {
+        path:"/schedule-week/detail/:id",
+        page: ScheduleWeekDetail,
+        layout: DefaultLayout
+    },
+    {
+        path:"/schedule-week/detail/:id/:idStudent",
+        page: ScheduleWeekDetail,
         layout: DefaultLayout
     },
     {
@@ -48,6 +70,10 @@ export const PRIVATE_ROUTER = [
         page: OutlinePage,
         layout: DefaultLayout
     },
+]
+
+export const STUDENT_ROUTER = [
+    
     {
         path:"/outline/input",
         page: InputOutlinePage,
@@ -55,15 +81,32 @@ export const PRIVATE_ROUTER = [
     },
     {
         path:"/outline/input/:id",
-        page: InputOutlinePage,
+        page: EditOutlinePage,
+        layout: DefaultLayout
+    },
+]
+
+export const TEACHER_ROUTER = [
+    {
+        path:"/",
+        page: HomePage,
         layout: DefaultLayout
     },
     {
-        path:"/plant/detail/:id",
-        page: DetailPlantDefault,
+        path:"/manager-student-mentor",
+        page: ManageStudentMentor,
         layout: DefaultLayout
     },
-    
+    {
+        path:"/schedule-week/input/:idSemester",
+        page: ScheduleWeekInput,
+        layout: DefaultLayout
+    },
+    {
+        path:"/schedule-week/edit/:idScheduleWeek",
+        page: ScheduleWeekInput,
+        layout: DefaultLayout
+    },
 ]
 
 export const ADMIN_ROUTER = [
@@ -80,6 +123,11 @@ export const ADMIN_ROUTER = [
     {
         path:"/semester/detail/:id",
         page: DetailSemesterPage,
+        layout: DefaultLayout
+    },
+    {
+        path:"/semester/detail/group-reivew/:idSemester/:idGroup",
+        page: GroupReviewOutlineDetail,
         layout: DefaultLayout
     },
     {

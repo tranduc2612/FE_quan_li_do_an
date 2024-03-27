@@ -3,6 +3,7 @@ import { RootState } from "../store";
 import axios from "axios";
 import request, { BASE_URL_MEDIA } from "~/services/axios";
 import { BASE_URL } from "~/ultis/contants";
+import { IUser } from "~/types/IUser";
 
 interface IUserInfo{
     isLogin: boolean,
@@ -60,14 +61,15 @@ export const refreshToken = createAsyncThunk(
                 if(userData.token && userData.refreshToken){
                     localStorage.setItem('access_token', userData.token)
                     localStorage.setItem('refresh_token',userData.refreshToken)
+                }else{
+                    localStorage.clear();
                 }
-                console.log(userData);
                 return userData;
             }).catch((error)=>{
                 console.log(error);
                 localStorage.clear();
 
-                return error
+                return null
             })
             return response;
     //   const response:IUser = await new Promise((resolve) =>
@@ -116,7 +118,8 @@ const authSlice = createSlice({
            })
            .addCase(refreshToken.fulfilled, (state, action: PayloadAction<IUser>) => {
                 state.logging = false
-                if (action.payload.code != 'ERR_BAD_REQUEST') {
+                console.log(action.payload)
+                if (action.payload) {
                     state.isLogin = true
                     state.infoData = action.payload
                 }

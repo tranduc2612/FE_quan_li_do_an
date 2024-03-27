@@ -3,7 +3,11 @@ import request from "~/services/axios";
 import { IResponse } from "~/types/IResponse";
 import { IScheduleSemester } from "~/types/IScheduleSemester";
 
-
+export const getScheduleSemester = async (id: string): Promise<IResponse<IScheduleSemester>> => {
+    const data: IResponse<IScheduleSemester> = await request.get("/ScheduleSemester/get-schedule-semester?id="+id,{
+    });
+    return data;
+}
 
 export const getListScheduleSemester = async (idSemester: string): Promise<IResponse<IScheduleSemester[]>> => {
     const data: IResponse<IScheduleSemester[]> = await request.get("/ScheduleSemester/get-list-schedule-semester?semesterId="+idSemester,{

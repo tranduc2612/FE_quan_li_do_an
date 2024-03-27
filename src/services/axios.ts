@@ -10,6 +10,9 @@ request.interceptors.request.use(function (config) {
     const token = String(localStorage.getItem("access_token"));
     config.headers.Authorization = "Bearer " + token;
     config.headers["Content-Type"] = "application/json";
+    // config.headers["Content-Type"] = "multipart/form-data";
+    
+
     // Do something before request is sent
     return config;
   }, function (error) {

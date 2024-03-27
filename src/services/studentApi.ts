@@ -6,6 +6,7 @@ import { IStudent } from "~/types/IStudentType";
 import { IBaseList } from "~/types/IbaseList";
 
 
+
 export const addStudent = async (dataReq:IStudent): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.post("/Auth/register-student",{
         ...dataReq

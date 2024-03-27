@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { ADMIN_ROUTER, PRIVATE_ROUTER, PUBLIC_ROUTER } from "./routes"
+import { ADMIN_ROUTER, PRIVATE_ROUTER, PUBLIC_ROUTER, STUDENT_ROUTER, TEACHER_ROUTER } from "./routes"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useAppSelector } from "./redux/hook";
 import { isLogin,inforUser } from "./redux/slices/authSlice";
@@ -23,7 +23,7 @@ function App() {
               path={item.path}
               element={
                 isLoginUser ?
-                  <Navigate to="/" />
+                  <Navigate to={"/profile/"+info?.userName} />
                   :
                   <Layout>
                     <Page />
@@ -32,7 +32,7 @@ function App() {
             />
           })}
 
-          {isLoginUser && PRIVATE_ROUTER.map((item, index) => {
+          {(isLoginUser) && PRIVATE_ROUTER.map((item, index) => {
             const Page = item.page;
             const Layout = item.layout || DefaultLayout;
             return <Route
@@ -47,7 +47,37 @@ function App() {
             />
           })}
 
-          {isLoginUser && ADMIN_ROUTER.map((item, index) => {
+          {(isLoginUser && info?.role === "STUDENT") && STUDENT_ROUTER.map((item, index) => {
+            const Page = item.page;
+            const Layout = item.layout || DefaultLayout;
+            return <Route
+              key={index}
+              path={item.path}
+              element={
+                <Layout>
+                  <Page />
+                </Layout>
+
+              }
+            />
+          })}
+
+          {(isLoginUser && info?.role === "TEACHER") && TEACHER_ROUTER.map((item, index) => {
+            const Page = item.page;
+            const Layout = item.layout || DefaultLayout;
+            return <Route
+              key={index}
+              path={item.path}
+              element={
+                <Layout>
+                  <Page />
+                </Layout>
+
+              }
+            />
+          })}
+
+          {(isLoginUser && info?.role === "TEACHER" && info?.isAdmin === 1) && ADMIN_ROUTER.map((item, index) => {
             const Page = item.page;
             const Layout = item.layout || DefaultLayout;
             return <Route

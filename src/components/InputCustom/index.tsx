@@ -13,7 +13,9 @@ type IProps = {
     errorMessage: any,
     type?:string,
     onChange: any,
-    onBlur: any
+    onBlur: any,
+    placeholder?: string,
+    multiline?:boolean
 }
 
 const CssTextField = styled(TextField)({
@@ -62,7 +64,9 @@ function InputCustom({
     isError,
     errorMessage,
     onChange,
-    onBlur
+    onBlur,
+    placeholder,
+    multiline = false
 }: IProps) {
 
     const [showPassword, setShowPassword] = useState(false);
@@ -73,6 +77,8 @@ function InputCustom({
       event.preventDefault();
     };
 
+    
+
     return (<>
         <CssTextField
             id={id}
@@ -81,9 +87,11 @@ function InputCustom({
             type={type}
             name={name}
             label={label}
+            placeholder={placeholder}
             onChange={onChange}
             helperText={errorMessage}
             onBlur={onBlur}
+            multiline={multiline}
             fullWidth
         >
             

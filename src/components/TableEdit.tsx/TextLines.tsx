@@ -20,7 +20,10 @@ export default function CustomEditComponent(props: GridRenderEditCellParams) {
   
     return <>
             <TextField
-                value={props.value}
+                sx={{
+                  "& fieldset": { border: 'none' },
+                }}
+                value={props.value || ""}
                 onChange={handleValueChange}
                 id="outlined-multiline-flexible"
                 multiline

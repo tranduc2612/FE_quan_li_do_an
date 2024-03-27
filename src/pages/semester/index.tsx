@@ -98,6 +98,12 @@ function SemesterPage() {
             }
         },
         {
+            field: 'totalStudent',
+            headerName: 'Tổng số sinh viên',
+            width: 160,
+            editable: true,
+        },
+        {
             field: 'totalProjectAmount',
             headerName: 'Tổng số đồ án',
             width: 160,

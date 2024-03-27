@@ -1,3 +1,5 @@
+import { IMajorType } from "./IMajorType";
+
 export interface ITeacher {
     passwordText?: string,
     userName?: string,
@@ -14,5 +16,6 @@ export interface ITeacher {
     majorId?: string,
     education?:string,
     address?: string,
-    gender?:number
+    gender?:number,
+    major?:IMajorType
 }

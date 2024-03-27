@@ -10,27 +10,23 @@ interface IProps{
     active: boolean,
 };
 
-function BoxItem({className, link, active, header,dateTime }: IProps) {
+function ScheduleItem({className, link, active, header,dateTime }: IProps) {
     return (
-    <div className="mb-4 last:mb-0">
+    <div className={`mb-4 last:mb-0 cursor-pointer border-solid border rounded-md min-h-16 ${!active ? "bg-gray-200 border-gray-200 hover:bg-gray-300 hover:border-gray-200":"border-primary-blue hover:border-[#2074b085] hover:bg-light-blue"}`}>
         <Link to={link} className={`${className}`}>
-            <div className={`flex items-center justify-between transition ease-linear cursor-pointer border-solid border rounded-md p-2 ${!active ? "bg-gray-200 border-gray-200 hover:bg-gray-300 hover:border-gray-200":"border-primary-blue hover:border-[#2074b085] hover:bg-light-blue"}`}>
-                <div className="info flex flex-col justify-around text-primary-blue font-bold">
-                    <div className="text-lg">
+            <div className={`flex transition ease-linear p-2`}>
+                <div className="info flex flex-col-reverse justify-end text-primary-blue font-bold">
+                    <div style={{
+                        // lineHeight: "2rem",
+                        // maxHeight: "4rem",
+                        // overflow: "hidden",
+                        // display: "-webkit-box",
+                    }} className="text-lg line-clamp-1">
                         {header}
                     </div>
 
-                    <div className="font-normal text-sm ">
+                    <div className="font-normal text-sm">
                         {dateTime}
-                    </div>
-                </div>
-
-                <div className="flex tools">
-                    <div className="flex items-center p-2 rounded-full text-3xl me-2 hover:bg-gray-200">
-                        <Pencil className="text-primary-blue" />
-                    </div>
-                    <div className="flex items-center p-2 rounded-full text-3xl me-2 hover:bg-gray-200">
-                        <TrashCanOutline className="text-[red]" />
                     </div>
                 </div>
             </div>
@@ -39,4 +35,4 @@ function BoxItem({className, link, active, header,dateTime }: IProps) {
     </div>);
 }
 
-export default BoxItem;
+export default ScheduleItem;

@@ -13,5 +13,5 @@ export interface IScheduleSemester{
         content?:string,
         note?:string,
         createdByNavigation?:ITeacher,
-        semester?:ISemester
+        semester?:ISemester,
 }

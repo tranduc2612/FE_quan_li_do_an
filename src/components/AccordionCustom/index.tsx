@@ -5,13 +5,14 @@ import styles from "./AccordionCustom.module.scss"
 type IProps = {
     header: any,
     children: ReactElement,
+    inititalToggle?: boolean,
     size: "xl" | "xxl" | "xxxl"
 }
 
 const cx = classNames.bind(styles);
 
-function AccordionCustom({ header, children,size }: IProps) {
-    const [active, setActive] = useState(false);
+function AccordionCustom({ header, children,size,inititalToggle = false }: IProps) {
+    const [active, setActive] = useState(inititalToggle);
 
     const handleToggleContent = () => {
         setActive(!active)
