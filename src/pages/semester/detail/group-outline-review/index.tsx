@@ -15,7 +15,7 @@ import { ISemester } from "~/types/ISemesterType";
 import { IClassificationType } from "~/types/IClassificationType";
 import { getListMajor } from "~/services/majorApi";
 import { IMajorType } from "~/types/IMajorType";
-import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useNavigate, useParams } from 'react-router-dom';
 import ModalCustom from "~/components/Modal";
 import { toast } from "react-toastify";
@@ -23,7 +23,7 @@ import { ITeacher } from "~/types/ITeacherType";
 import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
 // import RegisterTeacher from "./input";
 import BoxWrapper from "~/components/BoxWrap";
-import { AssignGroupReviewTeaching, addGroupReview, assginGroupReviewToTeaching, deleteGroupReview, getListReviewOutline, getListReviewOutlineSemester, getListTeachingSemester, updateGroupReview } from "~/services/groupReviewOutlineApi";
+import { AssignGroupReviewTeaching, addGroupReview, assginGroupReviewToTeaching, deleteGroupReview, getListReviewOutline, getListReviewOutlineSemester, getListTeachingGroupOutline, updateGroupReview } from "~/services/groupReviewOutlineApi";
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
 import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
@@ -33,12 +33,10 @@ import { inforUser } from "~/redux/slices/authSlice";
 import Edit from "@mui/icons-material/Edit";
 import { ITeaching } from "~/types/ITeachingType";
 import { randomId } from "@mui/x-data-grid-generator";
+import Add from "@mui/icons-material/Add";
 
 
 const validationSchema = yup.object({
-    groupReviewOutlineId: yup
-      .string()
-      .required('Mã nhóm xét duyệt'),
       nameGroupReviewOutline: yup
       .string()
       .required('Tên nhóm xét duyệt'),
@@ -53,7 +51,7 @@ function GroupOutlineReview() {
     const info = useAppSelector(inforUser);
     const navigate = useNavigate();
     const [groupSelected,setGroupSelected] = useState<IGroupReviewOutline>({
-        groupReviewOutlineId: "",
+        groupReviewOutlineId: undefined,
         nameGroupReviewOutline: "",
         createdBy: "",
         isDelete: 0,
@@ -62,20 +60,10 @@ function GroupOutlineReview() {
     const [totalTeacher, setTotalTeacher] = useState(0);
     const apiRefTeacher = useGridApiRef();
     const [toggleAutoAssign,setToggleAutoAssign] = useState(false);
-    const [openModalInput,setOpenModalInput] = useState(false);
+    const [openModalInputGroup,setOpenModalInputGroup] = useState(false);
     const [openModalAssign,setOpenModalAssign] = useState(false);
     const [rowsTeacher,setRowsTeacher] = useState<any>([]);
     const [rowsTeacherChecked,setRowsTeacherChecked] = useState<any>([]);
-    const [paginationModel, setPaginationModel] = useState({
-        pageSize: 5,
-        page: 0,
-        pageMax: -1
-    });
-    const [paginationModelTeacher, setPaginationModelTeacher] = useState({
-        pageSize: 5,
-        page: 0,
-        pageMax:-1
-    });
     const [valueSearchTeacher,setValueSearchTeacher] = useState("");
 
     const apiRef = useGridApiRef();
@@ -95,49 +83,14 @@ function GroupOutlineReview() {
             width: 80,
             maxWidth: 60,
             flex: 1,
-            editable: true,
+            editable: false,
         },
         
         {
-            field: 'groupReviewOutlineId',
-            headerName: 'Mã nhóm',
-            width: 120,
-            editable: true,
-        },
-        {
-            field: 'nameGroupReviewOutline',
-            headerName: 'Tên nhóm',
-            width: 200,
-            editable: true,
-        },
-        {
-            field: 'semesterId',
-            headerName: 'Mã học kỳ',
-            width: 200,
-            editable: true,
-            renderCell:({row})=>{
-                return <>
-                    {id}    
-                </>
-            }
-        },
-        {
-            field: 'slgv',
-            headerName: 'Số lượng giáo viên',
-            width: 200,
-            editable: true,
-        },
-        {
-            field: 'slsv',
-            headerName: 'Số lượng đề cương',
-            width: 200,
-            editable: true
-        },
-        {
             field: 'action',
             headerName: 'Chức năng',
-            width: 100,
-            editable: true,
+            width: 200,
+            editable: false,
             renderCell:({row})=>{
                 return <>
                     <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
@@ -149,6 +102,26 @@ function GroupOutlineReview() {
                             <PersonAddIcon />
                         </Tooltip>
                     </div>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            setGroupSelected(row);
+                            formikInputGroup.values.nameGroupReviewOutline = row?.nameGroupReviewOutline;
+                            setOpenModalInputGroup(true);
+                    }}>
+                        <Tooltip title="Sửa nhóm xét duyệt">
+                            <Edit />
+                        </Tooltip>
+                    </div>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-red-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            setOpenModalDelete(true);
+                            setGroupSelected(row);
+                    }}>
+                        <Tooltip title="Xóa nhóm xét duyệt">
+                            <Delete />
+                        </Tooltip>
+                    </div>
+                    
                     {/* <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-red-500" onClick={(e)=>{
                             e.stopPropagation();
                             setOpenModalDelete(true);
@@ -156,6 +129,55 @@ function GroupOutlineReview() {
                     }}>
                         <Delete />
                     </div> */}
+                    
+    
+                </>
+            }
+        },
+        {
+            field: 'nameGroupReviewOutline',
+            headerName: 'Tên nhóm',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'semesterId',
+            headerName: 'Mã học kỳ',
+            width: 200,
+            editable: false,
+            renderCell:({row})=>{
+                return <>
+                    {id}    
+                </>
+            }
+        },
+        
+        {
+            field: 'slgv',
+            headerName: 'Số lượng giáo viên',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'slsv',
+            headerName: 'Số lượng đề cương',
+            width: 200,
+            editable: false
+        },
+        {
+            field: 'createdBy',
+            headerName: 'Người tạo',
+            width: 250,
+            editable: false,
+        },
+        {
+            field: 'createdDate',
+            headerName: 'Thời gian tạo',
+            width: 200,
+            editable: false,
+            renderCell:({row})=>{
+                return <>
+                    {formatDateTypeDateOnly(row?.createdDate)}
                     
     
                 </>
@@ -203,7 +225,7 @@ function GroupOutlineReview() {
             width: 200,
             editable: true,
             renderCell:({row})=>{
-                return <>{row?.groupReviewOutline  ? row?.groupReviewOutlineId : "Chưa được gán"}</>
+                return <>{row?.groupReviewOutline  ? row?.groupReviewOutlineId : <span className="text-red-600">Chưa được gán</span>}</>
             }
         },
         {
@@ -214,19 +236,17 @@ function GroupOutlineReview() {
         },
     ]
     useEffect(()=>{
-        hanleFetchApi();
+        hanleFetchApiGroupList();
     },[])
 
     useEffect(()=>{
         handleFetchApiTeacherList()
     },[groupSelected.groupReviewOutlineId])
 
-    const hanleFetchApi = async () => {
+    const hanleFetchApiGroupList = async () => {
         const idSemester = id;
         await getListReviewOutlineSemester({
-            semesterId: idSemester,
-            groupReviewOutlineId: formik.values.groupReviewOutlineId,
-            nameGroupReviewOutline: formik.values.nameGroupReviewOutline
+            semesterId: idSemester
         })
         .then((res:IResponse<IGroupReviewOutline[]>)=>{
           console.log(res)
@@ -256,9 +276,7 @@ function GroupOutlineReview() {
     const handleFetchApiTeacherList = async ()=>{
         const idSemester = id;
         setLoadingData(true)
-        await getListTeachingSemester({
-            pageSize: paginationModelTeacher.pageSize,
-            pageIndex:  paginationModelTeacher.page + 1,
+        await getListTeachingGroupOutline({
             semesterId:  idSemester,
             groupReviewOutlineId: groupSelected.groupReviewOutlineId,
             userNameTeacher: valueSearchTeacher
@@ -280,7 +298,6 @@ function GroupOutlineReview() {
                           ...data?.userNameTeacherNavigation
                         }
                     })
-                    console.log(newMap,"sadkaksdkasd")
                     const totalItem = newMap.length;
                     setTotalTeacher(totalItem)
                     setRowsTeacher([...newMap])
@@ -294,152 +311,74 @@ function GroupOutlineReview() {
         })
     }
 
-    const formik = useFormik({
-        initialValues: initialData,
-        onSubmit: (values) => {
-          console.log(values);
-        },
-    });
-
-    const formikInput = useFormik({
+    const formikInputGroup = useFormik({
         initialValues: {
-            groupReviewOutlineId: "",
             nameGroupReviewOutline: "",
+            semesterId:id
         },
         validationSchema: validationSchema,
         onSubmit: (values,{ setSubmitting, setErrors, setStatus }) => {
           console.log(values);
-          const req: IGroupReviewOutline = {
-            groupReviewOutlineId: values.groupReviewOutlineId,
-            nameGroupReviewOutline: values.nameGroupReviewOutline,
-            createdBy:info?.userName
+          
+          if(groupSelected.groupReviewOutlineId){
+            const req: IGroupReviewOutline = {
+                groupReviewOutlineId: groupSelected.groupReviewOutlineId,
+                nameGroupReviewOutline: values.nameGroupReviewOutline,
+                createdBy:info?.userName,
+                semesterId: values.semesterId
+              }
+            updateGroupReview(req)
+                .then((res:IResponse<any>)=>{
+                    if(res.success){
+                        setOpenModalInputGroup(false)
+                        formikInputGroup.resetForm();
+                        toast.success(res.msg)
+                        hanleFetchApiGroupList();
+                    }else{
+                        setErrors({ nameGroupReviewOutline: res.msg})
+                    }
+                })
+          }else{
+            const req: IGroupReviewOutline = {
+                nameGroupReviewOutline: values.nameGroupReviewOutline,
+                createdBy:info?.userName,
+                semesterId: values.semesterId
+              }
+              addGroupReview(req)
+                .then((res:IResponse<any>)=>{
+                    if(res.success){
+                        setOpenModalInputGroup(false)
+                        formikInputGroup.resetForm();
+                        toast.success(res.msg)
+                        hanleFetchApiGroupList();
+                    }else{
+                        setErrors({ nameGroupReviewOutline: res.msg})
+                    }
+                })
+            }
           }
-          addGroupReview(req)
-            .then((res:IResponse<any>)=>{
-                if(res.success){
-                    setOpenModalInput(false)
-                    formikInput.resetForm();
-                    setPaginationModel({
-                        page: 0,
-                        pageSize: 5,
-                        pageMax: -1
-                    })
-                    toast.success(res.msg)
-                }else{
-                    setErrors({ groupReviewOutlineId: res.msg})
-                }
-            })
-        },
     });
 
-    const handlePaginationModelChangeTeacher = async (newPaginationModel: GridPaginationModel) => {
-        // We have the cursor, we can allow the page transition.
-        setPaginationModelTeacher({
-            ...paginationModelTeacher,
-            page:newPaginationModel.page
-        })
-    };
-
-    const handleOpen = () => setOpenModalDelete(true);
-    const handleClose = () => setOpenModalDelete(false);
-
-    const handlePaginationModelChange = async (newPaginationModel: GridPaginationModel) => {
-        // We have the cursor, we can allow the page transition.
-        setPaginationModel({
-            ...paginationModel,
-            page:newPaginationModel.page
-        })
-    };
-
     const hanleDeleteGroup = ()=>{
-        const idSelect = apiRef.current.getSelectedRows();
-        console.log(idSelect)
-        // deleteGroupReview(groupSelected.groupReviewOutlineId || "")
-        // .then((res:any)=>{
-        //     console.log(res);
-        //     if(res.success){
-        //         toast.success(res.msg)
-        //         setPaginationModel({
-        //             page: 0,
-        //             pageSize: 10,
-        //             pageMax: -1
-        //         })
-        //     }else{
-        //         toast.error(res.msg)
-        //     }
-        // })
-        // .catch((err:any)=>{
-        //     console.log(err)
-        //     // toast.error(err)
-        // })
+        deleteGroupReview(groupSelected.groupReviewOutlineId || "")
+        .then((res:any)=>{
+            console.log(res);
+            if(res.success){
+                toast.success(res.msg)
+                hanleFetchApiGroupList()
+                setOpenModalDelete(false)
+            }else{
+                toast.error(res.msg)
+            }
+        })
+        .catch((err:any)=>{
+            console.log(err)
+        })
     }
 
     return (
             <div className="p-4 overflow-scroll max-h-screen">
                     { <div>
-                        {/* Form tìm kiếm */}
-                        {
-                            <form action="" onSubmit={formik.handleSubmit}>
-                                <div className="grid grid-cols-12 gap-4">
-
-                                    <div className="col-span-6">
-                                        <TextField
-                                            onChange={formik.handleChange}
-                                            value={formik.values.groupReviewOutlineId} 
-                                            id="groupReviewOutlineId" 
-                                            label="Mã nhóm"
-                                            name="groupReviewOutlineId"
-                                            variant="outlined"
-                                            fullWidth 
-                                        />
-                                    </div>
-
-                                    <div className="col-span-6">
-                                        <TextField
-                                            onChange={formik.handleChange} 
-                                            value={formik.values.nameGroupReviewOutline} 
-                                            id="nameGroupReviewOutline" 
-                                            label="Tên nhóm"
-                                            name="nameGroupReviewOutline"
-                                            variant="outlined"
-                                            fullWidth 
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between mt-5">
-                                    <div className="flex">
-                                        <div className="me-2">
-                                            <Button type="submit" variant="outlined" startIcon={<SearchIcon />}
-                                                onClick={()=>{
-                                                    hanleFetchApi()
-                                                }}
-                                            >
-                                                Tìm kiếm
-                                            </Button>
-                                        </div>
-                                        <div>
-                                            <Button variant="text" onClick={()=>{
-                                                formik.resetForm()
-                                            }}>
-                                                <RefreshIcon />
-                                            </Button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <Button variant="contained" startIcon={<CalculateIcon />} onClick={()=>{
-                                            setToggleAutoAssign(!toggleAutoAssign)
-                                        }}>
-                                        {
-                                            toggleAutoAssign ? "Gán tay" : "Tự động chia giảng viên"
-                                        }
-                                            
-                                        </Button>
-                                    </div>
-                                </div>
-                            </form>
-                        }
 
                         {/* Danh sách tìm kiếm */}
                         <div className="mt-5">
@@ -460,7 +399,6 @@ function GroupOutlineReview() {
                                 columns={columns}
                                 rowCount={total}
                                 localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                onPaginationModelChange={handlePaginationModelChange}
                                 onCellClick={({row})=>{
                                     const idSemester = id;
                                     const idGroup = row?.groupReviewOutlineId;
@@ -470,9 +408,33 @@ function GroupOutlineReview() {
                                 }}
                                 initialState={{
                                 pagination: {
-                                    paginationModel: { page: paginationModel.page, pageSize: paginationModel.pageSize },
+                                    paginationModel: { page: 0, pageSize: 5 },
                                 },
                                 }}
+                                slots={{ toolbar: ()=> <> <GridToolbarContainer>
+                                        <GridToolbarColumnsButton />
+                                        <GridToolbarFilterButton  />
+                                        <Button startIcon={<CalculateIcon />}>Tự động chia</Button>
+                                        <Button variant='text' startIcon={<Add />} onClick={()=>{
+                                            formikInputGroup.values.nameGroupReviewOutline = ""
+                                            setOpenModalInputGroup(true)
+                                            setGroupSelected({
+                                                groupReviewOutlineId: undefined,
+                                                nameGroupReviewOutline: "",
+                                                createdBy: "",
+                                                isDelete: 0,
+                                                createdDate: new Date()
+                                            })
+                                        }}>
+                                            Thêm mới nhóm xét duyệt
+                                        </Button>
+                            </GridToolbarContainer></> }}
+                                slotProps={{
+                                    toolbar: {
+                                        printOptions: { disableToolbarButton: true },
+                                        csvOptions: { disableToolbarButton: true },
+                                    }}
+                                }
                                 pageSizeOptions={[10]}
                             />
                         </div>
@@ -481,61 +443,88 @@ function GroupOutlineReview() {
                     
 
                     <Modal
-                        open={openModalInput}
-                        onClose={()=>setOpenModalInput(false)}
+                        open={openModalInputGroup}
+                        onClose={()=>{
+                            setGroupSelected({
+                                groupReviewOutlineId: undefined,
+                                nameGroupReviewOutline: "",
+                                createdBy: "",
+                                isDelete: 0,
+                                createdDate: new Date()
+                            })
+                            setOpenModalInputGroup(false)
+                        }}
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                     >
-                        <div className="p-5 rounded-xl bg-white w-2/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                         <div className="p-5 rounded-xl bg-white w-2/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                                 <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
-                                    Thêm mới nhóm xét duyệt
+                                    {groupSelected?.groupReviewOutlineId ? "Chỉnh sửa nhóm xét duyệt" :"Thêm mới nhóm xét duyệt"}
                                 </h2>
-                                <form method="dialog" onSubmit={formikInput.handleSubmit}>
+                                <form method="dialog" onSubmit={formikInputGroup.handleSubmit}>
                                     <div className="">
-                                        <div className="my-5">
-                                            <InputCustom
-                                                id={"groupReviewOutlineId"}
-                                                label="Mã phòng xét duyệt"
-                                                name={"groupReviewOutlineId"}
-                                                value={formikInput.values.groupReviewOutlineId} 
-                                                onChange={formikInput.handleChange}
-                                                onBlur={formikInput.handleBlur}
-                                                isError={formikInput.touched.groupReviewOutlineId && Boolean(formikInput.errors.groupReviewOutlineId)} 
-                                                errorMessage={formikInput.touched.groupReviewOutlineId && formikInput.errors.groupReviewOutlineId} 
-                                            />
-                                        </div>
-
                                         <div className="my-5">
                                             <InputCustom
                                                 id={"nameGroupReviewOutline"}
                                                 label="Tên phòng xét duyệt"
                                                 name={"nameGroupReviewOutline"}
-                                                value={formikInput.values.nameGroupReviewOutline} 
-                                                onChange={formikInput.handleChange}
-                                                onBlur={formikInput.handleBlur}
-                                                isError={formikInput.touched.nameGroupReviewOutline && Boolean(formikInput.errors.nameGroupReviewOutline)} 
-                                                errorMessage={formikInput.touched.nameGroupReviewOutline && formikInput.errors.nameGroupReviewOutline} 
+                                                value={formikInputGroup.values.nameGroupReviewOutline} 
+                                                onChange={formikInputGroup.handleChange}
+                                                onBlur={formikInputGroup.handleBlur}
+                                                isError={formikInputGroup.touched.nameGroupReviewOutline && Boolean(formikInputGroup.errors.nameGroupReviewOutline)} 
+                                                errorMessage={formikInputGroup.touched.nameGroupReviewOutline && formikInputGroup.errors.nameGroupReviewOutline} 
                                             />
                                         </div>
                                     </div>
-                                    <div className="float-end">
-                                        {/* if there is a button in form, it will close the modal */}
-                                        <button className="btn bg-slate-900 text-[#fff] hover:bg-white hover:text-slate-900 btn-outline me-4" onClick={()=>{
-                                            setOpenModalInput(false);
-                                            formikInput.resetForm();
-                                        }}>
-                                            Đóng
-                                        </button>
-                                        <button 
-                                            className={`btn btn-outline  text-[#fff] hover:bg-white hover:border-primary-blue bg-primary-blue hover:text-primary-blue`}
-                                            onClick={()=>{
-                                            }}>
-                                                Thêm mới
-                                        </button>
+                                    <div className="flex justify-end mt-8">
+                                        <div className="mx-2">
+                                        <Button variant="outlined" onClick={()=>{
+                                            setOpenModalInputGroup(false);
+                                            formikInputGroup.resetForm();
+                                        }}>Đóng</Button>
+                                        </div>
+                                        <div>
+                                            <Button variant="contained" type="submit">{groupSelected?.groupReviewOutlineId ? "Chỉnh sửa" :"Thêm mới"}</Button>
+                                        </div>
                                     </div>
                                 </form>
-                            </div>
+                        </div>
                     </Modal>
+
+                    
+
+                    <Modal
+                        open={openModalDelete}
+                        onClose={()=>setOpenModalDelete(false)}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <div className="p-5 rounded-xl bg-white w-2/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <div className="title mb-10" >
+                                <div className="text-2xl text-center text-primary-blue font-bold">
+                                    Thông báo xác nhận xóa nhóm xét duyệt
+                                </div>
+                            </div>
+                            <div className={``}>
+                                <div className="flex justify-center">
+                                    <span className="text-xl text-center font-medium">Bạn có muốn xóa nhóm xét duyệt {groupSelected.nameGroupReviewOutline} ?</span>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center mt-10">
+                            {/* if there is a button in form, it will close the modal */}
+                                    <div className="mx-5">
+                                        <Button variant="outlined" onClick={()=>setOpenModalDelete(false)}>Đóng</Button>
+                                    </div>
+                                    <div>
+                                        <Button variant="contained" onClick={()=>{
+                                            hanleDeleteGroup();
+                                        }}>Xóa</Button>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal>
+                    
 
                     <Modal
                         open={openModalAssign}
@@ -561,12 +550,11 @@ function GroupOutlineReview() {
                                     rowSelectionModel={rowsTeacherChecked}
                                     onRowSelectionModelChange={setRowsTeacherChecked}
                                     localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                    onPaginationModelChange={handlePaginationModelChangeTeacher}
                                     initialState={{
                                         pagination: {
                                             paginationModel: {
-                                                page: paginationModelTeacher.page, 
-                                                pageSize: paginationModelTeacher.pageSize 
+                                                page: 0, 
+                                                pageSize: 5 
                                             },
                                         },
                                     }}

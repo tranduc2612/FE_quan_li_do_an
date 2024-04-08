@@ -15,6 +15,12 @@ import ScheduleWeek from "~/pages/schedule-week"
 import ScheduleSemesterPage from "~/pages/schedule-semester"
 import ScheduleWeekInput from "~/pages/schedule-week/input"
 import ScheduleWeekDetail from "~/pages/schedule-week/detail"
+import DetailReviewMentor from "~/pages/review-template/mentor"
+import InputReviewMentor from "~/pages/review-template/mentor/input"
+import DetailReviewCommentor from "~/pages/review-template/commentator"
+import InputReviewCommentor from "~/pages/review-template/commentator/input"
+import DetailCouncil from "~/pages/semester/detail/council/detail"
+import TeacherCouncil from "~/pages/final/teacher"
 
 export const PUBLIC_ROUTER = [
     {
@@ -70,6 +76,26 @@ export const PRIVATE_ROUTER = [
         page: OutlinePage,
         layout: DefaultLayout
     },
+    {
+        path:"/review-mentor/",
+        page: DetailReviewMentor,
+        layout: DefaultLayout
+    },
+    {
+        path:"input/review-mentor/",
+        page: InputReviewMentor,
+        layout: DefaultLayout
+    },
+    {
+        path:"/review-commentor/",
+        page: DetailReviewCommentor,
+        layout: DefaultLayout
+    },
+    {
+        path:"input/review-commentor/",
+        page: InputReviewCommentor,
+        layout: DefaultLayout
+    },
 ]
 
 export const STUDENT_ROUTER = [
@@ -107,6 +133,11 @@ export const TEACHER_ROUTER = [
         page: ScheduleWeekInput,
         layout: DefaultLayout
     },
+    {
+        path:"/teacher/council",
+        page: TeacherCouncil,
+        layout: DefaultLayout
+    },
 ]
 
 export const ADMIN_ROUTER = [
@@ -128,6 +159,11 @@ export const ADMIN_ROUTER = [
     {
         path:"/semester/detail/group-reivew/:idSemester/:idGroup",
         page: GroupReviewOutlineDetail,
+        layout: DefaultLayout
+    },
+    {
+        path:"/semester/detail/council/:idSemester/:idCouncil",
+        page: DetailCouncil,
         layout: DefaultLayout
     },
     {

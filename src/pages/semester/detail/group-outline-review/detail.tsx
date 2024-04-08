@@ -15,7 +15,7 @@ import { ISemester } from "~/types/ISemesterType";
 import { IClassificationType } from "~/types/IClassificationType";
 import { getListMajor } from "~/services/majorApi";
 import { IMajorType } from "~/types/IMajorType";
-import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useNavigate, useParams } from 'react-router-dom';
 import ModalCustom from "~/components/Modal";
 import { toast } from "react-toastify";
@@ -23,7 +23,7 @@ import { ITeacher } from "~/types/ITeacherType";
 import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
 // import RegisterTeacher from "./input";
 import BoxWrapper from "~/components/BoxWrap";
-import { AssignGroupReviewProjectOutline, AssignGroupReviewTeaching, addGroupReview, assginGroupReviewToProjectOutline, assginGroupReviewToTeaching, deleteGroupReview, getGroupReview, getListProjectOutlineByGroupId, getListReviewOutline, getListReviewOutlineSemester, getListTeachingSemester, updateGroupReview } from "~/services/groupReviewOutlineApi";
+import { AssignGroupReviewProjectOutline, AssignGroupReviewTeaching, addGroupReview, assginGroupReviewToProjectOutline, assginGroupReviewToTeaching, deleteGroupReview, getGroupReview, getListProjectOutlineByGroupId, getListReviewOutline, getListReviewOutlineSemester, getListTeachingGroupOutline, updateGroupReview } from "~/services/groupReviewOutlineApi";
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
 import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
@@ -36,20 +36,12 @@ import { randomId } from "@mui/x-data-grid-generator";
 import { IProjectOutline } from "~/types/IProjectOutline";
 
 
-const validationSchema = yup.object({
-    groupReviewOutlineId: yup
-      .string()
-      .required('Mã nhóm xét duyệt'),
-      nameGroupReviewOutline: yup
-      .string()
-      .required('Tên nhóm xét duyệt'),
-
-  });
-
-
-
 function GroupReviewOutlineDetail() {
-    const [rows,setRows] = useState<any>([]);
+    const [lstProjectInGroup,setLstProjectInGroup] = useState<any>([]);
+    const [totalLstProjectInGroup, setTotalLstProjectInGroup] = useState(0);
+    const [lstProjectNotInGroup,setLstProjectNotInGroup] = useState<any>([]);
+    const [totalLstProjectNotInGroup, setTotalLstProjectNotInGroup] = useState(0);
+
     const {idGroup,idSemester} = useParams();
     const info = useAppSelector(inforUser);
     const navigate = useNavigate();
@@ -60,11 +52,9 @@ function GroupReviewOutlineDetail() {
         isDelete: 0,
         createdDate: new Date()
     });
-    const [totalStudent, setTotalStudent] = useState(0);
     const apiRefStudent = useGridApiRef();
     const [openModalInput,setOpenModalInput] = useState(false);
     const [openModalAddStudent,setOpenModalAddStudent] = useState(false);
-    const [rowsStudent,setRowsStudent] = useState<any>([]);
     const [rowsStudentChecked,setRowsStudentChecked] = useState<any>([]);
     const [paginationModel, setPaginationModel] = useState({
         pageSize: 5,
@@ -80,7 +70,6 @@ function GroupReviewOutlineDetail() {
 
     const apiRef = useGridApiRef();
     const [openModalDelete, setOpenModalDelete] = useState(false);
-    const [total, setTotal] = useState(0);
     const [loadingData,setLoadingData] = useState(false);
     const initialData = {
         userNameSearch: "",
@@ -116,6 +105,11 @@ function GroupReviewOutlineDetail() {
             headerName: 'Tên đề tài',
             width: 250,
             editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.nameProject ? row?.nameProject : <span className="text-red-600">Chưa đăng ký</span>}  
+                </>
+            }
         },
         {
             field: 'statusProject',
@@ -129,23 +123,16 @@ function GroupReviewOutlineDetail() {
             width: 250,
             editable: true,
             renderCell:({row})=>{
-                return <>
-                    {row?.userNameMentorNavigation ? row?.userNameMentorNavigation?.userName : <span className="text-red-600">Chưa được gán</span>}  
-                </>
+                return <div onClick={(e)=>{
+                    e.stopPropagation();
+                    if(row?.userNameMentor){
+                        navigate("/profile/"+row?.userNameMentor)
+                    }
+                }}>
+                    {row?.userNameMentor ? row?.userNameMentor : <span className="text-red-600">Chưa được gán</span>}  
+                </div>
             }
         },
-        {
-            field: 'userNameMentorNavigation',
-            headerName: 'Giảng viên hướng dẫn',
-            width: 250,
-            editable: true,
-            renderCell:({row})=>{
-                return <>
-                    {row?.userNameMentorNavigation ? row?.userNameMentorNavigation?.fullName :<></>}  
-                </>
-            }
-        },
-        
         {
             field: 'semesterId',
             headerName: 'Mã học kỳ',
@@ -153,7 +140,7 @@ function GroupReviewOutlineDetail() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {idSemester}  
+                    {row?.semesterId}  
                 </>
             }
         },
@@ -190,6 +177,11 @@ function GroupReviewOutlineDetail() {
             headerName: 'Tên đề tài',
             width: 250,
             editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.nameProject ? row?.nameProject : <span className="text-red-600">Chưa đăng ký</span>}  
+                </>
+            }
         },
         {
             field: 'statusProject',
@@ -204,29 +196,7 @@ function GroupReviewOutlineDetail() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.userNameMentorNavigation ? row?.userNameMentorNavigation?.userName : <span className="text-red-600">Chưa được gán</span>}  
-                </>
-            }
-        },
-        {
-            field: 'userNameMentorNavigation',
-            headerName: 'Giảng viên hướng dẫn',
-            width: 250,
-            editable: true,
-            renderCell:({row})=>{
-                return <>
-                    {row?.userNameMentorNavigation ? row?.userNameMentorNavigation?.fullName :<></>}  
-                </>
-            }
-        },
-        {
-            field: 'groupReviewOutlineId',
-            headerName: 'Mã nhóm xét duyệt',
-            width: 200,
-            editable: true,
-            renderCell:({row})=>{
-                return <>
-                    {row?.groupReviewOutline ? row?.groupReviewOutline?.groupReviewOutlineId : <span className="text-red-600">Chưa được gán</span>}  
+                    {row?.userNameMentor ? row?.userNameMentor : <span className="text-red-600">Chưa được gán</span>}  
                 </>
             }
         },
@@ -237,7 +207,7 @@ function GroupReviewOutlineDetail() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.groupReviewOutline ? row?.groupReviewOutline?.nameGroupReviewOutline :<></>}  
+                    {row?.groupReviewOutline ? row?.groupReviewOutline?.nameGroupReviewOutline :<span className="text-red-600">Chưa được gán</span>}  
                 </>
             }
         },
@@ -245,7 +215,7 @@ function GroupReviewOutlineDetail() {
     ]
     useEffect(()=>{
         setLoadingData(true)
-        Promise.all([hanleFetchApi(),handleFetchDetailGroup(),handleFetchApiProjectOutlineAll()])
+        Promise.all([hanleFetchApi(),handleFetchDetailGroup()])
         .then((res)=>{
             setLoadingData(false)
         })
@@ -281,9 +251,9 @@ function GroupReviewOutlineDetail() {
         if(idSemester){
             await getListProjectOutlineByGroupId({
                 semesterId: idSemester,
-                groupReviewOutlineId: idGroup,
-                nameProject: formik.values.nameProjectSearch,
-                UserName: formik.values.userNameSearch
+                // groupReviewOutlineId: idGroup,
+                // nameProject: formik.values.nameProjectSearch,
+                // UserName: formik.values.userNameSearch
             })
             .then((res:IResponse<IProjectOutline[]>)=>{
               console.log(res)
@@ -291,98 +261,107 @@ function GroupReviewOutlineDetail() {
                 const dataMap = res.returnObj;
                 
                 if(dataMap.length <= 0) {
-                    setTotal(0)
-                    setRows([])
+                    setTotalLstProjectInGroup(0)
+                    setLstProjectInGroup([])
+                    setLstProjectNotInGroup([])
                 }else{
-                    const newMap = dataMap.map((data:IProjectOutline,index:any)=>{
+                    const lstInGroup = dataMap.filter(x=>x?.groupReviewOutlineId == idGroup).map((data:IProjectOutline,index:any)=>{
                         return {
-                          id: index+1,
+                          id: index+1, 
                           ...data,
                           ...data?.userNameNavigation,
                         }
                     })
-                    console.log(newMap,"sadkaksdkasd")
-                    const totalItem = newMap.length;
-                    setTotal(totalItem)
-                    setRows([...newMap])
-                }
-              }
-            })
-        }
-        
-    }
-
-    const handleFetchApiProjectOutlineAll = async ()=>{
-        if(idSemester){
-            await getListProjectOutlineByGroupId({
-                semesterId: idSemester,
-                groupReviewOutlineId: idGroup,
-                nameProject: "",
-                UserName: valueSearchStudent,
-                isGetAll: 1
-            })
-            .then((res:IResponse<IProjectOutline[]>)=>{
-              console.log(res)
-              if(res.success && res.returnObj) {
-                const dataMap = res.returnObj;
-                
-                if(dataMap.length <= 0) {
-                    setTotal(0)
-                    setRows([])
-                }else{
-                    const newMap = dataMap.map((data:IProjectOutline,index:any)=>{
-                        return {
-                          id: index+1,
-                          ...data,
-                          ...data?.userNameNavigation,
-                        }
-                    })
-                    const totalItem = newMap.length;
-                    setRowsStudent([...newMap])
                     
-                    const checked = newMap.filter((item:any,index:any)=>{
-                        return item?.groupReviewOutline?.groupReviewOutlineId == idGroup
+                    setTotalLstProjectInGroup(lstInGroup.length)
+                    setLstProjectInGroup([...lstInGroup])
+
+                    console.log(dataMap)
+                    const lstNotInGroup = dataMap.map((data:IProjectOutline,index:any)=>{
+                        return {
+                          id: index+1,
+                          ...data,
+                          ...data?.userNameNavigation,
+                        }
+                    }).sort(function(a:any, b:any) {
+                        if (a?.groupReviewOutlineId === idGroup && b?.groupReviewOutlineId !== idGroup) {
+                          return -1; // a nằm trước b
+                        }
+                      
+                        if (a?.groupReviewOutlineId !== idGroup && b?.groupReviewOutlineId === idGroup) {
+                          return 1; // b nằm trước a
+                        }
+                      
+                        return 0; // Giữ nguyên thứ tự ban đầu
+                      })
+                    setTotalLstProjectNotInGroup(lstNotInGroup.length)
+                    setLstProjectNotInGroup([...lstNotInGroup])
+
+                    const checked = lstNotInGroup.filter((item:any,index:any)=>{
+                        if(item?.userNameNavigation?.userNameMentor){
+                            console.log(item)
+                        }
+                        return item?.groupReviewOutlineId == idGroup
                     }).map((r,index) => r.id)
-                    setTotalStudent(totalItem)
                     setRowsStudentChecked([...checked])
                 }
               }
             })
-    }
+        }
+         
     }
 
-    
-
-    const formikInput = useFormik({
-        initialValues: {
-            groupReviewOutlineId: "",
-            nameGroupReviewOutline: "",
-        },
-        validationSchema: validationSchema,
-        onSubmit: (values,{ setSubmitting, setErrors, setStatus }) => {
-          console.log(values);
-          const req: IGroupReviewOutline = {
-            groupReviewOutlineId: values.groupReviewOutlineId,
-            nameGroupReviewOutline: values.nameGroupReviewOutline,
-            createdBy:info?.userName
-          }
-          addGroupReview(req)
-            .then((res:IResponse<any>)=>{
-                if(res.success){
-                    setOpenModalInput(false)
-                    formikInput.resetForm();
-                    setPaginationModel({
-                        page: 0,
-                        pageSize: 5,
-                        pageMax: -1
-                    })
-                    toast.success(res.msg)
-                }else{
-                    setErrors({ groupReviewOutlineId: res.msg})
-                }
-            })
-        },
-    });
+    const handleFetchApiProjectOutlineAll = async ()=>{
+    //     if(idSemester){
+    //         await getListProjectOutlineByGroupId({
+    //             semesterId: idSemester,
+    //             groupReviewOutlineId: idGroup,
+    //             nameProject: "",
+    //             UserName: valueSearchStudent
+    //         })
+    //         .then((res:IResponse<IProjectOutline[]>)=>{
+    //           console.log(res)
+    //           if(res.success && res.returnObj) {
+    //             const dataMap = res.returnObj;
+                
+    //             if(dataMap.length <= 0) {
+    //                 setTotal(0)
+    //                 setRows([])
+    //             }else{
+    //                 const newMap = dataMap.map((data:IProjectOutline,index:any)=>{
+    //                     return {
+    //                       id: index+1,
+    //                       ...data,
+    //                       ...data?.userNameNavigation,
+    //                       ...data?.groupReviewOutline
+    //                     } 
+    //                 })
+    //                 const totalItem = newMap.length;
+                    // setRowsStudent([...newMap].sort(function(a:any, b:any) {
+                    //     if (a?.groupReviewOutlineId === idGroup && b?.groupReviewOutlineId !== idGroup) {
+                    //       return -1; // a nằm trước b
+                    //     }
+                      
+                    //     if (a?.groupReviewOutlineId !== idGroup && b?.groupReviewOutlineId === idGroup) {
+                    //       return 1; // b nằm trước a
+                    //     }
+                      
+                    //     return 0; // Giữ nguyên thứ tự ban đầu
+                    //   }))
+                    
+    //                   setTotalStudent(totalItem)
+                    //   const checked = newMap.filter((item:any,index:any)=>{
+                    //       if(item?.userNameNavigation?.userNameMentor){
+                    //           console.log(item)
+                    //       }
+                    //       return item?.groupReviewOutlineId == idGroup
+                    //   }).map((r,index) => r.id)
+                    // setRowsStudentChecked([...checked])
+    //             }
+    //           }
+    //         })
+    // }
+    }
 
     const handlePaginationModelChangeTeacher = async (newPaginationModel: GridPaginationModel) => {
         // We have the cursor, we can allow the page transition.
@@ -414,74 +393,11 @@ function GroupReviewOutlineDetail() {
                     </h2>
                     <div className={"grid grid-cols-8 mb-5"}>
                         <div className={"col-span-8 my-1"}>
-                            <b>Mã phòng:</b> <span className={"text-text-color"}>{groupSelected?.groupReviewOutlineId}</span> 
-                        </div>
-
-                        <div className={"col-span-8 my-1"}>
                             <b>Tên phòng:</b> <span className={"text-text-color"}>{groupSelected?.nameGroupReviewOutline}</span> 
                         </div>
                     </div>
                     <div>
-                        {/* Form tìm kiếm */}
-                        {
-                            <form action="" onSubmit={formik.handleSubmit}>
-                                <div className="grid grid-cols-12 gap-4">
-
-                                    <div className="col-span-6">
-                                        <TextField
-                                            onChange={formik.handleChange}
-                                            value={formik.values.userNameSearch} 
-                                            id="userNameSearch" 
-                                            label="Tên tài khoản"
-                                            name="userNameSearch"
-                                            variant="outlined"
-                                            fullWidth 
-                                        />
-                                    </div>
-
-                                    <div className="col-span-6">
-                                        <TextField
-                                            onChange={formik.handleChange} 
-                                            value={formik.values.nameProjectSearch} 
-                                            id="nameProjectSearch" 
-                                            label="Tên đồ án"
-                                            name="nameProjectSearch"
-                                            variant="outlined"
-                                            fullWidth 
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between mt-5">
-                                    <div className="flex">
-                                        <div className="me-2">
-                                            <Button type="submit" variant="outlined" startIcon={<SearchIcon />}
-                                                onClick={()=>{
-                                                    hanleFetchApi()
-                                                }}
-                                            >
-                                                Tìm kiếm
-                                            </Button>
-                                        </div>
-                                        <div>
-                                            <Button variant="text" onClick={()=>{
-                                                formik.resetForm()
-                                            }}>
-                                                <RefreshIcon />
-                                            </Button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <Button variant="contained" startIcon={<AddIcon />} onClick={()=>{
-                                            setOpenModalAddStudent(true)
-                                        }}>
-                                            Thêm sinh viên vào nhóm
-                                        </Button>
-                                    </div>
-                                </div>
-                            </form>
-                        }
+                        
 
                         {/* Danh sách tìm kiếm */}
                         <div className="mt-5">
@@ -498,17 +414,25 @@ function GroupReviewOutlineDetail() {
                                     }
                                 }}
                                 checkboxSelection={false}
-                                rows={rows}
+                                rows={lstProjectInGroup}
                                 columns={columns}
-                                rowCount={total}
+                                // rowCount={totalLstProjectInGroup}
                                 localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
                                 onPaginationModelChange={handlePaginationModelChange}
                                 onCellClick={({row})=>{
-                                    const idGroup = row?.groupReviewOutlineId;
-                                    if(idSemester && idGroup){
-                                        navigate(`/semester/detail/group-reivew/${idSemester}/${idGroup}`);
+                                    if(row?.userName){
+                                        navigate("/profile/"+row?.userName)
                                     }
                                 }}
+                                slots={{ toolbar: ()=> <> <GridToolbarContainer>
+                                    <GridToolbarColumnsButton />
+                                    <GridToolbarFilterButton  />
+                                    <Button variant="text" startIcon={<AddIcon />} onClick={()=>{
+                                        setOpenModalAddStudent(true)
+                                    }}>
+                                        Thêm sinh viên vào nhóm
+                                    </Button>
+                                </GridToolbarContainer></> }}
                                 initialState={{
                                 pagination: {
                                     paginationModel: { page: paginationModel.page, pageSize: paginationModel.pageSize },
@@ -535,12 +459,12 @@ function GroupReviewOutlineDetail() {
                                         loadingData ? <LoadingData /> : 
                                         <DataGrid
                                         apiRef={apiRefStudent}
-                                        rows={rowsStudent}
+                                        rows={lstProjectNotInGroup}
                                         loading={loadingData}
                                         columns={columnsProjectOutline}
-                                        rowCount={totalStudent}
+                                        // rowCount={totalLstProjectNotInGroup}
                                         checkboxSelection={true}
-                                        isRowSelectable={(params: GridRowParams) => params.row?.groupReviewOutline?.groupReviewOutlineId == idGroup || !params.row?.groupReviewOutline?.groupReviewOutlineId}
+                                        isRowSelectable={(params: GridRowParams) => params.row?.groupReviewOutlineId == idGroup || !params.row?.groupReviewOutlineId}
                                         rowSelectionModel={rowsStudentChecked}
                                         onRowSelectionModelChange={setRowsStudentChecked}
                                         localeText={viVN.components.MuiDataGrid.defaultProps.localeText}

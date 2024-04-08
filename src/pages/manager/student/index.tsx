@@ -29,6 +29,7 @@ import { getListTeacher } from "~/services/teacherApi";
 import { ITeacher } from "~/types/ITeacherType";
 import { assignTeacherMentor } from "~/services/projectApi";
 import BoxWrapper from "~/components/BoxWrap";
+import { renderStatusAccount } from "~/ultis/common";
 
 
 
@@ -240,7 +241,7 @@ function StudentManager({setCurrentPage}:IPageProps) {
             editable: true,
             renderCell:({row})=>{
                 return <>{
-                    row?.status == "AUTH" ? <span className="text-green-600">Hoạt động</span>: <span className="text-red-600">Bị khóa</span>
+                    <span className={`${row?.status == "BLOCK" ? "text-red-600" : "text-green-600"}`}>{renderStatusAccount(row?.status)}</span>
                 }</>
             }
         }

@@ -479,7 +479,7 @@ function GroupReviewOutlineManager({setCurrentPage}:IPageProps) {
                                         </div>
                                     </div>
                                 </form>
-                            </div>
+                        </div>
                     </Modal>
 
                     <Modal

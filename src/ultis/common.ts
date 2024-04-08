@@ -223,6 +223,35 @@ function caculatorTime(date: string): string {
     return numberMonth + " tháng trước";
 }
 
+export function renderRoleInCouncil(role?: string){
+    if(role == "CT"){
+        return "Chủ tịch"
+    }
+    if(role == "TK"){
+        return "Thư ký"
+    }
+    if(role == "UV1"){
+        return "Ủy viên 1"
+    }
+    if(role == "UV2"){
+        return "Ủy viên 2"
+    }
+    if(role == "UV3"){
+        return "Ủy viên 3"
+    }
+    return ""
+}
+
+export function renderStatusAccount(status?: string){
+    if(status == "AUTH"){
+        return "Hoạt động"
+    }
+    if(status == "BLOCK"){
+        return "Bị khóa"
+    }
+    return ""
+}
+
 export function dateShowNotification(fromDate:any, toDate:any){
     const timeCaculator = caculatorTime(fromDate);
     const strFromDate = formatDateTypeDateOnly(fromDate);

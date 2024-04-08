@@ -22,6 +22,7 @@ import { ITeacher } from "~/types/ITeacherType";
 import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
 import RegisterTeacher from "./input";
 import BoxWrapper from "~/components/BoxWrap";
+import { renderStatusAccount } from "~/ultis/common";
 
 
 
@@ -142,6 +143,11 @@ function TeacherManager({setCurrentPage}:IPageProps) {
             headerName: 'Trạng thái tài khoản',
             width: 160,
             editable: true,
+            renderCell:({row})=>{
+                return <>{
+                    <span className={`${row?.status == "BLOCK" ? "text-red-600" : "text-green-600"}`}>{renderStatusAccount(row?.status)}</span>
+                }</>
+            }
         },
         {
             field: 'action',

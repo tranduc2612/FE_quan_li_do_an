@@ -22,8 +22,7 @@ export interface ReqListProjectOutlineModel{
     semesterId: string
     groupReviewOutlineId?: string,
     UserName?: string,
-    nameProject?:string,
-    isGetAll?:number
+    nameProject?:string
 }
 
 export const getListReviewOutline = async (dataReq:any): Promise<IResponse<IBaseList<IGroupReviewOutline>>> => {
@@ -33,7 +32,7 @@ export const getListReviewOutline = async (dataReq:any): Promise<IResponse<IBase
     return data;
 }
 
-export const getListTeachingSemester = async (dataReq:any): Promise<IResponse<ITeaching[]>> => {
+export const getListTeachingGroupOutline = async (dataReq:any): Promise<IResponse<ITeaching[]>> => {
     const data: IResponse<ITeaching[]> = await request.post("/GroupReviewOutline/get-list-teaching",{
         ...dataReq
     });

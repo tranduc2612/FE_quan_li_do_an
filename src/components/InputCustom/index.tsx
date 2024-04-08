@@ -15,8 +15,9 @@ type IProps = {
     onChange: any,
     onBlur: any,
     placeholder?: string,
-    multiline?:boolean
+    multiline?:boolean,
 }
+
 
 const CssTextField = styled(TextField)({
     '&': {
@@ -25,6 +26,9 @@ const CssTextField = styled(TextField)({
     '& .MuiFormHelperText-root':{
         fontSize:"0.89rem",
         margin: '0px'
+    },
+    '& textarea::placeholder':{
+        whiteSpace:"pre-wrap"
     },
     '& ~ &': {
         marginTop: '20px',
@@ -76,7 +80,6 @@ function InputCustom({
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
     };
-
     
 
     return (<>
@@ -93,6 +96,7 @@ function InputCustom({
             onBlur={onBlur}
             multiline={multiline}
             fullWidth
+            
         >
             
         </CssTextField>

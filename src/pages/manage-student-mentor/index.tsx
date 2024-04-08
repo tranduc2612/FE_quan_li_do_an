@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import BoxWrapper from '~/components/BoxWrap';
+import HeaderPageTitle from '~/components/HeaderPageTitle';
 import InputSelectCustom from '~/components/InputSelectCustom';
 import LoadingData from '~/components/LoadingData';
 import { useAppSelector } from "~/redux/hook";
@@ -212,89 +213,94 @@ function ManageStudentMentor() {
     
 
     return (
-        <BoxWrapper className=''>
-            <div className="p-4">
-            <div className="grid grid-cols-3 mb-5">
-                <div className="col-span-1">
-                    <InputSelectCustom
-                        id={"semester"}
-                        name={"semester"}
-                        onChange={formik.handleChange}
-                        value={formik.values.semester}
-                        placeholder="Học kỳ"
-                        label="Học kỳ"
-                        onBlur={undefined}
-                    >
-                        {
-                            semesterOption && semesterOption.map((x)=>{
-                                return <MenuItem key={x.semesterId} value={x.semesterId}>{x.nameSemester}</MenuItem>
-                            })
-                        }
-                    </InputSelectCustom>
-                </div>
-            </div>
-            {
-                loadingData ? <LoadingData /> : 
-                <>
-                    
-                            { <div>
-                                {/* Danh sách tìm kiếm */}
-                                <div className="mt-5">
-                                    <DataGrid
-                                        apiRef={apiRef}
-                                        sx={{
-                                            // disable cell selection style
-                                            '.MuiDataGrid-cell:focus': {
-                                            outline: 'none'
-                                            },
-                                            // pointer cursor on ALL rows
-                                            '& .MuiDataGrid-row:hover': {
-                                            cursor: 'pointer'
-                                            }
-                                        }}
-                                        rows={rows}
-                                        columns={columns}
-                                        rowCount={total}
-                                        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                        onCellClick={({row})=>{
-                                            // const idSemester = id;
-                                            // const idGroup = row?.groupReviewOutlineId;
-                                            if(row?.userName){
-                                                navigate(`/profile/${row?.userName}`);
-                                            }
-                                        }}
-                                        initialState={{
-                                        pagination: {
-                                            paginationModel: { page: 0, pageSize: 10 },
-                                        },
-                                        }}
-                                        slots={{ toolbar: ()=> <> <GridToolbarContainer>
-                                                    <GridToolbarColumnsButton />
-                                                    <GridToolbarFilterButton  />
-                                                    <Button startIcon={<Download />}>Excel</Button>
-                                                    <Button variant='text' startIcon={<BookClock />} onClick={()=>{
-                                                        navigate("/schedule-week/"+formik.values.semester)
-                                                    }}>
-                                                    Báo cáo tuần
-                                                </Button>
-                                            </GridToolbarContainer></> }}
-                                        
-                                        pageSizeOptions={[10]}
-                                        slotProps={{
-                                            toolbar: {
-                                                printOptions: { disableToolbarButton: true },
-                                                csvOptions: { disableToolbarButton: true },
-                                            }}
-                                        }
-                                    />
-                                </div>
-                            </div>
+        <>
+            <HeaderPageTitle pageName="Sinh viên hướng dẫn" />
+            <BoxWrapper className=''>
+                <div className="p-4">
+                <h2 className={"font-bold text-primary-blue text-xl mb-10"}>
+                    Quản lý sinh viên hướng dẫn
+                </h2>
+                <div className="grid grid-cols-3 mb-5">
+                    <div className="col-span-1">
+                        <InputSelectCustom
+                            id={"semester"}
+                            name={"semester"}
+                            onChange={formik.handleChange}
+                            value={formik.values.semester}
+                            placeholder="Học kỳ"
+                            label="Học kỳ"
+                            onBlur={undefined}
+                        >
+                            {
+                                semesterOption && semesterOption.map((x)=>{
+                                    return <MenuItem key={x.semesterId} value={x.semesterId}>{x.nameSemester}</MenuItem>
+                                })
                             }
-                            
-                </>
-            }
-            </div>
-        </BoxWrapper>
+                        </InputSelectCustom>
+                    </div>
+                </div>
+                {
+                    loadingData ? <LoadingData /> : 
+                    <>
+                                { <div>
+                                    {/* Danh sách tìm kiếm */}
+                                    <div className="mt-5">
+                                        <DataGrid
+                                            apiRef={apiRef}
+                                            sx={{
+                                                // disable cell selection style
+                                                '.MuiDataGrid-cell:focus': {
+                                                outline: 'none'
+                                                },
+                                                // pointer cursor on ALL rows
+                                                '& .MuiDataGrid-row:hover': {
+                                                cursor: 'pointer'
+                                                }
+                                            }}
+                                            rows={rows}
+                                            columns={columns}
+                                            rowCount={total}
+                                            localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
+                                            onCellClick={({row})=>{
+                                                // const idSemester = id;
+                                                // const idGroup = row?.groupReviewOutlineId;
+                                                if(row?.userName){
+                                                    navigate(`/profile/${row?.userName}`);
+                                                }
+                                            }}
+                                            initialState={{
+                                            pagination: {
+                                                paginationModel: { page: 0, pageSize: 10 },
+                                            },
+                                            }}
+                                            
+                                            pageSizeOptions={[10]}
+                                            slots={{ toolbar: ()=> <> <GridToolbarContainer>
+                                                        <GridToolbarColumnsButton />
+                                                        <GridToolbarFilterButton  />
+                                                        <Button startIcon={<Download />}>Excel</Button>
+                                                        <Button variant='text' startIcon={<BookClock />} onClick={()=>{
+                                                            navigate("/schedule-week/"+formik.values.semester)
+                                                        }}>
+                                                        Báo cáo tuần
+                                                    </Button>
+                                                </GridToolbarContainer></> }}
+                                            slotProps={{
+                                                toolbar: {
+                                                    printOptions: { disableToolbarButton: true },
+                                                    csvOptions: { disableToolbarButton: true },
+                                                }}
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                                }
+                                
+                    </>
+                }
+                </div>
+            </BoxWrapper>
+        </>
     );
 }
 

@@ -3,7 +3,8 @@ export interface IGroupReviewOutline{
     nameGroupReviewOutline?: string,
     createdBy?:string,
     isDelete?: number,
-    createdDate?: Date
+    createdDate?: Date,
+    semesterId?:string
 }
 
 export interface IGroupReviewOutlineSemester{

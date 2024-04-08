@@ -43,12 +43,12 @@ function PageMannger() {
             icon: HumanMaleBoard,
             page:TeacherMannager
         },
-        {
-            id:EnumPage.GROUP_REVIEW_OUTLINE,
-            title:"Quản lý nhóm đọc duyệt",
-            icon: FormatListGroup,
-            page:GroupReviewOutlineManager
-        },
+        // {
+        //     id:EnumPage.GROUP_REVIEW_OUTLINE,
+        //     title:"Quản lý nhóm đọc duyệt",
+        //     icon: FormatListGroup,
+        //     page:GroupReviewOutlineManager
+        // },
         {
             id:EnumPage.TEMPLATE_FILE,
             title:"Quản lý biểu mẫu",

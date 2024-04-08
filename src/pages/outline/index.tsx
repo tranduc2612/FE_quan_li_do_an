@@ -225,40 +225,49 @@ function OutlinePage() {
                                 <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
                                     Giáo viên hướng dẫn
                                 </h2>
-                                <div className={"grid grid-cols-9 mb-5"}>
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Họ và tên:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.fullName}</span> 
-                                    </div>
+                                {
+                                    data?.userNameNavigation?.userNameMentor ? 
+                                    <div className={"grid grid-cols-9 mb-5"}>
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Họ và tên:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.fullName}</span> 
+                                        </div>
 
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Số điện thoại:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.phone}</span> 
-                                    </div>
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Số điện thoại:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.phone}</span> 
+                                        </div>
 
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Email:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.email}</span> 
-                                    </div>
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Email:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.email}</span> 
+                                        </div>
 
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Chuyên ngành:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.major?.majorName}</span> 
-                                    </div>
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Chuyên ngành:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.major?.majorName}</span> 
+                                        </div>
 
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Học hàm:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.education}</span> 
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Học hàm:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.education}</span> 
+                                        </div>
                                     </div>
-                                </div>
+                                    :
+                                    <h1 className="text-2xl text-red-600">Chưa được phân giáo viên hướng dẫn</h1>
+                                }
 
                                 <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
                                     Nhóm xét duyệt
                                 </h2>
-                                <div className={"grid grid-cols-9 mb-5"}>
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Mã nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.groupReviewOutlineId}</span> 
-                                    </div>
+                                {
+                                    data?.groupReviewOutline ? 
+                                    <div className={"grid grid-cols-9 mb-5"}>
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Mã nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.groupReviewOutlineId}</span> 
+                                        </div>
 
-                                    <div className={"col-span-3 m-2"}>
-                                        <b>Tên nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.nameGroupReviewOutline}</span> 
+                                        <div className={"col-span-3 m-2"}>
+                                            <b>Tên nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.nameGroupReviewOutline}</span> 
+                                        </div>
                                     </div>
-                                </div>
+                                    : <h1 className="text-2xl text-red-600">Chưa được phân nhóm xét duyệt</h1>
+                                }
 
                                 <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
                                     Nội dung đề cương
@@ -343,7 +352,7 @@ function OutlinePage() {
             <BoxWrapper className={"col-span-3 max-h-screen overflow-hidden"}>
                 <div>
                     <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
-                        Nhận xét nhóm xét duyệt
+                        Nhận xét
                     </h2>
                     {
                     allowComment &&

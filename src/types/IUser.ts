@@ -1,3 +1,4 @@
+import { ICouncil } from "./ICouncil";
 import { IMajorType } from "./IMajorType";
 import { IProjecType } from "./IProjectType";
 
@@ -26,5 +27,6 @@ export interface IUser {
     isDelete?: number,
     status?:string,
     project?:IProjecType,
-    major?: IMajorType
+    major?: IMajorType,
+    council?: ICouncil,
 }

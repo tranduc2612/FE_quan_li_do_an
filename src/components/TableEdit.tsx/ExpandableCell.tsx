@@ -1,7 +1,7 @@
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { Link } from "mdi-material-ui";
 import * as React from 'react';
-function ExpandableCell({ value }: GridRenderCellParams) {
+function ExpandableCell({ value,length }: any) {
     const [expanded, setExpanded] = React.useState(false);
   
     return (
@@ -9,9 +9,9 @@ function ExpandableCell({ value }: GridRenderCellParams) {
         <span style={{
           whiteSpace: "pre-wrap"
         }}>
-          {expanded ? value : value?.toString().slice(0, 200)}
+          {expanded ? value : value?.toString().slice(0, 100)}
         </span>
-        {value?.length > 200 && (
+        {value?.length > 100 && (
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
           <span
             className="cursor-pointer text-xs underline text-primary-blue"

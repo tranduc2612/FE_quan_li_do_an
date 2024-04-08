@@ -7,6 +7,7 @@ import PlantSemester from "./plant-semester";
 import AccordionCustom from "~/components/AccordionCustom";
 import Add from "@mui/icons-material/Add";
 import GroupOutlineReview from "./group-outline-review";
+import CouncilSemester from "./council";
 
 function DetailSemesterPage() {
     const navigate = useNavigate();
@@ -54,7 +55,7 @@ function DetailSemesterPage() {
 
         <div className="mb-5">
             <AccordionCustom inititalToggle={true} header={"Danh sách hội đồng bảo vệ"} size={"xxxl"}>
-                <h1>Hello</h1>
+                <CouncilSemester />
             </AccordionCustom>
         </div>
     </>  );

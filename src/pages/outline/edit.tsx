@@ -2,7 +2,7 @@ import BoxWrapper from "~/components/BoxWrap";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
 import { Button, InputLabel, TextField } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, Pencil,PrinterCheck } from "mdi-material-ui";
+import { Check, ChevronLeft, Pencil,PrinterCheck } from "mdi-material-ui";
 import * as yup from 'yup';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -77,6 +77,7 @@ function EditOutlinePage() {
             updateProjectOutline(req)
             .then((res)=>{
                 if(res.success){
+                    toast.success(res.msg)
                     navigate("/outline/"+info?.userName)
                 }else{
                     toast.error(res.msg)
@@ -309,8 +310,8 @@ function EditOutlinePage() {
                             Quay lại
                     </Button>
                     <div>
-                        <Button variant="contained" type="submit" startIcon={<EditIcon />}>
-                            Chỉnh sửa
+                        <Button variant="contained" type="submit" startIcon={<Check />}>
+                            Lưu
                         </Button>
                         {/* <Button onClick={()=>{navigate(-1)}} variant="contained" startIcon={<PrinterCheck />}>
                             In

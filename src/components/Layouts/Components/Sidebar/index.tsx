@@ -1,4 +1,4 @@
-import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog,School,AccountSchool } from 'mdi-material-ui'
+import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog,School,AccountSchool, ApplicationOutline } from 'mdi-material-ui'
 import { NavLink, useNavigate } from 'react-router-dom';
 import images from '~/assets';
 import { useAppDispatch, useAppSelector } from '~/redux/hook';
@@ -71,6 +71,14 @@ function SideBar() {
             url:'/manager-student-mentor',
             title:"Sinh viên hướng dẫn",
             icon: AccountSchool,
+            role: "TEACHER",
+            isAdmin:0
+        },
+        {
+            id: randomId(),
+            url:'/teacher/council',
+            title:"Hội đồng bảo vệ",
+            icon: ApplicationOutline,
             role: "TEACHER",
             isAdmin:0
         },

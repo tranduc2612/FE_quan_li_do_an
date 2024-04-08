@@ -10,6 +10,7 @@ export interface IProjectOutline{
         techProject?:string,
         expectResult?:string,
         contentProject?:string,
+        groupReviewOutlineId?:string,
         comments?: ICommentType[],
         groupReviewOutline?:IGroupReviewOutline,
         userNameNavigation?: IProjecType,
