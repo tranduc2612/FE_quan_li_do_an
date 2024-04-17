@@ -43,6 +43,18 @@ export const getListProjectCouncil = async (dataReq: ListProjectCouncil): Promis
     return data;
 }
 
+export const excelListProjectCouncil = async (dataReq: ListProjectCouncil): Promise<IResponse<any>> => {
+    const data: any = await request.post(`/Report/export-excel-council-by-id`,
+    {
+        ...dataReq
+    },
+    {
+        responseType: 'blob'
+    }
+    )
+    return data;
+}
+
 export const getListTeachingNotInCouncil = async (dataReq: any): Promise<IResponse<ITeaching[]>> => {
     const data: IResponse<ITeaching[]> = await request.post("/Council/get-list-teaching-in-council",{
         ...dataReq

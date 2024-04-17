@@ -3,7 +3,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarColumnsButton, G
 import { useFormik } from "formik";
 import { Account, BookClock, ClipboardEdit, Download } from 'mdi-material-ui';
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import BoxWrapper from '~/components/BoxWrap';
 import HeaderPageTitle from '~/components/HeaderPageTitle';
 import InputCustom from "~/components/InputCustom";
@@ -11,7 +11,7 @@ import InputSelectCustom from '~/components/InputSelectCustom';
 import LoadingData from '~/components/LoadingData';
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { getListProjectCouncil, getTeaching } from '~/services/councilApi';
+import { excelListProjectCouncil, getListProjectCouncil, getTeaching } from '~/services/councilApi';
 import { getListSemester } from '~/services/semesterApi';
 import { IProjecType } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
@@ -28,7 +28,9 @@ const validationSchema = yup.object({
     score: yup
     .string()
     .required('Điểm không được để trống')
-    .matches(/^(10(\.0{1,2})?|[0-9](\.[0-9]{1,2})?)$/, "Điểm không hợp lệ"),
+    // .min(0)
+    // .max(10),
+    .matches(/^(10(\,0+)?|[0-9](\,[0-9]+)?)$/, "Điểm không hợp lệ"),
     comment: yup
     .string()
 });
@@ -43,19 +45,38 @@ function TeacherCouncil() {
     const [semesterOption,setSemesterOption] = useState<ISemester[]>([])
     const [loadingData,setLoadingData] = useState(false);
     const [openModal,setOpenModal] = useState(false);
-    const initialData = {
-        semester:"",
-        score: "",
-        comment:"",
-        role: ""
-    }
+
     const formik = useFormik({
-        initialValues: initialData,
+        initialValues: {
+            semester:"",
+            score: "",
+            comment:"",
+            role: ""
+        },
         validationSchema: validationSchema,
-        onSubmit: (values) => {
-          console.log(values);
+        onSubmit: (values,{setSubmitting}) => {
+            console.log(formik.values.score)
+            const req:ScoreType = {
+                userName: selectedProject?.userName,
+                semesterId: formik.values.semester,
+                role: formik.values.role,
+                score: formik.values.score,
+                comment: formik.values.comment
+            } 
+            updateScore(req)
+            .then((res:IResponse<any>)=>{
+                if(res.success){
+                    toast.success(res.msg)
+                    setOpenModal(false);
+                    handleFetchApiTeaching();
+                }else{
+                    toast.error(res.msg)                                   
+                }
+            })
         },
     });
+
+    
 
     const columns: GridColDef[] = [
         {
@@ -72,7 +93,7 @@ function TeacherCouncil() {
             width: 200,
             editable: false,
             renderCell:({row})=>{
-                return <>
+                return <>   
                     <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
                             e.stopPropagation();
                             if(row?.userName){
@@ -86,29 +107,51 @@ function TeacherCouncil() {
                     <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
                             e.stopPropagation();
                             setSelectedProject(row);
+                            console.log(detailTeaching?.positionInCouncil)
                             if(detailTeaching?.positionInCouncil){
-                                formik.errors.comment = "";
-                                formik.errors.score = "";
-                                formik.values.role = detailTeaching?.positionInCouncil
+                            //     // formik.errors.comment = "";
+                            //     // formik.errors.score = "";
+                                // formik.values.role = detailTeaching?.positionInCouncil
                                 if(detailTeaching?.positionInCouncil === "CT"){
-                                    formik.values.score = row?.scoreCt || "0",
-                                    formik.values.comment = row?.commentCt || ""
+                                    formik.setValues({
+                                        ...formik.values,
+                                        score: row?.scoreCt?.toString()?.replace(".",","),
+                                        comment: row?.commentCt || "",
+                                        role: detailTeaching?.positionInCouncil
+                                    })
                                 }
                                 if(detailTeaching?.positionInCouncil === "TK"){
-                                    formik.values.score = row?.scoreTk || "0",
-                                    formik.values.comment = row?.commentTk || ""
+                                    formik.setValues({
+                                        ...formik.values,
+                                        score: row?.scoreTk?.toString()?.replace(".",","),
+                                        comment: row?.commentTk || "",
+                                        role: detailTeaching?.positionInCouncil
+                                    })
                                 }
                                 if(detailTeaching?.positionInCouncil === "UV1"){
-                                    formik.values.score = row?.scoreUv1 || "0",
-                                    formik.values.comment = row?.commentUv1 || ""
+                                    console.log(row?.scoreUv1)
+                                    formik.setValues({
+                                        ...formik.values,
+                                        score: row?.scoreUv1?.toString()?.replace(".",","),
+                                        comment: row?.commentUv1 || "",
+                                        role: detailTeaching?.positionInCouncil
+                                    })
                                 }
                                 if(detailTeaching?.positionInCouncil === "UV2"){
-                                    formik.values.score = row?.scoreUv2 || "0",
-                                    formik.values.comment = row?.commentUv2 || ""
+                                    formik.setValues({
+                                        ...formik.values,
+                                        score: row?.scoreUv2?.toString()?.replace(".",","),
+                                        comment: row?.commentUv2 || "",
+                                        role: detailTeaching?.positionInCouncil
+                                    })
                                 }
                                 if(detailTeaching?.positionInCouncil === "UV3"){
-                                    formik.values.score = row?.scoreUv3 || "0",
-                                    formik.values.comment = row?.commentUv3 || ""
+                                    formik.setValues({
+                                        ...formik.values,
+                                        score: row?.scoreUv3?.toString()?.replace(".",","),
+                                        comment: row?.commentUv3 || "",
+                                        role: detailTeaching?.positionInCouncil
+                                    })
                                 }
                                 setOpenModal(true);
                             }
@@ -142,68 +185,65 @@ function TeacherCouncil() {
         },
         {
             field: 'scoreCt',
-            headerName: 'Điểm chủ tịch',
+            headerName: 'Chủ tịch',
             width: 100,
             editable: false,
             align: 'center'
         },
         {
             field: 'commentCt',
-            headerName: 'Đánh giá chủ tịch',
+            headerName: 'Đánh giá',
             width: 300,
             editable: false,
             renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
         },
         {
             field: 'scoreTk',
-            headerName: 'Điểm thư ký',
+            headerName: 'Thư ký',
             width: 100,
             editable: false,
             align: 'center'
         },
         {
             field: 'commentTk',
-            headerName: 'Đánh giá thư ký',
+            headerName: 'Đánh giá',
             width: 300,
             editable: false
         },
         {
             field: 'scoreUv1',
-            headerName: 'Điểm ủy viên 1',
+            headerName: 'Ủy viên 1',
             width: 100,
-            editable: false,
-            align: 'center'
+            editable: false
         },
         {
             field: 'commentUv1',
-            headerName: 'Đánh giá ủy viên 1',
+            headerName: 'Ủy viên 1',
             width: 300,
             editable: false
         },
         {
             field: 'scoreUv2',
-            headerName: 'Điểm ủy viên 2',
+            headerName: 'Ủy viên 2',
             width: 100,
-            editable: false,
-            align: 'center'
+            editable: false
 
         },
         {
             field: 'commentUv2',
-            headerName: 'Đánh giá ủy viên 2',
+            headerName: 'Ủy viên 2',
             width: 300,
             editable: false
         },
         {
             field: 'scoreUv3',
-            headerName: 'Điểm ủy viên 3',
+            headerName: 'Ủy viên 3',
             width: 100,
-            editable: false,
-            align: 'center'
+            editable: false
         },
         {
             field: 'commentUv3',
-            headerName: 'Đánh giá ủy viên 3',
+            headerName: 'Ủy viên 3',
             width: 300,
             editable: false
         },
@@ -244,7 +284,9 @@ function TeacherCouncil() {
     ];
     useEffect(()=>{
         // hanleFetchApi();
-        handleFetchApiTeaching();
+        if(formik.values.semester.length > 0){
+            handleFetchApiTeaching();
+        }
 
     },[formik.values.semester])
 
@@ -391,12 +433,24 @@ function TeacherCouncil() {
                                     slots={{ toolbar: ()=> <> <GridToolbarContainer>
                                                 <GridToolbarColumnsButton />
                                                 <GridToolbarFilterButton  />
-                                                <Button startIcon={<Download />}>Excel</Button>
-                                                <Button variant='text' startIcon={<BookClock />} onClick={()=>{
-                                                    navigate("/schedule-week/"+formik.values.semester)
+                                                <Button variant="text" startIcon={<Download />} onClick={()=>{
+                                                    excelListProjectCouncil({
+                                                        semesterId: formik.values.semester,
+                                                        councilId: detailTeaching?.councilId
+                                                    })
+                                                    .then((res:any)=>{
+                                                        const link = document.createElement('a');
+                                                        const fileName = 'BangDiem.xlsx';
+                                                        link.setAttribute('download', fileName);
+                                                        link.href = URL.createObjectURL(new Blob([res]));
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        link.remove();
+
+                                                    })
                                                 }}>
-                                                Báo cáo tuần
-                                            </Button>
+                                                    Xuất bảng điểm
+                                                </Button>
                                         </GridToolbarContainer></> }}
                                     slotProps={{
                                         toolbar: {
@@ -414,10 +468,9 @@ function TeacherCouncil() {
             </BoxWrapper>
 
             <Modal
+                key={1}
                 open={openModal}
                 onClose={()=>setOpenModal(false)}
-                aria-labelledby="modal-modal-title-delete"
-                aria-describedby="modal-modal-description-delete"
             >
                 <div className="p-5 rounded-xl bg-white w-2/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     <div className="title mb-5" >
@@ -483,25 +536,7 @@ function TeacherCouncil() {
                             }}
                             >Đóng</Button>
                         </div>
-                            <Button variant="contained" type="submit" onClick={()=>{
-                                const req:ScoreType = {
-                                    userName: selectedProject?.userName,
-                                    semesterId: formik.values.semester,
-                                    role: formik.values.role,
-                                    score: formik.values.score,
-                                    comment: formik.values.comment
-                                } 
-                                updateScore(req)
-                                .then((res:IResponse<any>)=>{
-                                    if(res.success){
-                                        toast.success(res.msg)
-                                        setOpenModal(false);
-                                        handleFetchApiTeaching();
-                                    }else{
-                                        toast.error(res.msg)                                   
-                                    }
-                                })
-                            }}>
+                            <Button variant="contained" type="submit">
                                 Lưu
                             </Button>
                         </div>

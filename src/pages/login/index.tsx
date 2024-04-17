@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import images from "~/assets";
 import { useAppDispatch, useAppSelector } from "~/redux/hook";
@@ -27,21 +27,20 @@ const validationSchema = yup.object({
     password: yup
       .string()
       .required('Mật khẩu không được để trống'),
-      role: yup
-        .string()
+    //   role: yup
+    //     .string()
   });
 
 function LoginPage() {
+    const uuid = useId();
     const [loadSubmit,setLoadSubmit] = useState(0);
     const isLoginUser = useAppSelector(isLogin);
     const isLogging = useAppSelector(logging);
     const isErrorLogin = useAppSelector(isError);
     const errorLoginUser = useAppSelector(errorLogging);
-    console.log(errorLoginUser);
     const currentUser = useAppSelector(inforUser);
-    console.log(currentUser)
     const dispatch = useAppDispatch();
-
+    console.log(currentUser)
     useEffect(()=>{
         formik.setErrors({[errorLoginUser.typeError]:errorLoginUser.messageError})
     },[loadSubmit,errorLoginUser])
@@ -53,12 +52,28 @@ function LoginPage() {
             role:"STUDENT"
         },
         validationSchema: validationSchema,
-        onSubmit: async (values:ILoginPayload, { setSubmitting, setErrors, setStatus }) => {
+        onSubmit: async (values:ILoginPayload) => {
+            console.log(values);
           dispatch(login(values));
-          setSubmitting(false);
           setLoadSubmit(loadSubmit+1)
+        formik.setSubmitting(false);
         },
     });
+
+    // const handleSubmit = ()=>{
+    //     console.log(Object.entries(formik.errors))
+    //     if(formik.errors.password && formik.errors.username){
+    //         return
+    //     }
+    //         dispatch(login({
+    //             username:formik.values.username,
+    //             password: formik.values.password,
+    //             role:formik.values.role
+    //         }));
+
+    //       formik.setSubmitting(false);
+    //       setLoadSubmit(loadSubmit+1)
+    // }
 
 
 
@@ -84,7 +99,7 @@ function LoginPage() {
                     <h1 className="font-bold">HỆ THỐNG QUẢN LÝ ĐỒ ÁN</h1>
                 </div>
 
-                <form className="form flex justify-center flex-col w-full mt-5 mb-5" onSubmit={formik.handleSubmit}>
+                <form className="form flex justify-center flex-col w-full mt-5 mb-5" onSubmit={formik.handleSubmit} key={uuid}>
                     <InputCustom
                         id={"username"}
                         label="Tài khoản"

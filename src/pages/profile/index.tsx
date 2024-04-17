@@ -138,11 +138,12 @@ function Profile() {
                             <div className={"col-span-3 m-2"}>
                                 <b>Vai trò:</b> <span className={"text-text-color"}>
                                     {renderRole(profile?.role || "")}    
+
                                 </span> 
                             </div>
 
                             <div className={"col-span-3 m-2"}>
-                                <b>Trạng thái tài khoản:</b> {profile?.status == "BLOCK" ? <span className="text-red-600">{renderStatusAccount(profile?.status)}</span> : <span className="text-green-600">{renderStatusAccount(profile?.status)}</span>}  
+                                <b>Trạng thái tài khoản:</b> {<span className={`${profile?.status === "BLOCK" ? "text-red-600" : "text-green-600"}`}>{renderStatusAccount(profile?.status)}</span>}  
                             </div>
                         </div>
                     </div>
@@ -189,15 +190,11 @@ function Profile() {
 
                             <div className={"grid grid-cols-9 mt-2"}>
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Mã giảng viên:</b> <span className={"text-text-color"}>{profile?.teacherCode}</span>
-                                </div>
-
-                                <div className={"col-span-3 m-2"}>
                                     <b>Chuyên ngành:</b> {profile?.major ? <span className={"text-text-color"}>{profile?.major.majorName}</span> : <span className={"text-red-600"}>Chưa đăng ký</span>}
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Học vấn:</b> {profile?.major ? <span className={"text-text-color"}>{profile?.education}</span> : <span className={"text-red-600"}>Chưa đăng ký</span>}
+                                    <b>Học vị:</b> {profile?.major ? <span className={"text-text-color"}>{profile?.education}</span> : <span className={"text-red-600"}>Chưa đăng ký</span>}
                                 </div>
 
                                 
@@ -276,22 +273,6 @@ function Profile() {
                             </div>
                             <div className={"col-span-5 m-2"}>
                                 <b>Địa điểm: </b> {council?.councilZoom}
-                            </div>
-
-                            <div className={"col-span-10 m-2 mb-0 text-primary-blue font-bold"}>
-                                Chủ tịch
-                            </div>
-                            {/* Chủ tịch */}
-                            <div className={"col-span-10 m-2 mb-0"}>
-                                <div className={""}>
-                                    <b>Điểm: </b> {project?.scoreCt}
-                                </div>
-                                <div className={"whitespace-pre-wrap"}>
-                                    <b>Nhận xét: </b>{project?.commentCt}
-                                    <div className={""}>
-                                        
-                                    </div> 
-                                </div>
                             </div>
 
                             <div className={"col-span-10 m-2 mb-0 text-primary-blue font-bold"}>

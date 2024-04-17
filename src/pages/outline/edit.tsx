@@ -69,9 +69,9 @@ function EditOutlinePage() {
             const req: IProjectOutline = {
                 userName: info?.userName,
                 nameProject: formik.values.nameProject,
-                contentProject: formik.values.contentProject,
-                expectResult: formik.values.expectResult,
-                techProject: formik.values.techProject,
+                contentProject: JSON.stringify(formik.values.contentProject),
+                expectResult: JSON.stringify(formik.values.expectResult),
+                techProject: JSON.stringify(formik.values.techProject),
                 plantOutline: plantOutlineConvert
             }
             updateProjectOutline(req)
@@ -95,11 +95,33 @@ function EditOutlinePage() {
             if(res.returnObj === null || info?.userName !== id){
                 navigate("/outline/"+id)
             }else{
-                formik.values.nameProject = res.returnObj?.nameProject || ""
-                formik.values.techProject = res.returnObj?.techProject || ""
-                formik.values.expectResult = res.returnObj?.expectResult || ""
-                formik.values.contentProject = res.returnObj?.contentProject || ""
-                formik.values.plantOutline = res.returnObj?.plantOutline || ""
+              let resData = res.returnObj;
+                if(res.returnObj.contentProject){
+                    resData = {
+                        ...resData,
+                        contentProject: JSON.parse(res.returnObj.contentProject)
+                    }
+                }
+                if(res.returnObj.expectResult){
+                    resData = {
+                        ...resData,
+                        expectResult: JSON.parse(res.returnObj.expectResult)
+                    }
+                }
+                if(res.returnObj.techProject){
+                    resData = {
+                        ...resData,
+                        techProject: JSON.parse(res.returnObj.techProject)
+                    }
+                }
+                formik.setValues({
+                  nameProject: resData?.nameProject || "",
+                  contentProject:resData?.contentProject || "",
+                  expectResult: resData?.expectResult || "",
+                  techProject:resData?.techProject || "",
+                  plantOutline:resData?.plantOutline || ""
+                })
+                
                 if(res.returnObj.plantOutline){
                     const plant = JSON.parse(res.returnObj.plantOutline);
                     const mapPlant = plant.map((item:any)=>{
@@ -256,7 +278,7 @@ function EditOutlinePage() {
         {
           field: 'actions',
           type: 'actions',
-          headerName: 'Actions',
+          headerName: 'Thao tác',
           width: 100,
           cellClassName: 'actions',
           getActions: ({ id }) => {

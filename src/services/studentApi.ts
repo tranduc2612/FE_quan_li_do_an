@@ -14,6 +14,13 @@ export const addStudent = async (dataReq:IStudent): Promise<IResponse<any>> => {
     return data;
 }
 
+export const updateStudent = async (dataReq:any): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.put("/Student/update-student?",{
+        ...dataReq
+    });
+    return data;
+}
+
 export const deleteStudent = async (userName:string): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.delete("/Student/delete-student?username="+userName,{
     });

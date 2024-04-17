@@ -17,11 +17,12 @@ export interface IStudent {
     majorId?: string,
     schoolYearName?: string,
     address?:string,
+    statusProject?:string,// thêm vào đây để lấy cho dễ
     gender?:number,
     isDelete?:string,
     semesterId?:string, //Thêm vào đây để có những form gửi lên thì cần ID học kỳ, chứ update thì ko lấy được thằng này đâu vì API ko trả về
     major?: IMajorType,
     project?: IProjecType,
-    gpa?:number
+    gpa?:string
     
 }

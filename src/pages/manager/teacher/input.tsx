@@ -1,6 +1,6 @@
 import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Button, MenuItem, TextField } from "@mui/material";
+import { Button, MenuItem } from "@mui/material";
 import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -14,22 +14,24 @@ import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { getListClassification } from "~/services/classificationApi";
 import { getListMajor } from "~/services/majorApi";
-import { addTeacher } from "~/services/teacherApi";
+import { addTeacher, updateTeacher } from "~/services/teacherApi";
 import { IClassificationType } from "~/types/IClassificationType";
 import { IMajorType } from "~/types/IMajorType";
 import { IResponse } from "~/types/IResponse";
 import { ITeacher } from "~/types/ITeacherType";
-import { formatFullnameToUsername } from "~/ultis/common";
 
 
 const validationSchema = yup.object({
+    username: yup
+      .string()
+      .required('Tên đăng nhập không được để trống'),
     fullname: yup
       .string()
-      .required('Họ tên không được để trống')
-      .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u,"Họ tên không được chứa kí tự đặc biệt"),
+      .required('Họ tên không được để trống'),
+    //   .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u,"Họ tên không được chứa kí tự đặc biệt"),
     education: yup
       .string()
-      .required('Học vấn không được để trống'),
+      .required('Học vị không được để trống'),
     address: yup
       .string()
       .required('Địa chỉ không được để trống'),
@@ -39,9 +41,6 @@ const validationSchema = yup.object({
     major: yup
         .string()
         .required('Chuyên ngành không được để trống'),
-    teacher_code: yup
-        .string()
-        .required('Mã giảng viên không được để trống'),
     phone: yup
         .string()
         .required('Số điện thoại không được để trống')
@@ -55,7 +54,7 @@ const validationSchema = yup.object({
 
 
 
-function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
+function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFetchApi}:any) {
     const [dateOfBirth,setDateOfBirth] = useState<any>(dayjs(new Date()));
     const [loading,setLoading] = useState(true);
     const infoUser = useAppSelector(inforUser);
@@ -91,13 +90,27 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
             
             setLoading(false)
           })  
+          .then(()=>{
+            if(userSelect.userName){
+                console.log(userSelect)
+                const teacher:ITeacher = userSelect;
+                formik.values.username = teacher.userName || ""
+                formik.values.fullname = teacher.fullName || "";
+                setDateOfBirth(dayjs(teacher.dob))
+                formik.values.phone = teacher.phone || ""
+                formik.values.email = teacher.email || ""
+                formik.values.status = teacher.status || ""
+                formik.values.address = teacher.address || ""
+                formik.values.education = teacher.education || ""
+                formik.values.isAdmin = teacher.isAdmin || "0"
+            }
+        })  
     },[]);
 
     const formik = useFormik({
         initialValues: {
             username:"",
             fullname:"",
-            teacher_code: "",
             status: "",
             phone:"",
             email:"",
@@ -109,8 +122,12 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
       },
         validationSchema: validationSchema,
         onSubmit: async (values,{ setSubmitting, setErrors, setStatus }) => {
+            const date = dateOfBirth.$D < 10 ? "0"+dateOfBirth.$D.toString(): dateOfBirth.$D.toString();
+            const month = dateOfBirth.$M+1 < 10 ? "0"+(dateOfBirth.$M+1).toString(): (dateOfBirth.$M+1).toString();
+
             const dataSubmit: ITeacher = {
-                passwordText: `${dateOfBirth.$D}/${dateOfBirth.$M+1}/${dateOfBirth.$y}`,
+                userName: values.username,
+                passwordText: `${date}/${month}/${dateOfBirth.$y}`,
                 fullName: values.fullname,
                 dob: new Date(dateOfBirth.$y,dateOfBirth.$M,dateOfBirth.$D+1),
                 phone: values.phone,
@@ -119,20 +136,34 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
                 createdAt: new Date(),
                 createdBy: infoUser?.userName || "",
                 status: values.status,
-                teacherCode: values.teacher_code,
                 isAdmin: values.isAdmin,
                 address: values.address,
-                gender: values.gender
+                gender: values.gender,
+                education: values.education,
+                majorId: values.major
             }
-            const data = await addTeacher(dataSubmit);
-            if(data.success){
-                setSwitchPageInput(false);
-                toast.success(data.msg)
+            console.log(dataSubmit)
+            if(userSelect.userName){
+                const data = await updateTeacher(dataSubmit);
+                if(data.success){
+                    setSwitchPageInput(false);
+                    handleFetchApi();
+                    toast.success(data.msg)
+                }else{
+                    console.log(data)
+                    setErrors({ username: data.msg})
+                }
             }else{
-                console.log(data)
-                setErrors({ username: data.msg})
+                const data = await addTeacher(dataSubmit);
+                if(data.success){
+                    setSwitchPageInput(false);
+                    handleFetchApi();
+                    toast.success(data.msg)
+                }else{
+                    console.log(data)
+                    setErrors({ username: data.msg})
+                }
             }
-            console.log(data);
         },
     });
 
@@ -147,31 +178,17 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
         <form action="" onSubmit={formik.handleSubmit}>
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12">
-                            <TextField 
-                                id="username" 
-                                label="Tài khoản"
-                                value={formatFullnameToUsername(formik.values.fullname) +"_"+ formik.values.teacher_code}
-                                name="username"
-                                variant="outlined"
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                                error={formik.touched.username && Boolean(formik.errors.username)} 
-                                helperText={formik.touched.username && formik.errors.username} 
-                                fullWidth 
-                            />
-                        </div>
-
-                        <div className="col-span-12">
                             <InputCustom
-                                id={"teacher_code"}
-                                label="Mã giảng viên"
-                                name={"teacher_code"}
-                                value={formik.values.teacher_code} 
+                                id={"username"}
+                                label="Tên đăng nhập"
+                                name={"username"}
+                                value={formik.values.username} 
+                                readOnly={userSelect?.userName ? true : false}
+                                disabled={userSelect?.userName ? true : false}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                isError={formik.touched.teacher_code && Boolean(formik.errors.teacher_code)} 
-                                errorMessage={formik.touched.teacher_code && formik.errors.teacher_code} 
+                                isError={formik.touched.username && Boolean(formik.errors.username)} 
+                                errorMessage={formik.touched.username && formik.errors.username} 
                             />
                         </div>
 
@@ -294,7 +311,7 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userName}:any) {
                         <div className="col-span-12">
                             <InputCustom
                                 id={"education"}
-                                label="Học vấn"
+                                label="Học vị"
                                 name={"education"}
                                 value={formik.values.education} 
                                 isError={formik.touched.education && Boolean(formik.errors.education)} 

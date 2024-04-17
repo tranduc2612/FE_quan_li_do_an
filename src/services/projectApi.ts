@@ -11,6 +11,12 @@ export interface ScoreType {
     comment?: string
 }
 
+export interface IReqKeyHash {
+    role?:string,
+    key?:string
+
+}
+
 export const getListProjectByUsernameMentor = async (userNameTeacher?:string,semesterId?:string): Promise<IResponse<IProjecType[]>> => {
     const data: IResponse<IProjecType[]> = await request.get(`/Project/get-list-project-by-mentor?username_teacher=${userNameTeacher}&semesterId=${semesterId}`);
     return data;
@@ -33,6 +39,13 @@ export const assignCommentator = async (userNameStudent?:string,userNameTeacher?
 
 export const updateScore = async (req:ScoreType): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.put(`/Project/update-project-score`,{
+        ...req
+    });
+    return data;
+}
+
+export const GetProjectByHashKey = async (req:IReqKeyHash): Promise<IResponse<IProjecType>> => {
+    const data: IResponse<IProjecType> = await request.post("/Project/get-info-review-by-hash-key",{
         ...req
     });
     return data;

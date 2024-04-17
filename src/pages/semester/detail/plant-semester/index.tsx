@@ -112,8 +112,10 @@ const [flagEdit,setFlagEdit] = useState(false);
       const idSemester = id;
       const currentDate = new Date();
       currentDate.setHours(12, 1, 0, 0);
+      const prevDate = new Date();
+      prevDate.setDate(currentDate.getDate() - 7)
       const req: IScheduleSemester = {
-          fromDate: currentDate,
+          fromDate: prevDate,
           toDate: currentDate,
           typeSchedule: "Market", 
           semesterId: idSemester,
@@ -293,7 +295,7 @@ const [flagEdit,setFlagEdit] = useState(false);
         {
           field: 'actions',
           type: 'actions',
-          headerName: 'Actions',
+          headerName: 'Thao tác',
           width: 100,
           cellClassName: 'actions',
           getActions: ({ id }) => {

@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { IResponse } from "~/types/IResponse";
 import Loading from "~/components/Loading";
 import { dateShowNotification } from "~/ultis/common";
-import { dowloadScheduleWeekDetail, getScheduleWeek, getScheduleWeekDetail, handleScheduleWeekDetail, updateCommentScheduleWeek } from "~/services/scheduleWeekApi";
+import { deleteScheduleWeek, dowloadScheduleWeekDetail, getScheduleWeek, getScheduleWeekDetail, handleScheduleWeekDetail, updateCommentScheduleWeek } from "~/services/scheduleWeekApi";
 import { IScheduleWeek } from "~/types/IScheduleWeek";
 import Edit from "@mui/icons-material/Edit";
 import { useAppSelector } from "~/redux/hook";
@@ -97,7 +97,17 @@ function ScheduleWeekDetail() {
                                 </span>
                                 <span className="flex items-center cursor-pointer p-2 rounded-full text-3xl me-2 hover:bg-gray-200"
                                     onClick={()=>{
-                                        
+                                        if(id){
+                                            deleteScheduleWeek(id)
+                                            .then((res)=>{
+                                                if(res.success){
+                                                    toast.success(res.msg);
+                                                    navigate(-1)
+                                                }else{
+                                                    toast.error(res.msg)
+                                                }
+                                            })
+                                        }
                                     }}
                                 >
                                     <Delete className="text-red-600" />

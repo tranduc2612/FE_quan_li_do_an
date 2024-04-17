@@ -7,7 +7,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import InputSelectCustom from "~/components/InputSelectCustom";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Delete } from "mdi-material-ui";
+import { Account, ChevronLeft, Delete, Note, NoteOutline, Printer } from "mdi-material-ui";
 import LoadingData from "~/components/LoadingData";
 import { getListClassification } from "~/services/classificationApi";
 import { IResponse } from "~/types/IResponse";
@@ -34,6 +34,7 @@ import Edit from "@mui/icons-material/Edit";
 import { ITeaching } from "~/types/ITeachingType";
 import { randomId } from "@mui/x-data-grid-generator";
 import { IProjectOutline } from "~/types/IProjectOutline";
+import RenderStatusProject from "~/components/RenderStatusProject";
 
 
 function GroupReviewOutlineDetail() {
@@ -93,7 +94,36 @@ function GroupReviewOutlineDetail() {
             flex: 1,
             editable: true,
         },
-        
+        {
+            field: 'action',
+            headerName: 'Chức năng',
+            width: 200,
+            editable: false,
+            renderCell:({row})=>{
+                return <>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            if(row?.userName){
+                                navigate(`/profile/${row?.userName}`);
+                            }
+                    }}>
+                        <Tooltip title="Trang cá nhân">
+                            <Account />
+                        </Tooltip>
+                    </div>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            if(row?.userName){
+                                navigate(`/outline/${row?.userName}`);
+                            }
+                    }}>
+                        <Tooltip title="Chi tiết đề cương">
+                            <Note />
+                        </Tooltip>
+                    </div>
+                </>
+            }
+        },
         {
             field: 'userName',
             headerName: 'Tên tài khoản',
@@ -116,6 +146,7 @@ function GroupReviewOutlineDetail() {
             headerName: 'Trạng thái đồ án',
             width: 250,
             editable: true,
+            renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
         {
             field: 'userNameMentorNavigationId',
@@ -188,6 +219,7 @@ function GroupReviewOutlineDetail() {
             headerName: 'Trạng thái đồ án',
             width: 200,
             editable: true,
+            renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
         {
             field: 'userNameMentorNavigationId',
@@ -432,6 +464,16 @@ function GroupReviewOutlineDetail() {
                                     }}>
                                         Thêm sinh viên vào nhóm
                                     </Button>
+                                    {/* <Button variant="text" startIcon={<Printer />} onClick={()=>{
+
+                                    }}>
+                                        In danh sách sinh viên
+                                    </Button>
+                                    <Button variant="text" startIcon={<Printer />} onClick={()=>{
+                                    
+                                    }}>
+                                        In danh sách giảng viên
+                                    </Button> */}
                                 </GridToolbarContainer></> }}
                                 initialState={{
                                 pagination: {

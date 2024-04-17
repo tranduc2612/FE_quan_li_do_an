@@ -74,15 +74,16 @@ function InputOutlinePage() {
             const req: IProjectOutline = {
                 userName: info?.userName,
                 nameProject: formik.values.nameProject,
-                contentProject: formik.values.contentProject,
-                expectResult: formik.values.expectResult,
-                techProject: formik.values.techProject,
+                contentProject: JSON.stringify(formik.values.contentProject),
+                expectResult: JSON.stringify(formik.values.expectResult),
+                techProject: JSON.stringify(formik.values.techProject),
                 plantOutline: plantOutlineConvert
             }
             addProjectOutline(req)
             .then((res)=>{
                 if(res.success){
                     navigate("/outline/"+info?.userName)
+                    toast.success(res.msg)
                 }else{
                     toast.error(res.msg)
                 }
@@ -223,7 +224,7 @@ function InputOutlinePage() {
         {
           field: 'actions',
           type: 'actions',
-          headerName: 'Actions',
+          headerName: 'Thao tác',
           width: 100,
           cellClassName: 'actions',
           getActions: ({ id }) => {

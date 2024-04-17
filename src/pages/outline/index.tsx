@@ -1,27 +1,26 @@
-import BoxWrapper from "~/components/BoxWrap";
-import HeaderPageTitle from "~/components/HeaderPageTitle";
-import { Button, InputLabel, TextField } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, Delete, Pencil,PrinterCheck,Send } from "mdi-material-ui";
-import TableCustom from "~/components/TableEdit.tsx";
-import TableView from "~/components/TableView";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowModes, GridRowsProp, GridToolbarContainer, useGridApiRef, viVN } from "@mui/x-data-grid";
-import CustomEditComponent from "~/components/TableEdit.tsx/TextLines";
-import ExpandableCell from "~/components/TableEdit.tsx/ExpandableCell";
-import { useEffect, useState } from "react";
-import { IResponse } from "~/types/IResponse";
-import { IProjectOutline } from "~/types/IProjectOutline";
-import { getProjectOutline } from "~/services/projectOutlineApi";
-import LoadingData from "~/components/LoadingData";
 import Add from "@mui/icons-material/Add";
+import { Button, TextField } from "@mui/material";
+import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { ChevronLeft, Pencil, PrinterCheck, Send } from "mdi-material-ui";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import images from "~/assets";
+import BoxWrapper from "~/components/BoxWrap";
+import ItemCommentOutline from "~/components/CommentOutline/item";
+import HeaderPageTitle from "~/components/HeaderPageTitle";
+import LoadingData from "~/components/LoadingData";
+import ExpandableCell from "~/components/TableEdit.tsx/ExpandableCell";
+import CustomEditComponent from "~/components/TableEdit.tsx/TextLines";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { formatDate, formatDateTypeDateOnly } from "~/ultis/common";
-import images from "~/assets";
 import { addCommentOutline, checkPermission, deleteCommentOutline, getListCommentOutline, updateCommentOutline } from "~/services/commentOutlineApi";
+import { getFileWordOutline, getProjectOutline } from "~/services/projectOutlineApi";
 import { ICommentType } from "~/types/IComment";
-import { toast } from "react-toastify";
-import ItemCommentOutline from "~/components/CommentOutline/item";
+import { IProjectOutline } from "~/types/IProjectOutline";
+import { IResponse } from "~/types/IResponse";
+import { formatDateTypeDateOnly } from "~/ultis/common";
+
 function OutlinePage() {
     const navigate = useNavigate();
     const info = useAppSelector(inforUser)
@@ -42,7 +41,7 @@ function OutlinePage() {
             headerName: 'STT',
             type: 'text',
             width: 50,
-            editable: true,
+            editable: false,
         },
         {
           field: 'content',
@@ -50,7 +49,7 @@ function OutlinePage() {
           width: 300,
           align: 'left',
           headerAlign: 'left',
-          editable: true,
+          editable: false,
           renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
           renderEditCell: (props) => <><CustomEditComponent {...props} />
         </>
@@ -60,7 +59,7 @@ function OutlinePage() {
           headerName: 'Từ ngày',
           type: 'text',
           width: 250,
-          editable: true,
+          editable: false,
           renderCell:({row}) => {
             return <>{formatDateTypeDateOnly(row?.fromDate)}</>
             }
@@ -70,7 +69,7 @@ function OutlinePage() {
             headerName: 'Đến ngày',
             type: 'text',
             width: 250,
-            editable: true,
+            editable: false,
             renderCell:({row}) => {
                 return <>{formatDateTypeDateOnly(row?.toDate)}</>
             }
@@ -81,7 +80,7 @@ function OutlinePage() {
             width: 250,
             align: 'left',
             headerAlign: 'left',
-            editable: true,
+            editable: false,
             renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
             renderEditCell: (props) => <><CustomEditComponent {...props} />
           </>
@@ -90,10 +89,30 @@ function OutlinePage() {
 
     useEffect(()=>{
     if(id){
+        setLoading(true)
         getProjectOutline(id)
         .then((res:IResponse<IProjectOutline>)=>{
             if(res.success && res.returnObj){
-                setData(res.returnObj);
+                let resData = res.returnObj;
+                if(res.returnObj.contentProject){
+                    resData = {
+                        ...resData,
+                        contentProject: JSON.parse(res.returnObj.contentProject)
+                    }
+                }
+                if(res.returnObj.expectResult){
+                    resData = {
+                        ...resData,
+                        expectResult: JSON.parse(res.returnObj.expectResult)
+                    }
+                }
+                if(res.returnObj.techProject){
+                    resData = {
+                        ...resData,
+                        techProject: JSON.parse(res.returnObj.techProject)
+                    }
+                }
+                setData(resData);
                 if(res.returnObj.plantOutline){
                     const plant = JSON.parse(res.returnObj.plantOutline);
                     console.log(plant)
@@ -190,208 +209,232 @@ function OutlinePage() {
     }
 
     return ( <>
-        <HeaderPageTitle pageName="Đề cương đồ án"/>
-        <div className="grid gap-3 grid-cols-12">
-            <BoxWrapper className={"col-span-9"}>
-                <div>
-                    <div className="flex justify-between w-full mb-5">
-                        <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
-                                Quay lại
-                        </Button>
-                        <div className="flex">
-                            {
-                                data && info?.userName === id ? 
-                                <div className="flex items-center p-2 rounded-full text-3xl mx-5 hover:bg-gray-200" onClick={()=>{navigate("/outline/input/"+id)}}>
-                                    <Pencil className="text-primary-blue cursor-pointer" />
-                                </div>
-                                
-                                : <></>
-                            }
-                            
-                            {
-                                data?.userNameNavigation?.userNameMentor === info?.userName || id === info?.userName &&
-                                <Button onClick={()=>{navigate(-1)}} variant="contained" startIcon={<PrinterCheck />}>
-                                    In
-                                </Button>
-                            }
+    {
+        loading ? 
+        <LoadingData />
+        :
+        <>
+            <HeaderPageTitle pageName="Đề cương đồ án"/>
+            <div className="grid gap-3 grid-cols-12">
+                <BoxWrapper className={"col-span-9"}>
+                    <div>
+                        <div className="flex justify-between w-full mb-5">
+                            <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
+                                    Quay lại
+                            </Button>
+                            <div className="flex">
+                                {
+                                    data && info?.userName === id ? 
+                                    <div className="flex items-center p-2 rounded-full text-3xl mx-5 hover:bg-gray-200" onClick={()=>{navigate("/outline/input/"+id)}}>
+                                        <Pencil className="text-primary-blue cursor-pointer" />
+                                    </div>
+                                    : <></>
+                                }
+                                {
+                                    data?.userNameNavigation?.userNameMentor === info?.userName || id === info?.userName &&
+                                    <Button onClick={()=>{
+                                        getFileWordOutline(info?.userName)
+                                        .then((res:any)=>{
+                                            if(info?.userName){
+                                                const link = document.createElement('a');
+                                                const fileName = `DeCuong_${info?.userName}.docx`;
+                                                link.setAttribute('download', fileName);
+                                                link.href = URL.createObjectURL(new Blob([res]));
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                link.remove();
+                                            }
+                                        })
+                                        .catch((err)=>{
+                                            console.log(err)
+                                            toast.warning("Không hợp lệ")
+                                        })
+
+                                    }} variant="contained" startIcon={<PrinterCheck />}>
+                                        In
+                                    </Button>
+                                }
+                            </div>
                         </div>
                         
-                    </div>
-                    
-                    {
-                        data ? <>
-                            
-                            <div>
-                                <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
-                                    Giáo viên hướng dẫn
-                                </h2>
-                                {
-                                    data?.userNameNavigation?.userNameMentor ? 
-                                    <div className={"grid grid-cols-9 mb-5"}>
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Họ và tên:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.fullName}</span> 
-                                        </div>
-
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Số điện thoại:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.phone}</span> 
-                                        </div>
-
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Email:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.email}</span> 
-                                        </div>
-
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Chuyên ngành:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.major?.majorName}</span> 
-                                        </div>
-
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Học hàm:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.education}</span> 
-                                        </div>
-                                    </div>
-                                    :
-                                    <h1 className="text-2xl text-red-600">Chưa được phân giáo viên hướng dẫn</h1>
-                                }
-
-                                <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
-                                    Nhóm xét duyệt
-                                </h2>
-                                {
-                                    data?.groupReviewOutline ? 
-                                    <div className={"grid grid-cols-9 mb-5"}>
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Mã nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.groupReviewOutlineId}</span> 
-                                        </div>
-
-                                        <div className={"col-span-3 m-2"}>
-                                            <b>Tên nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.nameGroupReviewOutline}</span> 
-                                        </div>
-                                    </div>
-                                    : <h1 className="text-2xl text-red-600">Chưa được phân nhóm xét duyệt</h1>
-                                }
-
-                                <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
-                                    Nội dung đề cương
-                                </h2>
-
-                                <div className={"grid grid-cols-4"}>
-                                    <div className={"col-span-4 m-2"}>
-                                        <b>Tên đề tài:&#160;</b>
-                                        <span className={"text-text-color"}>{data?.nameProject}</span>
-                                    </div>
-
-                                    <div className={"col-span-4 m-2"}>
-                                        <b>Công nghệ sử dụng:&#160;</b>
-                                        <span className={"text-text-color whitespace-pre-wrap"}>{data?.techProject}</span> 
-                                    </div>
-
-                                    <div className={"col-span-4 m-2"}>
-                                        <b>Nội dung đề tài:</b> 
-                                        <br/>
-                                        <span className={"text-text-color whitespace-pre-wrap"}>
-                                            {data?.contentProject}
-                                        </span></div>
-
-                                    <div className={"col-span-4 m-2"}>
-                                        <b>Các kết quả chính dự kiến đạt được:</b> 
-                                        <br/>
-                                        <span className={"text-text-color whitespace-pre-wrap"}>
-                                            {data?.expectResult}
-                                        </span> 
-                                    </div>
-
-                                    <div className={"col-span-4 m-2"}>
-                                        <b>Kế hoạch thực hiện đề tài</b>
-                                    </div>
-                                    
-                                </div>
-                                <div className={"px-3"}>
-                                    <DataGrid
-                                        apiRef={apiRef}
-                                        sx={{
-                                            // disable cell selection style
-                                            '.MuiDataGrid-cell:focus': {
-                                            outline: 'none'
-                                            },
-                                            // pointer cursor on ALL rows
-                                            '& .MuiDataGrid-row:hover': {
-                                            cursor: 'pointer'
-                                            }
-                                        }}
-                                        loading={rows.length === 0}
-                                        rows={rows}
-                                        columns={columns}
-                                        rowCount={total}
-                                        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                        onCellClick={({row})=>{
-
-                                        }}
-                                        hideFooter={true}
-                                        // pageSizeOptions={[10]}
-                                    />
-                                </div>
-                                    
-                            </div>
-
-                        </> : <>
                         {
-                            info?.userName === id ? <>
-                                <div className="flex justify-center">
-                                    <Button onClick={handleCreateProjectOutline} variant="contained" startIcon={<Add />}>
-                                            Tạo đề cương đồ án
-                                    </Button>
-                                </div>            
+                            data ? <>
+                                
+                                <div>
+                                    <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
+                                        Giáo viên hướng dẫn
+                                    </h2>
+                                    {
+                                        data?.userNameNavigation?.userNameMentor ? 
+                                        <div className={"grid grid-cols-9 mb-5"}>
+                                            <div className={"col-span-3 m-2"}>
+                                                <b>Họ và tên:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.fullName}</span> 
+                                            </div>
+
+                                            <div className={"col-span-3 m-2"}>
+                                                <b>Số điện thoại:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.phone}</span> 
+                                            </div>
+
+                                            <div className={"col-span-3 m-2"}>
+                                                <b>Email:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.email}</span> 
+                                            </div>
+
+                                            <div className={"col-span-3 m-2"}>
+                                                <b>Chuyên ngành:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.major?.majorName}</span> 
+                                            </div>
+
+                                            <div className={"col-span-3 m-2"}>
+                                                <b>Học hàm:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.education}</span> 
+                                            </div>
+                                        </div>
+                                        :
+                                        <h1 className="text-2xl text-red-600">Chưa được phân giáo viên hướng dẫn</h1>
+                                    }
+
+                                    <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
+                                        Nhóm xét duyệt
+                                    </h2>
+                                    {
+                                        data?.groupReviewOutline ? 
+                                        <div className={"grid grid-cols-9 mb-5"}>
+                                            {/* <div className={"col-span-3 m-2"}>
+                                                <b>Mã nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.groupReviewOutlineId}</span> 
+                                            </div> */}
+
+                                            <div className={"col-span-3 m-2"}>
+                                                <b>Tên nhóm xét duyệt:</b> <span className={"text-text-color"}>{data?.groupReviewOutline?.nameGroupReviewOutline}</span> 
+                                            </div>
+                                        </div>
+                                        : <h1 className="text-2xl text-red-600">Chưa được phân nhóm xét duyệt</h1>
+                                    }
+
+                                    <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
+                                        Nội dung đề cương
+                                    </h2>
+
+                                    <div className={"grid grid-cols-4"}>
+                                        <div className={"col-span-4 m-2"}>
+                                            <b>Tên đề tài:&#160;</b>
+                                            <span className={"text-text-color"}>{data?.nameProject}</span>
+                                        </div>
+
+                                        <div className={"col-span-4 m-2"}>
+                                            <b>Công nghệ sử dụng:&#160;</b>
+                                            <div className={"text-text-color whitespace-pre-wrap"}>{data?.techProject || <span className={"text-red-600"}>Chưa có</span>}</div> 
+                                        </div>
+
+                                        <div className={"col-span-4 m-2"}>
+                                            <b>Nội dung đề tài:</b> 
+                                            <br/>
+                                            <span className={"text-text-color whitespace-pre-wrap"}>
+                                                {data?.contentProject || <span className={"text-red-600"}>Chưa có</span>}
+                                            </span></div>
+
+                                        <div className={"col-span-4 m-2"}>
+                                            <b>Các kết quả chính dự kiến đạt được:</b> 
+                                            <br/>
+                                            <span className={"text-text-color whitespace-pre-wrap"}>
+                                                {data?.expectResult || <span className={"text-red-600"}>Chưa có</span>}
+                                            </span> 
+                                        </div>
+
+                                        <div className={"col-span-4 m-2"}>
+                                            <b>Kế hoạch thực hiện đề tài</b>
+                                        </div>
+                                        
+                                    </div>
+                                    <div className={"px-3"}>
+                                        <DataGrid
+                                            apiRef={apiRef}
+                                            sx={{
+                                                // disable cell selection style
+                                                '.MuiDataGrid-cell:focus': {
+                                                outline: 'none'
+                                                },
+                                                // pointer cursor on ALL rows
+                                                '& .MuiDataGrid-row:hover': {
+                                                cursor: 'pointer'
+                                                }
+                                            }}
+                                            getRowHeight={() => 'auto'}
+                                            loading={rows.length === 0}
+                                            rows={rows}
+                                            columns={columns}
+                                            rowCount={total}
+                                            localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
+                                            onCellClick={({row})=>{
+
+                                            }}
+                                            hideFooter={true}
+                                            // pageSizeOptions={[10]}
+                                        />
+                                    </div>
+                                        
+                                </div>
+
                             </> : <>
-                                <h1 className="text-2xl">Sinh viên này chưa tạo đề cương đồ án</h1>
+                            {
+                                info?.userName === id ? <>
+                                    <div className="flex justify-center">
+                                        <Button onClick={handleCreateProjectOutline} variant="contained" startIcon={<Add />}>
+                                                Tạo đề cương đồ án
+                                        </Button>
+                                    </div>            
+                                </> : <>
+                                    <h1 className="text-2xl">Sinh viên này chưa tạo đề cương đồ án</h1>
+                                </>
+                            }
                             </>
                         }
-                        </>
-                    }
-                </div>
-            </BoxWrapper>
-                    
-            <BoxWrapper className={"col-span-3 max-h-screen overflow-hidden"}>
-                <div>
-                    <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
-                        Nhận xét
-                    </h2>
-                    {
-                    allowComment &&
-                    <div className="box_comment mb-10 grid grid-cols-10 gap-1">
-                        <img src={images.image.anh_demo} className={`col-span-2 rounded-full w-10 h-10 object-cover`} />
-                        <div className="col-span-7">
-                            <TextField 
-                                id="comment" 
-                                label="Nhận xét đề cương" 
-                                variant="standard"
-                                value={commentText}
-                                onChange={(e)=>{
-                                    setCommentText(e.target.value);
-                                }}
-                                multiline 
-                                fullWidth
-                            />
-                            
-                        </div>
-                        <div className="col-span-1 cursor-pointer flex flex-col justify-center" onClick={handleAddComment}>
-                            <Send className="text-blue-600" />
-                        </div>
                     </div>
-                    }
+                </BoxWrapper>
+                        
+                <BoxWrapper className={"col-span-3 max-h-screen overflow-hidden"}>
+                    <div>
+                        <h2 className={"font-bold text-primary-blue text-xl mb-2"}>
+                            Nhận xét
+                        </h2>
+                        {
+                        allowComment &&
+                        <div className="box_comment mb-10 grid grid-cols-10 gap-1">
+                            <img src={images.image.anh_demo} className={`col-span-2 rounded-full w-10 h-10 object-cover`} />
+                            <div className="col-span-7">
+                                <TextField 
+                                    id="comment" 
+                                    label="Nhận xét đề cương" 
+                                    variant="standard"
+                                    value={commentText}
+                                    onChange={(e)=>{
+                                        setCommentText(e.target.value);
+                                    }}
+                                    multiline 
+                                    fullWidth
+                                />
+                                
+                            </div>
+                            <div className="col-span-1 cursor-pointer flex flex-col justify-center" onClick={handleAddComment}>
+                                <Send className="text-blue-600" />
+                            </div>
+                        </div>
+                        }
 
-                    <div className={"mt-5 max-h-screen overflow-scroll"}>
-                        <ul className="flex flex-col">
-                            {
-                                lstComment && lstComment.map((item)=>{
-                                    return (
-                                        <ItemCommentOutline handleDelete={handleDeleteComment} handleUpdate={handleUpdateComment} key={item.commentId} item={item} />
-                                    )
-                                })
-                            }
-                        </ul>
+                        <div className={"mt-5 max-h-screen overflow-scroll"}>
+                            <ul className="flex flex-col">
+                                {
+                                    lstComment && lstComment.map((item)=>{
+                                        return (
+                                            <ItemCommentOutline handleDelete={handleDeleteComment} handleUpdate={handleUpdateComment} key={item.commentId} item={item} />
+                                        )
+                                    })
+                                }
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            </BoxWrapper>        
-        </div>
+                </BoxWrapper>        
+            </div>
+    
+        </>
+    }
 
     </> );
 }

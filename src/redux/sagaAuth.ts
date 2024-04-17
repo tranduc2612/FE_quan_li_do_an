@@ -62,6 +62,7 @@ function* handleLogout() {
 function* watchFlow() {
   while (true) {
     const isLogin = Boolean(localStorage.getItem('access_token'));
+    console.log(isLogin)
     if (!isLogin) {
       const action: PayloadAction<ILoginPayload> = yield take(login.type);
       yield call(handleLogin, action.payload);

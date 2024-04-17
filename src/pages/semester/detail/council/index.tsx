@@ -263,6 +263,7 @@ function CouncilSemester() {
             }
           }
     });
+    console.log(formikInputGroup)
 
     const hanleDeleteGroup = ()=>{
         deleteCouncil(councilSelected.councilId || "")
@@ -302,7 +303,7 @@ function CouncilSemester() {
                                 checkboxSelection={toggleAutoAssign}
                                 rows={rows}
                                 columns={columns}
-                                rowCount={total}
+                                // rowCount={total}
                                 localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
                                 onCellClick={({row})=>{
                                     const idSemester = id;

@@ -170,7 +170,7 @@ export function renderRole(role:string){
         return "Sinh viên"
     }
     if(role === "TEACHER"){
-        return "Sinh viên"
+        return "Giảng viên"
     }
     return "Chưa xác định"
 }

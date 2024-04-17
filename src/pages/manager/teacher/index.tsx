@@ -1,28 +1,27 @@
-import { Button, MenuItem, Modal, TextField } from "@mui/material";
-import { useFormik } from "formik";
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import InputSelectCustom from "~/components/InputSelectCustom";
+import SearchIcon from '@mui/icons-material/Search';
+import { Button, MenuItem, Modal, TextField, Tooltip } from "@mui/material";
+import { DataGrid, GridColDef, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { useFormik } from "formik";
+import { AccountEdit, ChevronLeft, Delete, Printer } from "mdi-material-ui";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Delete } from "mdi-material-ui";
-import LoadingData from "~/components/LoadingData";
-import {IPageProps} from "../index"
-import { getListClassification } from "~/services/classificationApi";
-import { IResponse } from "~/types/IResponse";
-import { ISemester } from "~/types/ISemesterType";
-import { IClassificationType } from "~/types/IClassificationType";
-import { getListMajor } from "~/services/majorApi";
-import { IMajorType } from "~/types/IMajorType";
-import { DataGrid, GridColDef, GridPaginationModel, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useNavigate } from 'react-router-dom';
-import ModalCustom from "~/components/Modal";
 import { toast } from "react-toastify";
-import { ITeacher } from "~/types/ITeacherType";
-import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
-import RegisterTeacher from "./input";
 import BoxWrapper from "~/components/BoxWrap";
+import InputSelectCustom from "~/components/InputSelectCustom";
+import LoadingData from "~/components/LoadingData";
+import { getListClassification } from "~/services/classificationApi";
+import { getListMajor } from "~/services/majorApi";
+import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
+import { IClassificationType } from "~/types/IClassificationType";
+import { IMajorType } from "~/types/IMajorType";
+import { IResponse } from "~/types/IResponse";
+import { ITeacher } from "~/types/ITeacherType";
 import { renderStatusAccount } from "~/ultis/common";
+import { IPageProps } from "../index";
+import RegisterTeacher from "./input";
+import { getExcelListTeacher } from '~/services/reportApi';
 
 
 
@@ -31,7 +30,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
     const [rows,setRows] = useState<any>([]);
     const navigate = useNavigate();
     const [userSelect,setUserSelect] = useState<ITeacher>({
-        userName:"",
+        userName:undefined,
         passwordText:"",
         fullName:"",
         dob: new Date(),
@@ -42,27 +41,23 @@ function TeacherManager({setCurrentPage}:IPageProps) {
         createdBy:"",
         status:"",
         isAdmin:"",
-        teacherCode:"",
         majorId:"",
         education:""
     });
     const [switchPageInput,setSwitchPageInput] = useState(false);
-    const [paginationModel, setPaginationModel] = useState({
-        pageSize: 10,
+    const [paginationModel, a] = useState({
+        pageSize: 5,
         page: 0,
         pageMax: -1
     });
     const apiRef = useGridApiRef();
     const [openModalDelete, setOpenModalDelete] = useState(false);
-    const [total, setTotal] = useState(0);
-    const [semesterOption,setSemesterOption] = useState<ISemester[]>();
     const [statusOption,setstatusOption] = useState<IClassificationType[]>();
     const [majorOptions,setMajorOptions] = useState<IMajorType[]>();
     const [loading,setLoading] = useState(false);
     const initialData = {
         username: "",
         fullname:"",
-        teacher_code: "",
         major: "",
         status:"",
     }
@@ -77,17 +72,41 @@ function TeacherManager({setCurrentPage}:IPageProps) {
             flex: 1,
             editable: true,
         },
-        
         {
-            field: 'teacherCode',
-            headerName: 'Mã sinh viên',
-            width: 120,
+            field: 'action',
+            headerName: 'Thao tác',
+            width: 150,
             editable: true,
+            renderCell:({row})=>{
+                return <>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-red-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            setOpenModalDelete(true);
+                            setUserSelect(row);
+                    }}>
+                        <Tooltip title="Xóa giảng viên">
+                            <Delete />
+                        </Tooltip>
+                    </div>
+
+                    <div className="cursor-pointer p-1 hover:bg-slate-300 rounded-full text-blue-500 mx-1" onClick={(e)=>{
+                            e.stopPropagation();
+                            setSwitchPageInput(true);
+                            setUserSelect(row);
+                    }}>
+                        <Tooltip title="Chỉnh sửa thông tin">
+                            <AccountEdit />
+                        </Tooltip>
+                    </div>
+    
+    
+                </>
+            }
         },
         {
             field: 'userName',
             headerName: 'Tên tài khoản',
-            width: 350,
+            width: 200,
             editable: true,
         },
         {
@@ -99,7 +118,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
         {
             field: 'gender',
             headerName: 'Giới tính',
-            width: 200,
+            width: 130,
             editable: true,
             renderCell:({row})=>{
                 return <>{row?.gender == 1 ? "Nữ" : "Nam"}</>
@@ -107,17 +126,17 @@ function TeacherManager({setCurrentPage}:IPageProps) {
         },
         {
             field: 'education',
-            headerName: 'Học vấn',
-            width: 160,
+            headerName: 'Học vị',
+            width: 150,
             editable: true,
         },
         {
             field: 'isAdmin',
             headerName: 'Vai trò',
-            width: 160,
+            width: 150,
             editable: true,
             renderCell:({row})=>{
-                return <>{row?.isAdmin == 1 ? "Quản trị viên" : ""}</>
+                return <>{row?.isAdmin == 1 ? "Quản trị viên" : "Giảng viên"}</>
             }
         },
         {
@@ -126,16 +145,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
             width: 200,
             editable: true,
             renderCell:({row})=>{
-                return <>{row?.majorId  ? row?.major?.majorName : "Chưa đăng ký"}</>
-            }
-        },
-        {
-            field: 'userNameCommentatorNavigation',
-            headerName: 'Giáo viên phản biện',
-            width: 200,
-            editable: true,
-            renderCell:({row})=>{
-                return <>{row?.project?.userNameCommentatorNavigation  ? row?.project?.userNameCommentatorNavigation?.fullName : "Chưa được gán"}</>
+                return <>{row?.majorId  ? row?.major?.majorName : <span className="text-red-600">Chưa đăng ký</span>}</>
             }
         },
         {
@@ -149,25 +159,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                 }</>
             }
         },
-        {
-            field: 'action',
-            headerName: 'Chức năng',
-            width: 160,
-            editable: true,
-            renderCell:({row})=>{
-                return <>
-                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-red-500" onClick={(e)=>{
-                            e.stopPropagation();
-                            setOpenModalDelete(true);
-                            setUserSelect(row);
-                    }}>
-                        <Delete />
-                    </div>
-    
-    
-                </>
-            }
-        },
+        
     ];
 
     useEffect(()=>{
@@ -199,25 +191,20 @@ function TeacherManager({setCurrentPage}:IPageProps) {
 
     useEffect(()=>{
         hanleFetchApi();
-    },[switchPageInput,paginationModel])
+    },[])
 
     const hanleFetchApi = async () => {
-        if(paginationModel.page <= paginationModel.pageMax){
-            return;
-        }
         await getListTeacher({
             pageSize: paginationModel.pageSize,
             pageIndex:  paginationModel.page + 1,
             userName:  formik.values.username,
             fullName: formik.values.fullname,
-            teacherCode:  formik.values.teacher_code,
             majorId: formik.values.major,
             status: formik.values.status,
         })
         .then((res:IResponse<any>)=>{
           console.log(res)
           if(res.success && res.returnObj && res.returnObj.listResult) {
-            console.log(res.returnObj.listResult)
             const dataMap = res.returnObj.listResult;
             const newMap = dataMap.map((data:ITeacher,index:any)=>{
                 return {
@@ -226,20 +213,12 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                 }
             })
             const totalItem = res.returnObj.totalItem;
-            setTotal(totalItem)
             if(totalItem === 0){
                 setRows([])
-            }else if(paginationModel.page == 0 && paginationModel.pageMax == -1){
-                apiRef.current.setPage(0)
+            }else {
                 setRows([...newMap])
-            }else{
-                setRows([...rows,...newMap])
             }
 
-            setPaginationModel({
-                ...paginationModel,
-                pageMax: paginationModel.page
-            })
           }
         })
       }
@@ -254,13 +233,6 @@ function TeacherManager({setCurrentPage}:IPageProps) {
     const handleOpen = () => setOpenModalDelete(true);
     const handleClose = () => setOpenModalDelete(false);
 
-    const handlePaginationModelChange = async (newPaginationModel: GridPaginationModel) => {
-        // We have the cursor, we can allow the page transition.
-        setPaginationModel({
-            ...paginationModel,
-            page:newPaginationModel.page
-        })
-    };
 
     const hanleDeleteAccount = ()=>{
         deleteTeacher(userSelect.userName || "")
@@ -285,7 +257,24 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                 {
                     switchPageInput && 
                     <div className="mb-4">
-                        <Button onClick={()=>{setSwitchPageInput(false)}} variant="outlined" startIcon={<ChevronLeft />}>
+                        <Button onClick={()=>{
+                            setUserSelect({
+                                userName:undefined,
+                                passwordText:"",
+                                fullName:"",
+                                dob: new Date(),
+                                phone:"",
+                                email:"",
+                                avatar:"",
+                                createdAt: new Date(),
+                                createdBy:"",
+                                status:"",
+                                isAdmin:"",
+                                majorId:"",
+                                education:""
+                            })   
+                            setSwitchPageInput(false)
+                            }} variant="outlined" startIcon={<ChevronLeft />}>
                             Quay lại
                         </Button>
                     </div>
@@ -295,7 +284,12 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                     </h2>
                     {
                         switchPageInput ?
-                            <RegisterTeacher switchPageInput={switchPageInput} setSwitchPageInput={setSwitchPageInput} userName={userSelect} /> 
+                            <RegisterTeacher 
+                                switchPageInput={switchPageInput} 
+                                setSwitchPageInput={setSwitchPageInput} 
+                                userSelect={userSelect} 
+                                handleFetchApi={hanleFetchApi}
+                            /> 
                             : <div>
                         {/* Form tìm kiếm */}
                         {
@@ -310,18 +304,6 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                                             id="name" 
                                             label="Tài khoản"
                                             name="username"
-                                            variant="outlined"
-                                            fullWidth 
-                                        />
-                                    </div>
-
-                                    <div className="col-span-4">
-                                        <TextField
-                                            onChange={formik.handleChange} 
-                                            value={formik.values.teacher_code} 
-                                            id="teacher_code" 
-                                            label="Mã giảng viên"
-                                            name="teacher_code"
                                             variant="outlined"
                                             fullWidth 
                                         />
@@ -383,11 +365,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                                         <div className="me-2">
                                             <Button type="submit" variant="outlined" startIcon={<SearchIcon />}
                                                 onClick={()=>{
-                                                    setPaginationModel({
-                                                        page: 0,
-                                                        pageSize: 10,
-                                                        pageMax: -1
-                                                    })
+                                                    hanleFetchApi()
                                                 }}
                                             >
                                                 Tìm kiếm
@@ -402,10 +380,53 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <Button variant="contained" startIcon={<AddIcon />} onClick={()=>setSwitchPageInput(true)}>
-                                            Thêm mới
-                                        </Button>
+                                    <div className='flex'>
+                                        <div className='mx-5'>
+                                            <Button variant="text" startIcon={<Printer />} onClick={()=>{
+                                                getExcelListTeacher({
+                                                    pageSize: paginationModel.pageSize,
+                                                    pageIndex:  paginationModel.page + 1,
+                                                    userName:  formik.values.username.trim(),
+                                                    fullName: formik.values.fullname.trim(),
+                                                    majorId: formik.values.major.trim(),
+                                                    status: formik.values.status.trim(),
+                                                })
+                                                .then((res:any)=>{
+                                                    const link = document.createElement('a');
+                                                    const fileName = 'DanhSachGiangVien.xlsx';
+                                                    link.setAttribute('download', fileName);
+                                                    link.href = URL.createObjectURL(new Blob([res]));
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    link.remove();
+
+                                                })
+                                            }}>
+                                                Excel
+                                            </Button>
+                                        </div>
+                                        <div>
+                                            <Button variant="contained" startIcon={<AddIcon />} onClick={()=>{
+                                                setSwitchPageInput(true)
+                                                setUserSelect({
+                                                    userName:undefined,
+                                                    passwordText:"",
+                                                    fullName:"",
+                                                    dob: new Date(),
+                                                    phone:"",
+                                                    email:"",
+                                                    avatar:"",
+                                                    createdAt: new Date(),
+                                                    createdBy:"",
+                                                    status:"",
+                                                    isAdmin:"",
+                                                    majorId:"",
+                                                    education:""
+                                                })   
+                                            }}>
+                                                Thêm mới
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -428,9 +449,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                                 
                                 rows={rows}
                                 columns={columns}
-                                rowCount={total}
                                 localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                onPaginationModelChange={handlePaginationModelChange}
                                 onCellClick={({row})=>{
                                     navigate("/profile/"+row.userName)
                                 }}

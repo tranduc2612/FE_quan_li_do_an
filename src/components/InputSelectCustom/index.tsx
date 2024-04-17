@@ -36,8 +36,6 @@ function InputSelectCustom({
     isError,
     readOnly
 }: IProps) {
-    
-    console.log(placeholder)
     return (<>
     <FormControl 
             fullWidth>

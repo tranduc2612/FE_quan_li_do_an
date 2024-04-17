@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Button, Modal, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
-import { ChevronLeft, Pencil } from "mdi-material-ui";
+import { ChevronLeft, Download, Note, Pencil, Printer } from "mdi-material-ui";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from "react-toastify";
@@ -11,11 +11,12 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import BoxWrapper from "~/components/BoxWrap";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { AssignCouncilProject, AssignCouncilTeaching, assginCouncilToProject, assginCouncilToTeaching, getCouncil, getListProjectCouncil, getListTeachingNotInCouncil } from "~/services/councilApi";
+import { AssignCouncilProject, AssignCouncilTeaching, assginCouncilToProject, assginCouncilToTeaching, excelListProjectCouncil, getCouncil, getListProjectCouncil, getListTeachingNotInCouncil } from "~/services/councilApi";
 import { assignCommentator } from '~/services/projectApi';
 import { ICouncil } from "~/types/ICouncil";
 import { IProjecType } from '~/types/IProjectType';
 import { ITeaching } from "~/types/ITeachingType";
+import RenderStatusProject from '~/components/RenderStatusProject';
 
 
 function DetailCouncil() {
@@ -96,21 +97,37 @@ function DetailCouncil() {
                             <PersonAddIcon />
                         </Tooltip>
                     </div>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            if(row?.userName){
+                                navigate(`/outline/${row?.userName}`);
+                            }
+                    }}>
+                        <Tooltip title="Chi tiết đề cương">
+                            <Note />
+                        </Tooltip>
+                    </div>
                     
     
                 </>
             }
         },
         {
-            field: 'userName',
-            headerName: 'Tên tài khoản',
-            width: 300,
+            field: 'studentCode',
+            headerName: 'Mã sinh viên',
+            width: 150,
+            editable: true,
+        },
+        {
+            field: 'fullName',
+            headerName: 'Họ và tên',
+            width: 200,
             editable: true,
         },
         {
             field: 'nameProject',
             headerName: 'Tên đề tài',
-            width: 250,
+            width: 200,
             editable: true,
             renderCell:({row})=>{
                 return <>
@@ -119,14 +136,103 @@ function DetailCouncil() {
             }
         },
         {
+            field: 'scoreCt',
+            headerName: 'Chủ tịch',
+            width: 100,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreCt?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreTk',
+            headerName: 'Thư ký',
+            width: 100,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreTk?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreUv1',
+            headerName: 'UV1',
+            width: 100,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreUv1?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreUv2',
+            headerName: 'UV2',
+            width: 100,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreUv2?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreUv3',
+            headerName: 'UV3',
+            width: 100,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreUv3?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreMentor',
+            headerName: 'GVHD',
+            width: 80,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreMentor?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreCommentator',
+            headerName: 'GVHD',
+            width: 80,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreCommentator?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
+            field: 'scoreFinal',
+            headerName: 'Tổng kết',
+            width: 180,
+            editable: true,
+            renderCell:({row})=>{
+                return <>
+                    {row?.scoreFinal?.toString()?.replace(".",",")}  
+                </>
+            }
+        },
+        {
             field: 'statusProject',
             headerName: 'Trạng thái đồ án',
             width: 250,
             editable: true,
+            renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
         {
             field: 'userNameMentor',
-            headerName: 'Mã giảng viên hướng dẫn',
+            headerName: 'Giảng viên hướng dẫn',
             width: 250,
             editable: true,
             renderCell:({row})=>{
@@ -142,7 +248,7 @@ function DetailCouncil() {
         },
         {
             field: 'userNameCommentator',
-            headerName: 'Mã giảng viên phản biện',
+            headerName: 'Giảng viên phản biện',
             width: 250,
             editable: true,
             renderCell:({row})=>{
@@ -185,9 +291,15 @@ function DetailCouncil() {
             }
         },
         {
-            field: 'userName',
-            headerName: 'Tên tài khoản',
-            width: 300,
+            field: 'studentCode',
+            headerName: 'Mã sinh viên',
+            width: 150,
+            editable: true,
+        },
+        {
+            field: 'fullName',
+            headerName: 'Họ và tên',
+            width: 200,
             editable: true,
         },
         {
@@ -206,6 +318,7 @@ function DetailCouncil() {
             headerName: 'Trạng thái đồ án',
             width: 200,
             editable: true,
+            renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
         {
             field: 'userNameMentor',
@@ -242,15 +355,9 @@ function DetailCouncil() {
             editable: false,
         },
         {
-            field: 'teacherCode',
-            headerName: 'Mã giảng viên',
-            width: 120,
-            editable: false,
-        },
-        {
             field: 'userName',
             headerName: 'Tên tài khoản',
-            width: 350,
+            width: 250,
             editable: false,
         },
         {
@@ -261,7 +368,7 @@ function DetailCouncil() {
         },
         {
             field: 'education',
-            headerName: 'Học vấn',
+            headerName: 'Học vị',
             width: 160,
             editable: false,
         },
@@ -410,11 +517,16 @@ function DetailCouncil() {
                 }else{
                     const newMap = dataMap.map((data:ITeaching,index:any)=>{
                         return {
-                          id: index+1,
                           ...data,
                           ...data?.groupReviewOutline,
                           ...data?.semester,
                           ...data?.userNameTeacherNavigation
+                        }
+                    }).filter(x=>x.status === "AUTH").
+                    map((data:ITeaching,index:any)=>{
+                        return {
+                          id: index+1,
+                          ...data
                         }
                     })
                     const totalItem = newMap.length;
@@ -627,6 +739,24 @@ function DetailCouncil() {
                                             setOpenModalAddStudent(true)
                                         }}>
                                             Thêm sinh viên vào hội đồng
+                                        </Button>
+                                        <Button variant="text" startIcon={<Download />} onClick={()=>{
+                                            excelListProjectCouncil({
+                                                semesterId: idSemester,
+                                                councilId: idCouncil
+                                            })
+                                            .then((res:any)=>{
+                                                const link = document.createElement('a');
+                                                const fileName = 'BangDiem.xlsx';
+                                                link.setAttribute('download', fileName);
+                                                link.href = URL.createObjectURL(new Blob([res]));
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                link.remove();
+
+                                            })
+                                        }}>
+                                            Xuất bảng điểm
                                         </Button>
                                     </GridToolbarContainer></> }}
                                     initialState={{

@@ -1,28 +1,31 @@
 import Button from '@mui/material/Button';
+import { useFormik } from 'formik';
 import { Check, ChevronLeft } from "mdi-material-ui";
 import { useEffect, useState } from "react";
 import {
     useNavigate
 } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import * as yup from 'yup';
 import BoxWrapper from "~/components/BoxWrap";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
+import InputCustom from '~/components/InputCustom';
 import Loading from "~/components/Loading";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { IDetailScheduleWeek } from "~/types/IDetailScheduleWeek";
-import { IScheduleWeek } from "~/types/IScheduleWeek";
-import * as yup from 'yup';
-import { useFormik } from 'formik';
-import InputCustom from '~/components/InputCustom';
+import { GetProjectByHashKey, IReqKeyHash, ScoreType, updateScore } from '~/services/projectApi';
+import { IProjecType } from '~/types/IProjectType';
+import { IResponse } from '~/types/IResponse';
+import { IStudent } from '~/types/IStudentType';
 
 const validationSchema = yup.object({
-    review: yup
+    comment: yup
       .string()
-      .required('Họ tên không được để trống'),
+      .required('Đánh giá không được để trống'),
     score: yup
       .string()
       .required('Điểm không được để trống')
-      .matches(/^([0-3](\.\d{1,2})?|4(\.0{1,2})?|5(\.0{1,2})?)$/, 'Điểm không hợp lệ'),  
+      .matches(/^(10(\,0+)?|[0-9](\,[0-9]+)?)$/, "Điểm không hợp lệ"),
 
   });
 
@@ -31,19 +34,67 @@ function InputReviewMentor() {
     // const {id,idStudent} = useParams();
     const navigate = useNavigate();
     const [loading,setLoading] = useState(false); 
+    const [profile,setProfile] = useState<IStudent>();
+    const [project,setProject] = useState<IProjecType>();
+    
     const formik = useFormik({
         initialValues: {
             score:"",
-            review:"- Nhận xét chung về tính ý nghĩa thực tiễn của đồ án:\n- Ý thức, thái độ của sinh viên trong quá trình thực hiện đồ án:\n- Kết quả thực hiện đồ án (cần nhận xét cụ thể những kết quả đạt được, chưa làm được):"
+            comment:"- Nhận xét chung về tính ý nghĩa thực tiễn của đồ án:\n- Ý thức, thái độ của sinh viên trong quá trình thực hiện đồ án:\n- Kết quả thực hiện đồ án (cần nhận xét cụ thể những kết quả đạt được, chưa làm được):"
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-          console.log(values);
-          alert("Hello")
+            console.log(values);
+            const req:ScoreType = {
+                userName: profile?.userName,
+                semesterId: profile?.semesterId,
+                role: "MENTOR",
+                score: formik.values.score,
+                comment: JSON.stringify(formik.values.comment)
+            } 
+            updateScore(req)
+            .then((res:IResponse<any>)=>{
+                if(res.success){
+                    toast.success(res.msg);
+                    navigate("/review-mentor")
+                }else{
+                    toast.error(res.msg)                                   
+                }
+            })
         },
-      });
-    useEffect(()=>{
+    });
 
+
+    useEffect(()=>{
+        setLoading(true)
+        // if(){
+            const reqKey: IReqKeyHash ={
+                key: "E8117C89-9E43-4C3A-9CA1-E97C5AB681F5",
+                role: "MENTOR"
+            }
+            GetProjectByHashKey(reqKey)
+            .then((res:IResponse<IProjecType>)=>{
+                console.log(res);
+                if(res.success && res.returnObj){
+                    const req = res.returnObj
+                    console.log(req)
+                    if(req){
+                        setProject(req)
+                        formik.setValues({
+                            score: req?.scoreMentor ? req?.scoreMentor?.toString()?.replace(".",",") : "",
+                            comment: req?.commentMentor ? JSON.parse(req?.commentMentor) : "- Nhận xét chung về tính ý nghĩa thực tiễn của đồ án:\n- Ý thức, thái độ của sinh viên trong quá trình thực hiện đồ án:\n- Kết quả thực hiện đồ án (cần nhận xét cụ thể những kết quả đạt được, chưa làm được):"
+                        })
+                    }
+                    if(req?.userNameNavigation){
+                        setProfile(req?.userNameNavigation)
+                    }
+                    setLoading(false)
+                }
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+        // }
     },[])
 
     return (
@@ -69,15 +120,15 @@ function InputReviewMentor() {
 
                             <div className={"grid grid-cols-9 mt-2"}>
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Mã giảng viên:</b> <span className={"text-text-color"}>202020</span>
+                                    <b>Tên giảng viên:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.fullName}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Chuyên ngành:</b> <span className={"text-text-color"}>Công nghệ phần mềm</span>
+                                    <b>Chuyên ngành:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.major?.majorName}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Học vấn:</b> <span className={"text-text-color"}>Tiến sỹ</span>
+                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.education}</span>
                                 </div>
                             </div>
                     </div>
@@ -89,15 +140,15 @@ function InputReviewMentor() {
 
                             <div className={"grid grid-cols-9 mt-2"}>
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Mã sinh viên:</b> <span className={"text-text-color"}>201210096</span>
+                                    <b>Mã sinh viên:</b> <span className={"text-text-color"}>{profile?.studentCode}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Họ và tên:</b> <span className={"text-text-color"}>Trần Minh Đức</span>
+                                    <b>Họ và tên:</b> <span className={"text-text-color"}>{profile?.fullName}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Tên đề tài:</b> <span className={"text-text-color"}>Quản ly sinh viên</span>
+                                    <b>Tên đề tài:</b> <span className={"text-text-color"}>{project?.projectOutline?.nameProject}</span>
                                 </div>
                             </div>
                     </div>
@@ -124,15 +175,15 @@ function InputReviewMentor() {
                                 </div>
                                 <div className="col-span-9">
                                     <InputCustom
-                                        id={"review"}
+                                        id={"comment"}
                                         label="Nhận xét của giảng viên hướng dẫn"
-                                        name={"review"}
+                                        name={"comment"}
                                         placeholder="Nhận xét của giảng viên hướng dẫn"
-                                        value={formik.values.review}
+                                        value={formik.values.comment}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        isError={formik.touched.review && Boolean(formik.errors.review)}
-                                        errorMessage={formik.touched.review && formik.errors.review}
+                                        isError={formik.touched.comment && Boolean(formik.errors.comment)}
+                                        errorMessage={formik.touched.comment && formik.errors.comment}
                                         multiline={true}
                                     />
                                 </div>

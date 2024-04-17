@@ -16,6 +16,8 @@ type IProps = {
     onBlur: any,
     placeholder?: string,
     multiline?:boolean,
+    readOnly?:boolean,
+    disabled?:boolean
 }
 
 
@@ -70,6 +72,8 @@ function InputCustom({
     onChange,
     onBlur,
     placeholder,
+    disabled = false,
+    readOnly = false,
     multiline = false
 }: IProps) {
 
@@ -94,6 +98,10 @@ function InputCustom({
             onChange={onChange}
             helperText={errorMessage}
             onBlur={onBlur}
+            InputProps={{
+                readOnly: readOnly,
+            }}
+            disabled={disabled}
             multiline={multiline}
             fullWidth
             

@@ -1,14 +1,14 @@
 import { useFormik } from "formik";
 import { IPageProps } from "..";
 import InputSelectCustom from "~/components/InputSelectCustom";
-import { Button, FormHelperText, MenuItem, TextField } from "@mui/material";
+import { Button, FormHelperText, MenuItem, Modal, TextField } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from "react";
 import { formatFullnameToUsername } from "~/ultis/common";
 import TimePickerCustom from "~/components/InputTimePicker";
-import { addStudent } from "~/services/studentApi";
+import { addStudent, updateStudent } from "~/services/studentApi";
 import { IStudent } from "~/types/IStudentType";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
@@ -28,8 +28,8 @@ import { toast } from "react-toastify";
 const validationSchema = yup.object({
     fullname: yup
       .string()
-      .required('Họ tên không được để trống')
-      .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u,"Họ tên không được chứa kí tự đặc biệt"),
+      .required('Họ tên không được để trống'),
+    //   .matches(/^'?\p{L}+(?:[' ]\p{L}+)*'?$/u,"Họ tên không được chứa kí tự đặc biệt"),
     semester: yup
       .string()
       .required('Học kỳ không được để trống'),
@@ -67,16 +67,18 @@ const validationSchema = yup.object({
     setSwitchPageInput:(switchPage:boolean)=>void,
     switchPageInput:boolean,
     userSelect:IStudent,
-    setUserSelect:(student:IStudent)=>void
+    setUserSelect:(student:IStudent)=>void,
+    hanleFetchApiListStudent:()=>void
   }
 
 
-function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserSelect}:IProp) {
+function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserSelect,hanleFetchApiListStudent}:IProp) {
     const [dateOfBirth,setDateOfBirth] = useState<any>(dayjs(new Date()));
     const [loading,setLoading] = useState(true);
     const infoUser = useAppSelector(inforUser);
     const [semesterOption,setSemesterOption] = useState<ISemester[]>();
     const [statusOption,setstatusOption] = useState<IClassificationType[]>();
+    const [statusProjectOption,setStatusProjectOption] = useState<any[]>();
     const [initData,setInitData] = useState({
         username:"",
         fullname:"",
@@ -89,7 +91,8 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
         email:"",
         address:"",
         gender: 0,
-        gpa: ""
+        gpa: "",
+        statusProject:""
   })
 
 
@@ -101,11 +104,14 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
             }
         ),getListClassification({
             typeCode: "STATUS_SYSTEM"
+        }),getListClassification({
+            typeCode: "STATUS_PROJECT"
         })])
         .then((responses:IResponse<any>[]) => {
         
             const semesterRes = responses[0];
             const statusRes = responses[1];
+            const statusProjectRes = responses[2];
             if(semesterRes.success && semesterRes.returnObj && semesterRes.returnObj.length > 0){
                 setSemesterOption(semesterRes.returnObj);
                 formik.values.semester = semesterRes ? semesterRes.returnObj[0].semesterId : ""
@@ -114,7 +120,6 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 //     semester: semesterRes ? semesterRes.returnObj[0].semesterId : "",
                 // });
             }
-
             if(statusRes.success && statusRes.returnObj && statusRes.returnObj.length > 0){
                 setstatusOption(statusRes.returnObj)
                 // formik.setValues({
@@ -123,21 +128,36 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 //   });
                 formik.values.status = statusRes ? statusRes.returnObj[0].code : "" 
             }
+
+            if(statusProjectRes.success && statusProjectRes.returnObj && statusProjectRes.returnObj.length > 0){
+                setStatusProjectOption(statusProjectRes.returnObj)
+                // formik.setValues({
+                //     ...formik.values,
+                //     status: !statusProjectRes ? "" : statusProjectRes.returnObj[0].code,
+                //   });
+                // formik.values.statusProject = statusProjectRes ? statusProjectRes.returnObj[0].code : "" 
+            }
             
             setLoading(false)
           })
         .then(()=>{
             if(userSelect.userName){
+                console.log(userSelect)
+
                 const student:IStudent = userSelect;
                 formik.values.fullname = student.fullName || "";
-                setDateOfBirth(dayjs(student.dob)),
-                formik.values.phone = student.phone || "",
-                formik.values.email = student.email || "",
-                formik.values.status = student.status || "",
-                formik.values.student_code = student.studentCode || "",
-                formik.values.class = student.className || "",
-                formik.values.schoolYear = student.schoolYearName || "",
+                setDateOfBirth(dayjs(student.dob))
+                formik.values.phone = student.phone || ""
+                formik.values.email = student.email || ""
+                formik.values.status = student.status || ""
+                formik.values.student_code = student.studentCode || ""
+                formik.values.address = student.address || ""
+                formik.values.gpa = student.gpa || ""
+                formik.values.class = student.className || ""
+                formik.values.schoolYear = student.schoolYearName || ""
                 formik.values.semester = student?.project?.semester?.semesterId || ""
+                formik.values.statusProject = student?.project?.statusProject || "START"
+                
             }
         })  
     },[]);
@@ -148,8 +168,11 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
         initialValues: initData,
         validationSchema: validationSchema,
         onSubmit: async (values,{ setSubmitting, setErrors, setStatus }) => {
+            const date = dateOfBirth.$D < 10 ? "0"+dateOfBirth.$D.toString(): dateOfBirth.$D.toString();
+            const month = dateOfBirth.$M+1 < 10 ? "0"+(dateOfBirth.$M+1).toString(): (dateOfBirth.$M+1).toString();
+
             const dataSubmit: IStudent = {
-                passwordText: `${dateOfBirth.$D}/${dateOfBirth.$M+1}/${dateOfBirth.$y}`,
+                passwordText: `${date}/${month}/${dateOfBirth.$y}`,
                 fullName: values.fullname,
                 dob: new Date(dateOfBirth.$y,dateOfBirth.$M,dateOfBirth.$D+1),
                 phone: values.phone,
@@ -158,25 +181,48 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 createdAt: new Date(),
                 createdBy: infoUser?.userName || "",
                 status: values.status,
+                statusProject: values.statusProject,
                 studentCode: values.student_code,
                 className: values.class,
                 schoolYearName: values.schoolYear,
                 semesterId: values.semester,
                 address: values.address,
                 gender: values.gender,
-                gpa: Number(values.gpa),
+                gpa: values.gpa,
             }
-            const data = await addStudent(dataSubmit);
-            if(data.success){
-                setSwitchPageInput(false);
-                toast.success(data.msg)
+            if(userSelect?.userName){
+                const update = await updateStudent({
+                    ...dataSubmit,
+                    userName: userSelect.userName,
+                    majorId: userSelect?.majorId
+                });
+                if(update.success){
+                    setSwitchPageInput(false);
+                    toast.success(update.msg)
+                }else{
+                    console.log(update)
+                    setErrors({ username: update.msg})
+                }
             }else{
-                console.log(data)
-                setErrors({ username: data.msg})
+                const data = await addStudent(dataSubmit);
+                if(data.success){
+                    setSwitchPageInput(false);
+                    toast.success(data.msg)
+                }else{
+                    console.log(data)
+                    setErrors({ username: data.msg})
+                }
+                console.log(data);
             }
-            console.log(data);
+            hanleFetchApiListStudent();
         },
     });
+
+    const handleSubmit = ()=>{
+        if(formik.errors){
+            
+        }
+    }
 
 
 
@@ -197,6 +243,7 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 placeholder="Học kỳ"
                                 label="Học kỳ"
                                 onBlur={undefined}
+                                readOnly={userSelect?.userName ? true : false}
                                 isError={formik.touched.semester && Boolean(formik.errors.semester)}
                             >
                             {
@@ -213,7 +260,7 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                             <TextField 
                                 id="username" 
                                 label="Tài khoản"
-                                value={formik.values.semester +"_"+ formatFullnameToUsername(formik.values.fullname) +"_"+ formik.values.student_code}
+                                value={formik.values.semester +"_"+ formik.values.student_code}
                                 name="username"
                                 variant="outlined"
                                 InputProps={{
@@ -230,6 +277,8 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 id={"student_code"}
                                 label="Mã sinh viên"
                                 name={"student_code"}
+                                readOnly={userSelect?.userName ? true : false}
+                                disabled={userSelect?.userName ? true : false}
                                 value={formik.values.student_code} 
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -318,7 +367,8 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 onChange={(e) => {
                                     setDateOfBirth(e);
                                 } } 
-                                value={dateOfBirth}                                />
+                                value={dateOfBirth}                                
+                            />
                         </div>
 
                         {/* <div className="col-span-12">
@@ -374,6 +424,30 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 errorMessage={formik.touched.gpa && formik.errors.gpa} 
                             />
                         </div>
+                        {
+                            userSelect.userName &&
+                            <div className="col-span-12">
+                                <InputSelectCustom
+                                    id={"statusProject"}
+                                    name={"statusProject"}
+                                    onChange={formik.handleChange}
+                                    value={formik.values.statusProject}
+                                    placeholder="Trạng thái đồ án"
+                                    label="Trạng thái đồ án"
+                                    onBlur={undefined}
+                                    isError={formik.touched.statusProject && Boolean(formik.errors.statusProject)}
+
+                                >
+                                    {
+                                        statusProjectOption && statusProjectOption.map((x)=>{
+                                            return <MenuItem key={x.code} value={x.code}>{x.value}</MenuItem>
+                                        })
+                                    }
+
+                                </InputSelectCustom>
+                                    <span className="text-red-600">{formik.errors.statusProject}</span>
+                            </div>
+                        }
 
                         <div className="col-span-12">
                             <InputSelectCustom
@@ -420,7 +494,6 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 </form>
         }
         
-
     </div> );
 }
 

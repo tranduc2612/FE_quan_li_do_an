@@ -22,6 +22,7 @@ export interface IProjecType{
     commentTk?: string,
     semesterId?:string,
     councilId?:string,
+    statusProject?:string,
     commentGroupReviewOutline?: string,
     userName?: string,
     userNameMentor?:string,

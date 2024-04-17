@@ -87,12 +87,12 @@ export const PRIVATE_ROUTER = [
         layout: DefaultLayout
     },
     {
-        path:"/review-commentor/",
+        path:"/review-commentator/",
         page: DetailReviewCommentor,
         layout: DefaultLayout
     },
     {
-        path:"input/review-commentor/",
+        path:"input/review-commentator/",
         page: InputReviewCommentor,
         layout: DefaultLayout
     },

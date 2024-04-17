@@ -12,7 +12,6 @@ export interface ITeacher {
     createdBy?: string,
     status?: string,
     isAdmin?:string,
-    teacherCode?: string,
     majorId?: string,
     education?:string,
     address?: string,

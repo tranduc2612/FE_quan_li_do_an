@@ -11,6 +11,15 @@ export const getProjectOutline = async (userNameStudent:string): Promise<IRespon
     return data;
 }
 
+export const getFileWordOutline = async (userNameStudent?:string): Promise<any> => {
+    const data: IResponse<any> = await request.get(`/Printer/print-word-outline?id=`+userNameStudent,
+    {
+        responseType: 'blob'
+    }
+    )
+    return data;
+}
+
 export const addProjectOutline = async (projectOutline:IProjectOutline): Promise<IResponse<IProjectOutline>> => {
     const data: IResponse<IProjectOutline> = await request.post(`/Project/add-project-outline`,{
         ...projectOutline

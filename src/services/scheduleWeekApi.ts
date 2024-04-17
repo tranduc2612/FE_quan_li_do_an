@@ -32,6 +32,11 @@ export const updateScheduleWeek = async (dataReq: IScheduleWeek): Promise<IRespo
     return data;
 }
 
+export const deleteScheduleWeek = async (id:string): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.delete("/ScheduleWeek/delete-schedule-Week?id="+id);
+    return data;
+}
+
 export const updateCommentScheduleWeek = async (ScheduleWeekId:string,UserNameProject:string,Comment:string): Promise<IResponse<IScheduleWeek>> => {
     const data: IResponse<IDetailScheduleWeek> = await request.put(`/ScheduleWeek/update-comment-schedule-week?ScheduleWeekId=${ScheduleWeekId}&UserNameProject=${UserNameProject}&Comment=${Comment}`,{
         

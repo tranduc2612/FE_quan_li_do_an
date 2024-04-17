@@ -196,15 +196,9 @@ function GroupOutlineReview() {
         },
         
         {
-            field: 'teacherCode',
-            headerName: 'Mã giảng viên',
-            width: 120,
-            editable: true,
-        },
-        {
             field: 'userName',
             headerName: 'Tên tài khoản',
-            width: 350,
+            width: 250,
             editable: true,
         },
         {
@@ -215,19 +209,19 @@ function GroupOutlineReview() {
         },
         {
             field: 'education',
-            headerName: 'Học vấn',
+            headerName: 'Học vị',
             width: 160,
             editable: true,
         },
-        {
-            field: 'groupReviewOutlineId',
-            headerName: 'Mã nhóm xét duyệt',
-            width: 200,
-            editable: true,
-            renderCell:({row})=>{
-                return <>{row?.groupReviewOutline  ? row?.groupReviewOutlineId : <span className="text-red-600">Chưa được gán</span>}</>
-            }
-        },
+        // {
+        //     field: 'groupReviewOutlineId',
+        //     headerName: 'Mã nhóm xét duyệt',
+        //     width: 200,
+        //     editable: true,
+        //     renderCell:({row})=>{
+        //         return <>{row?.groupReviewOutline  ? row?.groupReviewOutlineId : <span className="text-red-600">Chưa được gán</span>}</>
+        //     }
+        // },
         {
             field: 'nameGroupReviewOutline',
             headerName: 'Tên nhóm xét duyệt',
@@ -291,11 +285,15 @@ function GroupOutlineReview() {
                 }else{
                     const newMap = dataMap.map((data:ITeaching,index:any)=>{
                         return {
-                          id: index+1,
                           ...data,
                           ...data?.groupReviewOutline,
                           ...data?.semester,
                           ...data?.userNameTeacherNavigation
+                        }
+                    }).filter(x=>x.status === "AUTH").map((data:ITeaching,index:any)=>{
+                        return {
+                          id: index+1,
+                          ...data,
                         }
                     })
                     const totalItem = newMap.length;
@@ -318,8 +316,6 @@ function GroupOutlineReview() {
         },
         validationSchema: validationSchema,
         onSubmit: (values,{ setSubmitting, setErrors, setStatus }) => {
-          console.log(values);
-          
           if(groupSelected.groupReviewOutlineId){
             const req: IGroupReviewOutline = {
                 groupReviewOutlineId: groupSelected.groupReviewOutlineId,
@@ -397,7 +393,7 @@ function GroupOutlineReview() {
                                 checkboxSelection={toggleAutoAssign}
                                 rows={rows}
                                 columns={columns}
-                                rowCount={total}
+                                // rowCount={total}
                                 localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
                                 onCellClick={({row})=>{
                                     const idSemester = id;
@@ -544,7 +540,7 @@ function GroupOutlineReview() {
                                     rows={rowsTeacher}
                                     loading={loadingData}
                                     columns={columnsTeacher}
-                                    rowCount={totalTeacher}
+                                    // rowCount={totalTeacher}
                                     checkboxSelection={true}
                                     isRowSelectable={(params: GridRowParams) => params.row?.groupReviewOutlineId == groupSelected?.groupReviewOutlineId || !params.row?.groupReviewOutlineId}
                                     rowSelectionModel={rowsTeacherChecked}

@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import { ChevronLeft } from "mdi-material-ui";
+import { ChevronLeft, Download, Pencil } from "mdi-material-ui";
 import { useEffect, useState } from "react";
 import {
     useNavigate
@@ -9,18 +9,44 @@ import HeaderPageTitle from "~/components/HeaderPageTitle";
 import Loading from "~/components/Loading";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { IDetailScheduleWeek } from "~/types/IDetailScheduleWeek";
-import { IScheduleWeek } from "~/types/IScheduleWeek";
+import { GetProjectByHashKey, IReqKeyHash } from '~/services/projectApi';
+import { IProjecType } from '~/types/IProjectType';
+import { IResponse } from '~/types/IResponse';
+import { IStudent } from '~/types/IStudentType';
 
 function DetailReviewMentor() {
     const info = useAppSelector(inforUser)
     // const {id,idStudent} = useParams();
     const navigate = useNavigate();
-    const [data,setData] = useState<IScheduleWeek>();
-    const [detail,setDetail] = useState<IDetailScheduleWeek>();
+    const [profile,setProfile] = useState<IStudent>();
+    const [project,setProject] = useState<IProjecType>();
     const [loading,setLoading] = useState(false); 
     useEffect(()=>{
-
+        setLoading(true)
+        // if(){
+            const reqKey: IReqKeyHash ={
+                key: "E8117C89-9E43-4C3A-9CA1-E97C5AB681F5",
+                role: "MENTOR"
+            }
+            GetProjectByHashKey(reqKey)
+            .then((res:IResponse<IProjecType>)=>{
+                console.log(res);
+                if(res.success && res.returnObj){
+                    const req = res.returnObj
+                    console.log(req)
+                    if(req){
+                        setProject(req)
+                    }
+                    if(req?.userNameNavigation){
+                        setProfile(req?.userNameNavigation)
+                    }
+                    setLoading(false)
+                }
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+        // }
     },[])
 
     return (
@@ -31,9 +57,24 @@ function DetailReviewMentor() {
         <div className="">
             <BoxWrapper className={`mb-5`}>
                 <div>
-                    <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
-                            Quay lại
-                    </Button>
+                    <div className='flex justify-between'>
+                        <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
+                                Quay lại
+                        </Button>
+
+                        <div className="flex">
+                            <div className="flex items-center p-2 rounded-full text-3xl mx-2 hover:bg-gray-200" onClick={()=>{navigate("/input/review-mentor")}}>
+                                <Pencil className="text-primary-blue cursor-pointer" />
+                            </div>
+
+                            <Button onClick={()=>{  
+                                
+                            }} variant="contained" startIcon={<Download />}>
+                                Tải xuống
+                            </Button>
+
+                        </div>
+                    </div>
                     <h2 className={"font-bold text-center text-primary-blue text-2xl mb-3 mt-3"}>
                         BẢN NHẬN XÉT VÀ CHẤM ĐIỂM ĐỒ ÁN TỐT NGHIỆP CỦA NGƯỜI HƯỚNG DẪN
                     </h2>
@@ -46,15 +87,15 @@ function DetailReviewMentor() {
 
                             <div className={"grid grid-cols-9 mt-2"}>
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Mã giảng viên:</b> <span className={"text-text-color"}>202020</span>
+                                    <b>Tên giảng viên:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.fullName}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Chuyên ngành:</b> <span className={"text-text-color"}>Công nghệ phần mềm</span>
+                                    <b>Chuyên ngành:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.major?.majorName}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Học vấn:</b> <span className={"text-text-color"}>Tiến sỹ</span>
+                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.education}</span>
                                 </div>
                             </div>
                     </div>
@@ -66,15 +107,15 @@ function DetailReviewMentor() {
 
                             <div className={"grid grid-cols-9 mt-2"}>
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Mã sinh viên:</b> <span className={"text-text-color"}>201210096</span>
+                                    <b>Mã sinh viên:</b> <span className={"text-text-color"}>{profile?.studentCode}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Họ và tên:</b> <span className={"text-text-color"}>Trần Minh Đức</span>
+                                    <b>Họ và tên:</b> <span className={"text-text-color"}>{profile?.fullName}</span>
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Tên đề tài:</b> <span className={"text-text-color"}>Quản ly sinh viên</span>
+                                    <b>Tên đề tài:</b> <span className={"text-text-color"}>{project?.projectOutline?.nameProject}</span>
                                 </div>
                             </div>
                     </div>
@@ -86,14 +127,14 @@ function DetailReviewMentor() {
 
                         <div className={"grid grid-cols-9 mt-2"}>
                             <div className={"col-span-9 m-2"}>
-                                <b>Điểm:&#160;</b> <span className={"text-primary-blue"}>8.0</span>
+                                <b>Điểm:&#160;</b> <span className={"text-primary-blue"}>{project?.scoreMentor}</span>
                             </div>
 
                             <div className={"col-span-9 m-2"}>
                                 <b>Nhận xét:</b> 
                             </div>
                             <span className={"text-text-color col-span-9 mx-2 pe-5 overflow-hidden whitespace-pre-wrap text-wrap break-words"}>
-                                201210ádasdasdasd096
+                                {project?.commentMentor && JSON.parse(project?.commentMentor)}
                             </span>
 
                             
