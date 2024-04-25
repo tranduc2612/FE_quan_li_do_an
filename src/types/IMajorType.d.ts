@@ -1,4 +1,6 @@
 export interface IMajorType{
    majorId:string,
-   majorName:string
+   majorName?:string,
+   createdAt?:datetime | string,
+   createdBy?: string
 }

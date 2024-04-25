@@ -13,9 +13,11 @@ import LoadingData from "~/components/LoadingData";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { getListClassification } from "~/services/classificationApi";
+import { getListEducation } from '~/services/educationApi';
 import { getListMajor } from "~/services/majorApi";
 import { addTeacher, updateTeacher } from "~/services/teacherApi";
 import { IClassificationType } from "~/types/IClassificationType";
+import { IEducationType } from '~/types/IEducationType';
 import { IMajorType } from "~/types/IMajorType";
 import { IResponse } from "~/types/IResponse";
 import { ITeacher } from "~/types/ITeacherType";
@@ -60,52 +62,9 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFe
     const infoUser = useAppSelector(inforUser);
     const [statusOption,setstatusOption] = useState<IClassificationType[]>();
     const [majorOptions,setMajorOptions] = useState<IMajorType[]>();
+    const [educationOptions,setEducationOptions] = useState<IEducationType[]>();
 
     const [initData,setInitData] = useState()
-
-
-    useEffect(()=>{
-        Promise.all([getListClassification({
-            typeCode: "STATUS_SYSTEM"
-        }),
-        getListMajor({
-            majorId:"",
-            majorName:""
-        })])
-        .then((responses:IResponse<any>[]) => {
-        
-            const statusRes = responses[0];
-            const majorState:IResponse<IMajorType[]> = responses[1];
-
-            if(statusRes.success && statusRes.returnObj && statusRes.returnObj.length > 0){
-                setstatusOption(statusRes.returnObj)
-                formik.values.status = statusRes ? statusRes.returnObj[0].code : "" 
-            }
-            if(majorState.success && majorState.returnObj && majorState.returnObj.length > 0){
-                setMajorOptions(majorState.returnObj)
-                formik.values.major = majorState ? majorState.returnObj[0].majorId : "" 
-            }
-
-            formik.values.isAdmin = "0" 
-            
-            setLoading(false)
-          })  
-          .then(()=>{
-            if(userSelect.userName){
-                console.log(userSelect)
-                const teacher:ITeacher = userSelect;
-                formik.values.username = teacher.userName || ""
-                formik.values.fullname = teacher.fullName || "";
-                setDateOfBirth(dayjs(teacher.dob))
-                formik.values.phone = teacher.phone || ""
-                formik.values.email = teacher.email || ""
-                formik.values.status = teacher.status || ""
-                formik.values.address = teacher.address || ""
-                formik.values.education = teacher.education || ""
-                formik.values.isAdmin = teacher.isAdmin || "0"
-            }
-        })  
-    },[]);
 
     const formik = useFormik({
         initialValues: {
@@ -139,7 +98,7 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFe
                 isAdmin: values.isAdmin,
                 address: values.address,
                 gender: values.gender,
-                education: values.education,
+                educationId: values.education,
                 majorId: values.major
             }
             console.log(dataSubmit)
@@ -166,6 +125,62 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFe
             }
         },
     });
+
+
+    useEffect(()=>{
+        Promise.all([getListClassification({
+            typeCode: "STATUS_SYSTEM"
+        }),
+        getListMajor({
+            majorId:"",
+            majorName:""
+        }),
+        getListEducation()])
+        .then((responses:IResponse<any>[]) => {
+        
+            const statusRes = responses[0];
+            const majorState:IResponse<IMajorType[]> = responses[1];
+            const educationState:IResponse<IEducationType[]> = responses[2];
+
+            if(statusRes.success && statusRes.returnObj && statusRes.returnObj.length > 0){
+                setstatusOption(statusRes.returnObj)
+                formik.values.status = statusRes ? statusRes.returnObj[0].code : "" 
+            }
+            if(majorState.success && majorState.returnObj && majorState.returnObj.length > 0){
+                setMajorOptions(majorState.returnObj)
+                formik.values.major = majorState ? majorState.returnObj[0].majorId : "" 
+            }
+            if(educationState.success && educationState.returnObj && educationState.returnObj.length > 0){
+                setEducationOptions(educationState.returnObj)
+                formik.values.education = educationState ? educationState.returnObj[0].educationId : "" 
+            }
+
+            formik.values.isAdmin = "0" 
+            
+            setLoading(false)
+          })  
+          .then(()=>{
+            if(userSelect.userName){
+                console.log(userSelect)
+                const teacher:ITeacher = userSelect;
+                formik.setValues({
+                    username: teacher.userName || "",
+                    fullname: teacher.fullName || "",
+                    status: teacher.status || "",
+                    phone: teacher.phone || "",
+                    email: teacher.email || "",
+                    education: teacher.educationId || "",
+                    major: teacher.majorId || "",
+                    isAdmin: teacher.isAdmin || "0",
+                    address: teacher.address || "",
+                    gender: teacher.gender || 0
+                })
+                setDateOfBirth(dayjs(teacher.dob))
+            }
+        })  
+    },[]);
+
+    
 
 
 
@@ -308,7 +323,7 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFe
                             </InputSelectCustom>
                         </div>
 
-                        <div className="col-span-12">
+                        {/* <div className="col-span-12">
                             <InputCustom
                                 id={"education"}
                                 label="Học vị"
@@ -319,6 +334,23 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFe
                                 onBlur={formik.handleBlur}
                                 errorMessage={formik.touched.education && formik.errors.education} 
                             />
+                        </div> */}
+                        <div className="col-span-12">
+                            <InputSelectCustom
+                                id={"education"}
+                                name={"education"}
+                                onChange={formik.handleChange}
+                                value={formik.values.education}
+                                placeholder="Học vị"
+                                label="Học vị"
+                                onBlur={undefined}
+                            >
+                                {
+                                        educationOptions && educationOptions.map((x)=>{
+                                            return <MenuItem key={x.educationId} value={x.educationId}>{x.educationName}</MenuItem>
+                                        })
+                                    }
+                            </InputSelectCustom>
                         </div>
 
                         <div className="col-span-12">

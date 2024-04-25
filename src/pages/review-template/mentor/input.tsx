@@ -128,7 +128,7 @@ function InputReviewMentor() {
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.education}</span>
+                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.educationId}</span>
                                 </div>
                             </div>
                     </div>

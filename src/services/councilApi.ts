@@ -55,7 +55,7 @@ export const excelListProjectCouncil = async (dataReq: ListProjectCouncil): Prom
     return data;
 }
 
-export const getListTeachingNotInCouncil = async (dataReq: any): Promise<IResponse<ITeaching[]>> => {
+export const getListTeachingCouncil = async (dataReq: any): Promise<IResponse<ITeaching[]>> => {
     const data: IResponse<ITeaching[]> = await request.post("/Council/get-list-teaching-in-council",{
         ...dataReq
     });

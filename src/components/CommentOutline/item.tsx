@@ -1,9 +1,10 @@
-import { TextField } from "@mui/material";
+import { Avatar, TextField } from "@mui/material";
 import { Check, Delete, Pencil } from "mdi-material-ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import images from "~/assets";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
+import { getFileAvatar } from "~/services/userApi";
 import { ICommentType } from "~/types/IComment";
 import { formatDate } from "~/ultis/common";
 
@@ -16,7 +17,13 @@ type IProps = {
 function ItemCommentOutline({item,handleDelete,handleUpdate}: IProps) {
     const info = useAppSelector(inforUser)
     const [switchEdit,setSwitchEdit] = useState(false);
+    const [avatar,setAvatar] = useState<any>()
     const [valueInput,setValueInput] = useState(item?.contentComment || "");
+
+    useEffect(()=>{
+        fetchApiAvatar()
+    },[])
+
     const handleUpdateComment = async ()=>{
         const req: ICommentType = {
             commentId: item?.commentId,
@@ -28,9 +35,24 @@ function ItemCommentOutline({item,handleDelete,handleUpdate}: IProps) {
         setSwitchEdit(false)
     }
 
+    const fetchApiAvatar = ()=>{
+        getFileAvatar("TEACHER",item?.createdBy)
+        .then((response:any)=>{
+            const blob = response.data;
+            const imgUrl = URL.createObjectURL(blob);
+            setAvatar(imgUrl);
+        })
+    }
+
     return ( <>
         <div key={item?.commentId} className="grid grid-cols-6 mb-8">
-                <img src={images.image.anh_demo} className={`col-span-1 rounded-full w-10 h-10 object-cover`} />
+                <Avatar 
+                    alt="Remy Sharp" 
+                    src={avatar}  
+                    sx={{ width: 40, height: 40, marginTop: 1 }}>
+                        
+                </Avatar>
+                {/* <img src={images.image.anh_demo} className={`col-span-1 rounded-full w-10 h-10 object-cover`} /> */}
                 <span className="content col-span-5">
                     <div className="flex justify-between text-primary-blue font-bold">
                         <span>{item?.createdByNavigation?.fullName}</span>

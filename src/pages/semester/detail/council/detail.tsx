@@ -11,7 +11,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import BoxWrapper from "~/components/BoxWrap";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { AssignCouncilProject, AssignCouncilTeaching, assginCouncilToProject, assginCouncilToTeaching, excelListProjectCouncil, getCouncil, getListProjectCouncil, getListTeachingNotInCouncil } from "~/services/councilApi";
+import { AssignCouncilProject, AssignCouncilTeaching, assginCouncilToProject, assginCouncilToTeaching, excelListProjectCouncil, getCouncil, getListProjectCouncil, getListTeachingCouncil } from "~/services/councilApi";
 import { assignCommentator } from '~/services/projectApi';
 import { ICouncil } from "~/types/ICouncil";
 import { IProjecType } from '~/types/IProjectType';
@@ -367,7 +367,7 @@ function DetailCouncil() {
             editable: false,
         },
         {
-            field: 'education',
+            field: 'educationName',
             headerName: 'Học vị',
             width: 160,
             editable: false,
@@ -413,8 +413,6 @@ function DetailCouncil() {
                               ...data?.userNameTeacherNavigation
                             }
                         });
-
-                        console.log(lstTeaching)
                         setLstTeachingInCouncil([...lstTeaching])
                         const UV1 = lstTeaching.find(x=>x.positionInCouncil == "UV1");
                         if(UV1){
@@ -471,7 +469,12 @@ function DetailCouncil() {
                     });
                     console.log(newMap,"sadkaksdkasd")
                     const lstInCouncil = [...newMap].filter(x=>x?.councilId == idCouncil);
-                    const lstNotInCouncil = [...newMap].sort(function(a:any, b:any) {
+
+                    // màn hình thêm
+                    const lstTeachingsUserName = lstTeachingInCouncil.map(x=>x.userNameTeacher)
+                    console.log(lstTeachingsUserName)
+
+                    const lstNotInCouncil = [...newMap].filter((x:IProjecType)=>!lstTeachingsUserName.includes(x.userNameMentor) && x.userNameMentor != null).sort(function(a:IProjecType, b:IProjecType) {
                         if (a?.councilId === idCouncil && b?.councilId !== idCouncil) {
                           return -1; // a nằm trước b
                         }
@@ -504,7 +507,7 @@ function DetailCouncil() {
 
     const handleFetchApiTeacherNotInCouncil = async ()=>{
         setLoadingData(true)
-        await getListTeachingNotInCouncil({
+        await getListTeachingCouncil({
             semesterId:  idSemester
         })
         .then((res:IResponse<ITeaching[]>)=>{
@@ -520,7 +523,8 @@ function DetailCouncil() {
                           ...data,
                           ...data?.groupReviewOutline,
                           ...data?.semester,
-                          ...data?.userNameTeacherNavigation
+                          ...data?.userNameTeacherNavigation,
+                          ...data?.userNameTeacherNavigation?.education
                         }
                     }).filter(x=>x.status === "AUTH").
                     map((data:ITeaching,index:any)=>{
@@ -735,10 +739,10 @@ function DetailCouncil() {
                                     slots={{ toolbar: ()=> <> <GridToolbarContainer>
                                         <GridToolbarColumnsButton />
                                         <GridToolbarFilterButton  />
-                                        <Button variant="text" startIcon={<AddIcon />} onClick={()=>{
+                                        <Button variant="text" startIcon={<Pencil />} onClick={()=>{
                                             setOpenModalAddStudent(true)
                                         }}>
-                                            Thêm sinh viên vào hội đồng
+                                            Chỉnh sửa sinh viên
                                         </Button>
                                         <Button variant="text" startIcon={<Download />} onClick={()=>{
                                             excelListProjectCouncil({

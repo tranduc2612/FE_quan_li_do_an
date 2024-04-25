@@ -50,3 +50,15 @@ export const GetProjectByHashKey = async (req:IReqKeyHash): Promise<IResponse<IP
     });
     return data;
 }
+
+export const downloadFileWord = async (req:IReqKeyHash): Promise<any> => {
+    const data: IResponse<any> = await request.post(`/Printer/print-word-review`,
+    {
+        ...req
+    },
+    {
+        responseType: 'blob'
+    }
+    )
+    return data;
+}

@@ -288,8 +288,13 @@ const [flagEdit,setFlagEdit] = useState(false);
           width: 220,
           editable: true,
           type: 'singleSelect',
-          valueOptions: ['Market', 'Finance', 'Development'],
-        },
+          valueOptions: [
+              { label: 'Lịch chốt đề cương', value: 'DC' },
+              { label: 'Lịch chốt điểm GVHD', value: 'GVHD' },
+              { label: 'Lịch chốt điểm GVPB', value: 'GVHPB' },
+              { label: 'Lịch chốt điểm Khoa', value: 'KHOA' }
+          ],
+      },
         { field: 'note', headerName: 'Ghi chú', width: 180, editable: true },
         { field: 'createdByName', headerName: 'Người tạo', width: 180, editable: false },
         {

@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import {
     useNavigate
 } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import BoxWrapper from "~/components/BoxWrap";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
 import Loading from "~/components/Loading";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { GetProjectByHashKey, IReqKeyHash } from '~/services/projectApi';
+import { GetProjectByHashKey, IReqKeyHash, downloadFileWord } from '~/services/projectApi';
 import { IProjecType } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { IStudent } from '~/types/IStudentType';
@@ -68,7 +69,26 @@ function DetailReviewCommentor() {
                             </div>
 
                             <Button onClick={()=>{  
-                                
+                                const req: IReqKeyHash ={
+                                    key: "FBE3394A-E02A-4252-8484-F4229A3ADE17",
+                                    role:"COMMENTATOR"
+                                }  
+                                downloadFileWord(req)
+                                .then((res:any)=>{
+                                    if(info?.userName){
+                                        const link = document.createElement('a');
+                                        const fileName = `NXGVPB_${info?.userName}.docx`;
+                                        link.setAttribute('download', fileName);
+                                        link.href = URL.createObjectURL(new Blob([res]));
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        link.remove();
+                                    }
+                                })
+                                .catch((err)=>{
+                                    console.log(err)
+                                    toast.warning("Không hợp lệ")
+                                })
                             }} variant="contained" startIcon={<Download />}>
                                 Tải xuống
                             </Button>
@@ -95,7 +115,7 @@ function DetailReviewCommentor() {
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameCommentatorNavigation?.education}</span>
+                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameCommentatorNavigation?.education?.educationName}</span>
                                 </div>
                             </div>
                     </div>

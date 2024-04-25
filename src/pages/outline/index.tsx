@@ -1,5 +1,5 @@
 import Add from "@mui/icons-material/Add";
-import { Button, TextField } from "@mui/material";
+import { Avatar, Button, TextField } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { ChevronLeft, Pencil, PrinterCheck, Send } from "mdi-material-ui";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { addCommentOutline, checkPermission, deleteCommentOutline, getListCommentOutline, updateCommentOutline } from "~/services/commentOutlineApi";
 import { getFileWordOutline, getProjectOutline } from "~/services/projectOutlineApi";
+import { getFileAvatar } from "~/services/userApi";
 import { ICommentType } from "~/types/IComment";
 import { IProjectOutline } from "~/types/IProjectOutline";
 import { IResponse } from "~/types/IResponse";
@@ -28,6 +29,7 @@ function OutlinePage() {
     const [rows,setRows] = useState<any>([]);
     const [allowComment,setAllowComment] = useState(false)
     const [commentText,setCommentText] = useState("")
+    const [avatar,setAvatar] = useState<any>()
     const [lstComment,setLstComment] = useState<ICommentType[]>([]);
     const [total, setTotal] = useState(0);
     const [loading,setLoading] = useState(true);
@@ -92,6 +94,7 @@ function OutlinePage() {
         setLoading(true)
         getProjectOutline(id)
         .then((res:IResponse<IProjectOutline>)=>{
+            
             if(res.success && res.returnObj){
                 let resData = res.returnObj;
                 if(res.returnObj.contentProject){
@@ -100,12 +103,16 @@ function OutlinePage() {
                         contentProject: JSON.parse(res.returnObj.contentProject)
                     }
                 }
+
                 if(res.returnObj.expectResult){
+
                     resData = {
                         ...resData,
                         expectResult: JSON.parse(res.returnObj.expectResult)
                     }
+
                 }
+
                 if(res.returnObj.techProject){
                     resData = {
                         ...resData,
@@ -152,6 +159,8 @@ function OutlinePage() {
             setLoading(false)
         })
 
+        fetchApiAvatar();
+
     }
 
     },[])
@@ -192,6 +201,15 @@ function OutlinePage() {
         }else{
             toast.warn("Thông tin không hợp lệ")
         }
+    }
+
+    const fetchApiAvatar = ()=>{
+        getFileAvatar("TEACHER",info?.userName)
+        .then((response:any)=>{
+            const blob = response.data;
+            const imgUrl = URL.createObjectURL(blob);
+            setAvatar(imgUrl);
+        })
     }
 
     const handleUpdateComment = async (req: ICommentType)=>{
@@ -284,7 +302,7 @@ function OutlinePage() {
                                             </div>
 
                                             <div className={"col-span-3 m-2"}>
-                                                <b>Học hàm:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.education}</span> 
+                                                <b>Học hàm:</b> <span className={"text-text-color"}>{data?.userNameNavigation?.userNameMentorNavigation?.education?.educationName}</span> 
                                             </div>
                                         </div>
                                         :
@@ -397,7 +415,14 @@ function OutlinePage() {
                         {
                         allowComment &&
                         <div className="box_comment mb-10 grid grid-cols-10 gap-1">
-                            <img src={images.image.anh_demo} className={`col-span-2 rounded-full w-10 h-10 object-cover`} />
+                            <div className="col-span-2">
+                                <Avatar 
+                                    alt="Remy Sharp" 
+                                    src={avatar}  
+                                    sx={{ width: 40, height: 40, marginTop:1 }}>
+                                        
+                                </Avatar>
+                            </div>
                             <div className="col-span-7">
                                 <TextField 
                                     id="comment" 

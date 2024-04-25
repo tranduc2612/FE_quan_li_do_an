@@ -9,3 +9,17 @@ export const getListMajor = async (dataReq:IMajorType): Promise<IResponse<IMajor
     });
     return data;
 }
+
+export const addMajor = async (dataReq:IMajorType): Promise<IResponse<IMajorType>> => {
+    const data: IResponse<IMajorType> = await request.post("/Major/add-major",{
+        ...dataReq
+    });
+    return data;
+}
+
+export const updateMajor = async (dataReq:IMajorType): Promise<IResponse<IMajorType>> => {
+    const data: IResponse<IMajorType> = await request.put("/Major/update-major",{
+        ...dataReq
+    });
+    return data;
+}

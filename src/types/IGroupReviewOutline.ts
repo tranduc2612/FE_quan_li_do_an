@@ -1,10 +1,13 @@
+import { ITeaching } from "./ITeachingType"
+
 export interface IGroupReviewOutline{
     groupReviewOutlineId?: string,
     nameGroupReviewOutline?: string,
     createdBy?:string,
     isDelete?: number,
     createdDate?: Date,
-    semesterId?:string
+    semesterId?:string,
+    teachings?:ITeaching[]
 }
 
 export interface IGroupReviewOutlineSemester{

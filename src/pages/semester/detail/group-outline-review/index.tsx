@@ -208,7 +208,7 @@ function GroupOutlineReview() {
             editable: true,
         },
         {
-            field: 'education',
+            field: 'educationName',
             headerName: 'Học vị',
             width: 160,
             editable: true,
@@ -288,7 +288,8 @@ function GroupOutlineReview() {
                           ...data,
                           ...data?.groupReviewOutline,
                           ...data?.semester,
-                          ...data?.userNameTeacherNavigation
+                          ...data?.userNameTeacherNavigation,
+                          ...data?.userNameTeacherNavigation?.education
                         }
                     }).filter(x=>x.status === "AUTH").map((data:ITeaching,index:any)=>{
                         return {
@@ -298,7 +299,17 @@ function GroupOutlineReview() {
                     })
                     const totalItem = newMap.length;
                     setTotalTeacher(totalItem)
-                    setRowsTeacher([...newMap])
+                    setRowsTeacher([...newMap].sort(function(a:any, b:any) {
+                        if (a?.groupReviewOutlineId === groupSelected.groupReviewOutlineId && b?.groupReviewOutlineId !== groupSelected.groupReviewOutlineId) {
+                          return -1; // a nằm trước b
+                        }
+                      
+                        if (a?.groupReviewOutlineId !== groupSelected.groupReviewOutlineId && b?.groupReviewOutlineId === groupSelected.groupReviewOutlineId) {
+                          return 1; // b nằm trước a
+                        }
+                      
+                        return 0; // Giữ nguyên thứ tự ban đầu
+                      }))
                     const checked = newMap.filter((item:any,index:any)=>item.groupReviewOutlineId == groupSelected?.groupReviewOutlineId).map((r,index) => r.id)
                     setRowsTeacherChecked([...checked])
                 }

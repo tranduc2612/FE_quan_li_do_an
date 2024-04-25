@@ -8,7 +8,7 @@ export interface IUser {
     email?: string,
     gender?: number,
     age?: number,
-    phone?: number,
+    phone?: string,
     dob?: string,
     address?: string,
     gpa?: string,

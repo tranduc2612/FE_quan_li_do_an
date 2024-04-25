@@ -5,5 +5,7 @@ export interface IClassificationType{
     value?:string
     role?:string
     fileName?:string
-    url?:string
+    url?:string,
+    createdAt?:string,
+    createdBy?:string
 }

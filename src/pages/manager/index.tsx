@@ -1,19 +1,19 @@
-import { useState } from "react";
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+import { AccountSchool, ChevronLeft, ChevronRight, HumanMaleBoard } from 'mdi-material-ui';
+import { FC, useState } from "react";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
 import SidebarAdmin from "~/components/SidebarAdmin";
-import {AccountSchool,HumanMaleBoard,InvoiceClock,ChevronLeft,ChevronRight,FormatListGroup}  from 'mdi-material-ui'
-import { FC } from "react"
-import BoxWrapper from "~/components/BoxWrap";
 import StudentManager from "./student";
 import TeacherMannager from "./teacher";
 import TemplateFile from "./template-file";
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
-import GroupReviewOutlineManager from "./group-review-outline";
+import MajorManage from './major';
+import EducationManage from './education';
 export enum EnumPage{
     STUDENT,
     TEACHER,
-    GROUP_REVIEW_OUTLINE,
+    MAJOR,
+    EDUCATION,
     TEMPLATE_FILE,
     PARAM_SYSTEM
 }
@@ -43,6 +43,18 @@ function PageMannger() {
             icon: HumanMaleBoard,
             page:TeacherMannager
         },
+        {
+            id:EnumPage.MAJOR,
+            title:"Quản lý chuyên ngành",
+            icon: ViewHeadlineIcon,
+            page: MajorManage
+        },
+        {
+            id:EnumPage.EDUCATION,
+            title:"Quản lý học vấn",
+            icon: ViewHeadlineIcon,
+            page: EducationManage
+        },
         // {
         //     id:EnumPage.GROUP_REVIEW_OUTLINE,
         //     title:"Quản lý nhóm đọc duyệt",
@@ -55,12 +67,12 @@ function PageMannger() {
             icon: TextSnippetIcon,
             page: TemplateFile
         },
-        {
-            id:EnumPage.PARAM_SYSTEM,
-            title:"Cấu hình tham số hệ thống",
-            icon: ViewHeadlineIcon,
-            page: TemplateFile
-        }
+        // {
+        //     id:EnumPage.PARAM_SYSTEM,
+        //     title:"Cấu hình tham số hệ thống",
+        //     icon: ViewHeadlineIcon,
+        //     page: TemplateFile
+        // }
     ]);
     const [expand,setExpand] = useState(true);
     const [currentPage,setCurrentPage] = useState<EnumPage>(EnumPage.STUDENT)

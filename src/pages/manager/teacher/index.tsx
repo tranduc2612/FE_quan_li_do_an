@@ -42,7 +42,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
         status:"",
         isAdmin:"",
         majorId:"",
-        education:""
+        educationId:""
     });
     const [switchPageInput,setSwitchPageInput] = useState(false);
     const [paginationModel, a] = useState({
@@ -271,7 +271,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                                 status:"",
                                 isAdmin:"",
                                 majorId:"",
-                                education:""
+                                educationId:""
                             })   
                             setSwitchPageInput(false)
                             }} variant="outlined" startIcon={<ChevronLeft />}>
@@ -280,7 +280,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                     </div>
                 } 
                     <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
-                        {switchPageInput ? "Thêm giảng viên": "Danh sách giảng viên "}
+                        {switchPageInput ? userSelect?.userName ? "Cập nhật giảng viên" : "Thêm giảng viên" : "Danh sách giảng viên "}
                     </h2>
                     {
                         switchPageInput ?
@@ -421,7 +421,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                                                     status:"",
                                                     isAdmin:"",
                                                     majorId:"",
-                                                    education:""
+                                                    educationId:""
                                                 })   
                                             }}>
                                                 Thêm mới

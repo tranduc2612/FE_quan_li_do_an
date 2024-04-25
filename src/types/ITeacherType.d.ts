@@ -1,3 +1,4 @@
+import { IEducationType } from "./IEducationType";
 import { IMajorType } from "./IMajorType";
 
 export interface ITeacher {
@@ -13,8 +14,9 @@ export interface ITeacher {
     status?: string,
     isAdmin?:string,
     majorId?: string,
-    education?:string,
+    educationId?:string,
     address?: string,
     gender?:number,
-    major?:IMajorType
+    major?:IMajorType,
+    education?:IEducationType
 }

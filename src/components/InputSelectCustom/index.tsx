@@ -14,7 +14,8 @@ type IProps = {
     children:any,
     defaultValue?:any,
     isError?: boolean,
-    readOnly?:boolean
+    readOnly?:boolean,
+    disabled?:boolean
 }
 
 const CssTextField = styled(Select)({
@@ -34,6 +35,7 @@ function InputSelectCustom({
     placeholder,
     defaultValue,
     isError,
+    disabled,
     readOnly
 }: IProps) {
     return (<>
@@ -52,6 +54,7 @@ function InputSelectCustom({
             defaultValue={defaultValue}
             error={isError}
             readOnly={readOnly}
+            disabled={disabled}
         >
             {children}
         </CssTextField>

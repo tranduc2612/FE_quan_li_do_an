@@ -1,31 +1,19 @@
-import { Button, MenuItem, Modal, TextField } from "@mui/material";
-import { useFormik } from "formik";
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import InputSelectCustom from "~/components/InputSelectCustom";
-import { useEffect, useState } from "react";
-import { ChevronLeft, Delete } from "mdi-material-ui";
-import LoadingData from "~/components/LoadingData";
-import { getListClassification } from "~/services/classificationApi";
-import { IResponse } from "~/types/IResponse";
-import { ISemester } from "~/types/ISemesterType";
-import { IClassificationType } from "~/types/IClassificationType";
-import { getListMajor } from "~/services/majorApi";
-import { IMajorType } from "~/types/IMajorType";
+import SearchIcon from '@mui/icons-material/Search';
+import { Button, TextField } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import ModalCustom from "~/components/Modal";
-import { toast } from "react-toastify";
-import { ITeacher } from "~/types/ITeacherType";
-import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
 import BoxWrapper from "~/components/BoxWrap";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
-import { getListPageSemester, getListSemester } from "~/services/semesterApi";
-import { convertDayjsToDate, convertDayjsToDateTime, formatDateTypeDateOnly, isCurrentTimeInRange } from "~/ultis/common";
 import TimePickerCustom from "~/components/InputTimePicker";
-import dayjs,{ Dayjs } from "dayjs";
 import RenderStatusTime from "~/components/RenderStatusTime";
+import { getListPageSemester } from "~/services/semesterApi";
+import { IResponse } from "~/types/IResponse";
+import { ISemester } from "~/types/ISemesterType";
+import { convertDayjsToDate, formatDateTypeDateOnly, isCurrentTimeInRange } from "~/ultis/common";
 
 
 

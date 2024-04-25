@@ -1,13 +1,10 @@
-import { IconButton, InputAdornment } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 type IProps = {
     id:string,
     label: string,
-    value?: string,
+    value?: string | number,
     name: string,
     isError: boolean | undefined,
     errorMessage: any,
@@ -98,8 +95,14 @@ function InputCustom({
             onChange={onChange}
             helperText={errorMessage}
             onBlur={onBlur}
+            onKeyDown={(e)=>{
+                if(type == 'number'){
+                    e.preventDefault();
+                }
+            }}
             InputProps={{
                 readOnly: readOnly,
+                inputProps: { min: 1, max: 50 }
             }}
             disabled={disabled}
             multiline={multiline}

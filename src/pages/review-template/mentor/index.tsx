@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import {
     useNavigate
 } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import BoxWrapper from "~/components/BoxWrap";
 import HeaderPageTitle from "~/components/HeaderPageTitle";
 import Loading from "~/components/Loading";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { GetProjectByHashKey, IReqKeyHash } from '~/services/projectApi';
+import { GetProjectByHashKey, IReqKeyHash, downloadFileWord } from '~/services/projectApi';
 import { IProjecType } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { IStudent } from '~/types/IStudentType';
@@ -67,8 +68,27 @@ function DetailReviewMentor() {
                                 <Pencil className="text-primary-blue cursor-pointer" />
                             </div>
 
-                            <Button onClick={()=>{  
-                                
+                            <Button onClick={()=>{
+                                const req: IReqKeyHash ={
+                                    key: "E8117C89-9E43-4C3A-9CA1-E97C5AB681F5",
+                                    role:"MENTOR"
+                                }  
+                                downloadFileWord(req)
+                                .then((res:any)=>{
+                                    if(info?.userName){
+                                        const link = document.createElement('a');
+                                        const fileName = `NXGVHD_${info?.userName}.docx`;
+                                        link.setAttribute('download', fileName);
+                                        link.href = URL.createObjectURL(new Blob([res]));
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        link.remove();
+                                    }
+                                })
+                                .catch((err)=>{
+                                    console.log(err)
+                                    toast.warning("Không hợp lệ")
+                                })
                             }} variant="contained" startIcon={<Download />}>
                                 Tải xuống
                             </Button>
@@ -95,7 +115,7 @@ function DetailReviewMentor() {
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.education}</span>
+                                    <b>Học vị:</b> <span className={"text-text-color"}>{project?.userNameMentorNavigation?.education?.educationName}</span>
                                 </div>
                             </div>
                     </div>

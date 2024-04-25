@@ -172,6 +172,9 @@ export function renderRole(role:string){
     if(role === "TEACHER"){
         return "Giảng viên"
     }
+    if(role === "ADMIN"){
+        return "Quản trị viên"
+    }
     return "Chưa xác định"
 }
 
@@ -259,3 +262,7 @@ export function dateShowNotification(fromDate:any, toDate:any){
 
     return `${timeCaculator} (${strFromDate} - ${strToDate})` 
 }
+
+export const validateFileType = (fileType:string) => {
+    return fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/gif';
+};

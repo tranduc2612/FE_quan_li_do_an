@@ -13,7 +13,7 @@ function RenderStatusProject({code}:any) {
         return <span className="text-green-600">Được bảo vệ</span>
     }
     if(code === "PAUSE"){
-        return <span className="text-yellow-600">Bảo lwuu đồ án</span>
+        return <span className="text-yellow-600">Bảo lưu đồ án</span>
     }
     return <></>
 }

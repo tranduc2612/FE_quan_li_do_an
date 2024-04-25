@@ -22,6 +22,7 @@ import * as yup from 'yup';
 import { ScoreType, updateScore } from "~/services/projectApi";
 import { toast } from "react-toastify";
 import ExpandableCell from "~/components/TableEdit.tsx/ExpandableCell";
+import RenderStatusProject from "~/components/RenderStatusProject";
 
 
 const validationSchema = yup.object({
@@ -279,7 +280,8 @@ function TeacherCouncil() {
             field: 'statusProject',
             headerName: 'Trạng thái đồ án',
             width: 150,
-            editable: false
+            editable: false,
+            renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
     ];
     useEffect(()=>{

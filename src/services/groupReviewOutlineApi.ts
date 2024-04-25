@@ -2,6 +2,7 @@ import { Fetcher } from "swr";
 import request from "~/services/axios";
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
 import { IProjectOutline } from "~/types/IProjectOutline";
+import { IProjecType } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
 import { ITeaching } from "~/types/ITeachingType";
 import { IBaseList } from "~/types/IbaseList";
@@ -39,8 +40,15 @@ export const getListTeachingGroupOutline = async (dataReq:any): Promise<IRespons
     return data;
 }
 
-export const getListProjectOutlineByGroupId = async (dataReq:ReqListProjectOutlineModel): Promise<IResponse<IProjectOutline[]>> => {
+export const getListProjectOutline = async (dataReq:ReqListProjectOutlineModel): Promise<IResponse<IProjectOutline[]>> => {
     const data: IResponse<IProjectOutline[]> = await request.post("/GroupReviewOutline/get-list-project-outline-by-groupid",{
+        ...dataReq
+    });
+    return data;
+}
+
+export const getListProjectByGroupReview = async (dataReq:ReqListProjectOutlineModel): Promise<IResponse<IProjecType[]>> => {
+    const data: IResponse<IProjecType[]> = await request.post("/Project/get-list-project-by-group-review",{
         ...dataReq
     });
     return data;

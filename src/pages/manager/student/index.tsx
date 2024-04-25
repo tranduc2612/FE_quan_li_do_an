@@ -277,7 +277,7 @@ function StudentManager({setCurrentPage}:IPageProps) {
             editable: true,
         },
         {
-            field: 'education',
+            field: 'educationName',
             headerName: 'Học vị',
             width: 160,
             editable: true,
@@ -408,6 +408,7 @@ function StudentManager({setCurrentPage}:IPageProps) {
                 return {
                     id: index+1,
                   ...data,
+                  ...data?.education
                 }
             }).filter((x:any)=>x.status !== "BLOCK")
             const totalItem = newMap.length;
@@ -547,7 +548,7 @@ function StudentManager({setCurrentPage}:IPageProps) {
                         </div>
                     } 
                         <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
-                            {switchPageInput ? "Thêm sinh viên ": "Danh sách sinh viên "}
+                            {switchPageInput ? userSelectStudent?.userName ? "Cập nhật sinh viên" : "Thêm sinh viên " : "Danh sách sinh viên "}
                         </h2>
                         {
                             switchPageInput ? <RegisterStudent switchPageInput={switchPageInput} setSwitchPageInput={setSwitchPageInput} userSelect={userSelectStudent} setUserSelect={setUserSelectStudent} hanleFetchApiListStudent={hanleFetchApiListStudent}/> : 

@@ -1,40 +1,22 @@
-import { Button, MenuItem, Modal, TextField, Tooltip } from "@mui/material";
-import { useFormik } from "formik";
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import CalculateIcon from '@mui/icons-material/Calculate';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import InputSelectCustom from "~/components/InputSelectCustom";
-import { useEffect, useState } from "react";
-import { Account, ChevronLeft, Delete, Note, NoteOutline, Printer } from "mdi-material-ui";
-import LoadingData from "~/components/LoadingData";
-import { getListClassification } from "~/services/classificationApi";
-import { IResponse } from "~/types/IResponse";
-import { ISemester } from "~/types/ISemesterType";
-import { IClassificationType } from "~/types/IClassificationType";
-import { getListMajor } from "~/services/majorApi";
-import { IMajorType } from "~/types/IMajorType";
+import { Button, Modal, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { useFormik } from "formik";
+import { Account, ChevronLeft, Note, Pencil } from "mdi-material-ui";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import ModalCustom from "~/components/Modal";
 import { toast } from "react-toastify";
-import { ITeacher } from "~/types/ITeacherType";
-import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
+import LoadingData from "~/components/LoadingData";
+import { IResponse } from "~/types/IResponse";
 // import RegisterTeacher from "./input";
 import BoxWrapper from "~/components/BoxWrap";
-import { AssignGroupReviewProjectOutline, AssignGroupReviewTeaching, addGroupReview, assginGroupReviewToProjectOutline, assginGroupReviewToTeaching, deleteGroupReview, getGroupReview, getListProjectOutlineByGroupId, getListReviewOutline, getListReviewOutlineSemester, getListTeachingGroupOutline, updateGroupReview } from "~/services/groupReviewOutlineApi";
-import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
-import * as yup from 'yup';
-import InputCustom from "~/components/InputCustom";
-import { formatDateTypeDateOnly } from "~/ultis/common";
+import RenderStatusProject from "~/components/RenderStatusProject";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import Edit from "@mui/icons-material/Edit";
+import { AssignGroupReviewProjectOutline, assginGroupReviewToProjectOutline, getGroupReview, getListProjectByGroupReview } from "~/services/groupReviewOutlineApi";
+import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
+import { IProjecType } from "~/types/IProjectType";
 import { ITeaching } from "~/types/ITeachingType";
-import { randomId } from "@mui/x-data-grid-generator";
-import { IProjectOutline } from "~/types/IProjectOutline";
-import RenderStatusProject from "~/components/RenderStatusProject";
 
 
 function GroupReviewOutlineDetail() {
@@ -54,7 +36,6 @@ function GroupReviewOutlineDetail() {
         createdDate: new Date()
     });
     const apiRefStudent = useGridApiRef();
-    const [openModalInput,setOpenModalInput] = useState(false);
     const [openModalAddStudent,setOpenModalAddStudent] = useState(false);
     const [rowsStudentChecked,setRowsStudentChecked] = useState<any>([]);
     const [paginationModel, setPaginationModel] = useState({
@@ -67,10 +48,8 @@ function GroupReviewOutlineDetail() {
         page: 0,
         pageMax:-1
     });
-    const [valueSearchStudent,setValueSearchStudent] = useState("");
-
+    const [teachings,setTeachings] = useState<ITeaching[]>([])
     const apiRef = useGridApiRef();
-    const [openModalDelete, setOpenModalDelete] = useState(false);
     const [loadingData,setLoadingData] = useState(false);
     const initialData = {
         userNameSearch: "",
@@ -125,8 +104,14 @@ function GroupReviewOutlineDetail() {
             }
         },
         {
-            field: 'userName',
-            headerName: 'Tên tài khoản',
+            field: 'studentCode',
+            headerName: 'Mã sinh viên',
+            width: 150,
+            editable: true,
+        },
+        {
+            field: 'fullName',
+            headerName: 'Họ và tên',
             width: 300,
             editable: true,
         },
@@ -187,19 +172,14 @@ function GroupReviewOutlineDetail() {
             editable: true,
         },
         {
-            field: 'semesterId',
-            headerName: 'Mã học kỳ',
-            width: 200,
+            field: 'studentCode',
+            headerName: 'Mã sinh viên',
+            width: 150,
             editable: true,
-            renderCell:({row})=>{
-                return <>
-                    {idSemester}  
-                </>
-            }
         },
         {
-            field: 'userName',
-            headerName: 'Tên tài khoản',
+            field: 'fullName',
+            headerName: 'Họ và tên',
             width: 300,
             editable: true,
         },
@@ -247,7 +227,7 @@ function GroupReviewOutlineDetail() {
     ]
     useEffect(()=>{
         setLoadingData(true)
-        Promise.all([hanleFetchApi(),handleFetchDetailGroup()])
+        Promise.all([handleFetchDetailGroup()])
         .then((res)=>{
             setLoadingData(false)
         })
@@ -260,16 +240,18 @@ function GroupReviewOutlineDetail() {
         })
     },[])
 
-    // useEffect(()=>{
-    //     handleFetchApiTeacherList()
-    // },[groupSelected.groupReviewOutlineId])
+    useEffect(()=>{
+        hanleFetchApi()
+    },[teachings])
 
     const handleFetchDetailGroup = async () =>{
         if(idGroup){
             getGroupReview(idGroup)
             .then((res)=>{
+                console.log(res)
                 if(res.success && res.returnObj){
                     setGroupSelected(res.returnObj)
+                    setTeachings(res.returnObj.teachings || [])
                 }
             })
             .catch(()=>{
@@ -279,15 +261,17 @@ function GroupReviewOutlineDetail() {
     }
 
     const hanleFetchApi = async () => {
-        console.log(idSemester)
+        if(teachings.length === 0){
+            return
+        }
         if(idSemester){
-            await getListProjectOutlineByGroupId({
+            await getListProjectByGroupReview({
                 semesterId: idSemester,
                 // groupReviewOutlineId: idGroup,
                 // nameProject: formik.values.nameProjectSearch,
                 // UserName: formik.values.userNameSearch
             })
-            .then((res:IResponse<IProjectOutline[]>)=>{
+            .then((res:IResponse<IProjecType[]>)=>{
               console.log(res)
               if(res.success && res.returnObj) {
                 const dataMap = res.returnObj;
@@ -297,44 +281,48 @@ function GroupReviewOutlineDetail() {
                     setLstProjectInGroup([])
                     setLstProjectNotInGroup([])
                 }else{
-                    const lstInGroup = dataMap.filter(x=>x?.groupReviewOutlineId == idGroup).map((data:IProjectOutline,index:any)=>{
+                    // lấy danh sách đồ án trên trang chính
+                    const lstInGroup = dataMap.filter(x=>x?.projectOutline?.groupReviewOutlineId == idGroup).map((data:IProjecType,index:any)=>{
                         return {
                           id: index+1, 
                           ...data,
                           ...data?.userNameNavigation,
+                          ...data?.projectOutline,
                         }
                     })
                     
                     setTotalLstProjectInGroup(lstInGroup.length)
                     setLstProjectInGroup([...lstInGroup])
 
-                    console.log(dataMap)
-                    const lstNotInGroup = dataMap.map((data:IProjectOutline,index:any)=>{
+                    // lấy ở danh sách check
+                    const arrTeachingUsername = teachings.map(x=>x.userNameTeacher);
+                    console.log(arrTeachingUsername)
+                    const lstNotInGroup = dataMap.filter((data:IProjecType,index:any)=>!arrTeachingUsername.includes(data?.userNameMentor) && data?.userNameMentor != null).map((data:IProjecType,index:any)=>{
                         return {
-                          id: index+1,
-                          ...data,
-                          ...data?.userNameNavigation,
-                        }
+                            id: index+1,
+                            ...data,
+                            ...data?.userNameNavigation,
+                            ...data?.projectOutline,
+                          }
                     }).sort(function(a:any, b:any) {
-                        if (a?.groupReviewOutlineId === idGroup && b?.groupReviewOutlineId !== idGroup) {
+                        if (a?.projectOutline?.groupReviewOutlineId === idGroup && b?.projectOutline?.groupReviewOutlineId !== idGroup) {
                           return -1; // a nằm trước b
                         }
                       
-                        if (a?.groupReviewOutlineId !== idGroup && b?.groupReviewOutlineId === idGroup) {
+                        if (a?.projectOutline?.groupReviewOutlineId !== idGroup && b?.projectOutline?.groupReviewOutlineId === idGroup) {
                           return 1; // b nằm trước a
                         }
                       
                         return 0; // Giữ nguyên thứ tự ban đầu
                       })
+                    console.log(lstNotInGroup)
                     setTotalLstProjectNotInGroup(lstNotInGroup.length)
                     setLstProjectNotInGroup([...lstNotInGroup])
 
                     const checked = lstNotInGroup.filter((item:any,index:any)=>{
-                        if(item?.userNameNavigation?.userNameMentor){
-                            console.log(item)
-                        }
-                        return item?.groupReviewOutlineId == idGroup
-                    }).map((r,index) => r.id)
+                        console.log(item)
+                        return item?.projectOutline?.groupReviewOutlineId == idGroup
+                    }).map((r:any,index) => r?.id)
                     setRowsStudentChecked([...checked])
                 }
               }
@@ -459,10 +447,10 @@ function GroupReviewOutlineDetail() {
                                 slots={{ toolbar: ()=> <> <GridToolbarContainer>
                                     <GridToolbarColumnsButton />
                                     <GridToolbarFilterButton  />
-                                    <Button variant="text" startIcon={<AddIcon />} onClick={()=>{
+                                    <Button variant="text" startIcon={<Pencil />} onClick={()=>{
                                         setOpenModalAddStudent(true)
                                     }}>
-                                        Thêm sinh viên vào nhóm
+                                        Chỉnh sửa sinh viên
                                     </Button>
                                     {/* <Button variant="text" startIcon={<Printer />} onClick={()=>{
 

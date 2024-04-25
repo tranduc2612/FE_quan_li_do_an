@@ -94,6 +94,9 @@ const authSlice = createSlice({
             state.logging = false
             state.infoData = action.payload
         },
+        changeInfo(state, action: PayloadAction<IUser>){
+            state.infoData = action.payload
+        },
         loginFailed(state,action: PayloadAction<IErrorPayload>){
             state.isLogin = false
             state.logging = false
@@ -138,7 +141,7 @@ const authSlice = createSlice({
        }
 })
 
-export const {login,logout,loginSucces,loginFailed} = authSlice.actions
+export const {login,logout,loginSucces,loginFailed,changeInfo} = authSlice.actions
 
 export const isLogin = (state:RootState) => state.auth.isLogin
 export const isError = (state:RootState) => state.auth.isError

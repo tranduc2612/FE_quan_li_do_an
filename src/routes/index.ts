@@ -20,7 +20,8 @@ import InputReviewMentor from "~/pages/review-template/mentor/input"
 import DetailReviewCommentor from "~/pages/review-template/commentator"
 import InputReviewCommentor from "~/pages/review-template/commentator/input"
 import DetailCouncil from "~/pages/semester/detail/council/detail"
-import TeacherCouncil from "~/pages/final/teacher"
+import TeacherCouncil from "~/pages/council/teacher"
+import TeacherGroupReview from "~/pages/group-review-outline"
 
 export const PUBLIC_ROUTER = [
     {
@@ -136,6 +137,11 @@ export const TEACHER_ROUTER = [
     {
         path:"/teacher/council",
         page: TeacherCouncil,
+        layout: DefaultLayout
+    },
+    {
+        path:"/teacher/group-review",
+        page: TeacherGroupReview,
         layout: DefaultLayout
     },
 ]

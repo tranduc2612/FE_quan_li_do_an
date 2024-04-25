@@ -10,6 +10,7 @@ import BoxWrapper from '~/components/BoxWrap';
 import HeaderPageTitle from '~/components/HeaderPageTitle';
 import InputSelectCustom from '~/components/InputSelectCustom';
 import LoadingData from '~/components/LoadingData';
+import RenderStatusProject from '~/components/RenderStatusProject';
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { getListProjectByUsernameMentor } from '~/services/projectApi';
@@ -59,31 +60,31 @@ function ManageStudentMentor() {
             flex: 1,
             editable: true,
         },
-        {
-            field: 'action',
-            headerName: 'Chức năng',
-            width: 200,
-            editable: true,
-            renderCell:({row})=>{
-                return <>
-                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
-                            e.stopPropagation();
-                    }}>
-                        <Tooltip title="Trang cá nhân">
-                            <Account />
-                        </Tooltip>
-                    </div>
-                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
-                            e.stopPropagation();
-                    }}>
-                        <Tooltip title="Xem lịch tuần">
-                            <BookClock />
-                        </Tooltip>
-                    </div>
+        // {
+        //     field: 'action',
+        //     headerName: 'Chức năng',
+        //     width: 200,
+        //     editable: true,
+        //     renderCell:({row})=>{
+        //         return <>
+        //             {/* <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
+        //                     e.stopPropagation();
+        //             }}>
+        //                 <Tooltip title="Trang cá nhân">
+        //                     <Account />
+        //                 </Tooltip>
+        //             </div> */}
+        //             <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
+        //                     e.stopPropagation();
+        //             }}>
+        //                 <Tooltip title="Xem lịch tuần">
+        //                     <BookClock />
+        //                 </Tooltip>
+        //             </div>
                     
-                </>
-            }
-        },
+        //         </>
+        //     }
+        // },
         {
             field: 'userName',
             headerName: 'Tên tài khoản',
@@ -149,7 +150,8 @@ function ManageStudentMentor() {
             field: 'statusProject',
             headerName: 'Trạng thái đồ án',
             width: 150,
-            editable: true
+            editable: true,
+            renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
         {
             field: 'status',

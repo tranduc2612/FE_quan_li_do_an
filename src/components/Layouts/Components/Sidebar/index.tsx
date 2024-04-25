@@ -1,4 +1,4 @@
-import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog,School,AccountSchool, ApplicationOutline } from 'mdi-material-ui'
+import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog,School,AccountSchool, ApplicationOutline, MessageDraw } from 'mdi-material-ui'
 import { NavLink, useNavigate } from 'react-router-dom';
 import images from '~/assets';
 import { useAppDispatch, useAppSelector } from '~/redux/hook';
@@ -7,6 +7,7 @@ import Avatar from '@mui/material/Avatar';
 import { useEffect, useState } from 'react';
 import { randomId } from '@mui/x-data-grid-generator';
 import { IUser } from '~/types/IUser';
+import { getFileAvatar } from '~/services/userApi';
 
 
 type ISideBar_Type = {
@@ -22,9 +23,23 @@ function SideBar() {
     const info = useAppSelector(inforUser)
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [avatar,setAvatar] = useState<any>();
     const handleLogout = () => {
         dispatch(logout())
     }
+
+    const fetchApiAvatar = ()=>{
+        getFileAvatar(info?.role,info?.userName)
+        .then((response:any)=>{
+            const blob = response.data;
+            const imgUrl = URL.createObjectURL(blob);
+            setAvatar(imgUrl);
+        })
+    }
+    
+    useEffect(()=>{
+        fetchApiAvatar()
+    },[info])
 
     const SIDEBAR_ALL:ISideBar_Type[] = [
         {
@@ -76,12 +91,21 @@ function SideBar() {
         },
         {
             id: randomId(),
+            url:'/teacher/group-review',
+            title:"Nhóm xét duyệt",
+            icon: MessageDraw,
+            role: "TEACHER",
+            isAdmin:0
+        },
+        {
+            id: randomId(),
             url:'/teacher/council',
             title:"Hội đồng bảo vệ",
             icon: ApplicationOutline,
             role: "TEACHER",
             isAdmin:0
         },
+        
     ]
 
     const SIDEBAR_ADMIN:ISideBar_Type[] = [
@@ -194,7 +218,7 @@ function SideBar() {
             }}>
                 <div className="flex items-center flex-col justify-items-center sidebar_item p-2 text-xs text-nowrap font-semibold text-[#333] hover:text-primary-blue">
                 {/* <img className={"w-10 h-10 mb-3 rounded-full object-cover"} src={images.image.anh_demo} alt="" /> */}
-                    <Avatar alt="Remy Sharp" src={images.image.anh_demo} />
+                    <Avatar alt="Remy Sharp" src={avatar} />
                     <span className="text-center mt-3">
                         Đăng xuất
                     </span>
