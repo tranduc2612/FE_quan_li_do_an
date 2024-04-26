@@ -6,10 +6,22 @@ import { IStudent } from "~/types/IStudentType";
 import { IUser } from "~/types/IUser";
 import { BASE_URL } from "~/ultis/contants";
 
-
+export interface changePasswordModel {
+    userName?: string,
+    passwordOld?: string,
+    passwordNew?: string,
+    role?: string
+}
 
 export const GetProfileUser = async (username:string): Promise<IResponse<IUser>> => {
     const data: IResponse<IUser> = await request.get("/Auth/get-profile?username="+username,{
+    });
+    return data;
+}
+
+export const changePassword = async (dataReq:changePasswordModel): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.post("/Auth/change-password",{
+        ...dataReq
     });
     return data;
 }

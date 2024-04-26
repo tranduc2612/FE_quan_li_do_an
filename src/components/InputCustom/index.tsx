@@ -1,5 +1,7 @@
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 type IProps = {
     id:string,
@@ -83,12 +85,12 @@ function InputCustom({
     };
     
 
-    return (<>
+    return (<div className="relative">
         <CssTextField
             id={id}
             error={isError}
             value={value}
-            type={type}
+            type={type === 'password' ? showPassword ? "text" : "password" : type}
             name={name}
             label={label}
             placeholder={placeholder}
@@ -111,7 +113,16 @@ function InputCustom({
         >
             
         </CssTextField>
-    </>);
+        {
+            type === "password" ? <div className="absolute right-5 top-3 cursor-pointer text-blue-600" onClick={handleClickShowPassword}>
+                {
+                    showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />
+                }
+                
+            </div> : <></>
+        }
+        
+    </div>);
 }
 
 export default InputCustom;

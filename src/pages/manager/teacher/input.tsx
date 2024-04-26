@@ -26,7 +26,11 @@ import { ITeacher } from "~/types/ITeacherType";
 const validationSchema = yup.object({
     username: yup
       .string()
-      .required('Tên đăng nhập không được để trống'),
+      .required('Tên đăng nhập không được để trống')
+      .min(8, 'Tên đăng nhập phải có ít nhất 8 kí tự')
+      .max(50, 'Tên đăng nhập không được quá 50 kí tự')
+      .matches(/^[^\W_]+$/, "Tên đăng nhập không được chứa kí tự đặc biệt")
+      ,
     fullname: yup
       .string()
       .required('Họ tên không được để trống'),

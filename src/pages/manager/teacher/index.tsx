@@ -23,7 +23,16 @@ import { IPageProps } from "../index";
 import RegisterTeacher from "./input";
 import { getExcelListTeacher } from '~/services/reportApi';
 
-
+// const validationSchema = yup.object({
+//     username: yup
+//       .string()
+//       .min(8, 'Mật khẩu phải có ít nhất 8 kí tự')
+//       .matches(/[a-z]/, 'Mật khẩu phải có ít nhất 1 chữ viết thường')
+//       .matches(/[A-Z]/, 'Mật khẩu phải có ít nhất 1 chữ viết hoa')
+//       .matches(/^[^\W_]+$/, "Mật khẩu không được chứa kí tự đặc biệt")
+//     //   .matches(/[$&+,:;=?@#|'<>.^*()%!-]/, "Mật khẩu không được chứa kí tự đặc biệt")
+//       .required('Mật khẩu không được để trống'),
+//   });
 
 
 function TeacherManager({setCurrentPage}:IPageProps) {
@@ -225,6 +234,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
 
     const formik = useFormik({
         initialValues: initialData,
+        
         onSubmit: (values) => {
           console.log(values);
         },

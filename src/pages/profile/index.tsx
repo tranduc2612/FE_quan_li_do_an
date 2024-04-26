@@ -12,7 +12,7 @@ import InputCustom from "~/components/InputCustom";
 import Loading from "~/components/Loading";
 import { useAppDispatch, useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { GetProfileUser } from "~/services/userApi";
+import { GetProfileUser, changePassword, changePasswordModel } from "~/services/userApi";
 import { ICouncil } from "~/types/ICouncil";
 import { IProjecType } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
@@ -25,6 +25,7 @@ import { getListScheduleWeek } from "~/services/scheduleWeekApi";
 import { IScheduleWeek } from "~/types/IScheduleWeek";
 import { ISemester } from "~/types/ISemesterType";
 import { getSemester } from "~/services/semesterApi";
+import { toast } from "react-toastify";
 
 const keyPost = '/api/user/123';
 const cx = classNames.bind(style);
@@ -35,10 +36,16 @@ const validationSchema = yup.object({
       .required('Mật khẩu không được để trống'),
     new_password: yup
       .string()
+      .min(8, 'Mật khẩu phải có ít nhất 8 kí tự')
+      .matches(/[a-z]/, 'Mật khẩu phải có ít nhất 1 chữ viết thường')
+      .matches(/[A-Z]/, 'Mật khẩu phải có ít nhất 1 chữ viết hoa')
+      .matches(/^[^\W_]+$/, "Mật khẩu không được chứa kí tự đặc biệt")
+    //   .matches(/[$&+,:;=?@#|'<>.^*()%!-]/, "Mật khẩu không được chứa kí tự đặc biệt")
       .required('Mật khẩu không được để trống'),
     new_password_2: yup
       .string()
       .required('Mật khẩu không được để trống')
+      
       .oneOf([yup.ref('new_password')], 'Mật khẩu không khớp'),
   });
 
@@ -66,8 +73,26 @@ function Profile() {
           new_password_2:""
         },
         validationSchema: validationSchema,
-        onSubmit: (values) => {
-          console.log(values);
+        onSubmit: (values,{setErrors}) => {
+            // if(values.new_password !== values.new_password_2){
+            //     setErrors({ new_password_2: "Mật khẩu không khớp"})
+            //     return
+            // }
+            const reqData: changePasswordModel = {
+                userName: info?.userName || "",
+                passwordOld: values.password || "",
+                passwordNew: values.new_password_2 || "",
+                role: info?.role == "ADMIN" ? 'TEACHER' : info?.role || ""
+            }
+            changePassword(reqData)
+            .then((res:IResponse<any>)=>{
+                if(res.success){
+                    toast.success(res.msg)
+                    formik.resetForm();
+                }else{
+                    setErrors({ password: res.msg})
+                }
+            })
         },
       });
 
@@ -330,7 +355,7 @@ function Profile() {
                 : <></>
             }
         {
-            project == undefined && profile?.role === "TEACHER" ? <></> :
+            project == undefined && (profile?.role === "TEACHER" || profile?.role === "ADMIN") ? <></> :
             <div className="mb-5">
                 <AccordionCustom header={"Lịch báo cáo tuần"} size="xxl">
                     <div>
@@ -338,7 +363,7 @@ function Profile() {
                             <div className="p-5 py-0">
                                 <div className={"grid grid-cols-12 mb-5 text-base"}>
                                     <div className={"col-span-6 m-2"}>
-                                        <b>Mã học kỳ:</b> <span className={"text-text-color font-normal"}>{semester?.semesterId}22</span>
+                                        <b>Mã học kỳ:</b> <span className={"text-text-color font-normal"}>{semester?.semesterId}</span>
                                     </div>
                                     <div className={"col-span-6 m-2"}>
                                         <b>Tên học kỳ:</b> <span className={"text-text-color font-normal"}>{semester?.nameSemester}</span>
@@ -508,7 +533,8 @@ function Profile() {
                 <div className={"mb-4"}>
                     <InputCustom
                         id="password" 
-                        label={"Mật khẩu hiện tại"} 
+                        label={"Mật khẩu hiện tại"}
+                        type="password" 
                         name={"password"}
                         value={formik.values.password} 
                         isError={formik.touched.password && Boolean(formik.errors.password)} 
@@ -523,6 +549,7 @@ function Profile() {
                         id="new_password" 
                         label={"Mật khẩu mới"} 
                         name={"new_password"}
+                        type="password" 
                         value={formik.values.new_password} 
                         isError={formik.touched.new_password && Boolean(formik.errors.new_password)} 
                         onChange={formik.handleChange}
@@ -536,6 +563,7 @@ function Profile() {
                         id="new_password_2" 
                         label={"Nhập lại mật khẩu mới"} 
                         name={"new_password_2"}
+                        type="password" 
                         value={formik.values.new_password_2} 
                         isError={formik.touched.new_password_2 && Boolean(formik.errors.new_password_2)} 
                         onChange={formik.handleChange}

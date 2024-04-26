@@ -370,26 +370,30 @@ function CouncilSemester() {
                                 <form method="dialog" onSubmit={formikInputGroup.handleSubmit}>
                                     <div className="">
                                         <div className="my-5">
-                                            <InputCustom
-                                                id={"nameCouncil"}
-                                                label="Tên phòng hội đồng"
-                                                name={"nameCouncil"}
-                                                value={formikInputGroup.values.nameCouncil} 
-                                                onChange={formikInputGroup.handleChange}
-                                                onBlur={formikInputGroup.handleBlur}
-                                                isError={formikInputGroup.touched.nameCouncil && Boolean(formikInputGroup.errors.nameCouncil)} 
-                                                errorMessage={formikInputGroup.touched.nameCouncil && formikInputGroup.errors.nameCouncil} 
-                                            />
-                                            <InputCustom
-                                                id={"zoomCouncil"}
-                                                label="Địa điểm bảo vệ hội đồng"
-                                                name={"zoomCouncil"}
-                                                value={formikInputGroup.values.zoomCouncil} 
-                                                onChange={formikInputGroup.handleChange}
-                                                onBlur={formikInputGroup.handleBlur}
-                                                isError={formikInputGroup.touched.zoomCouncil && Boolean(formikInputGroup.errors.zoomCouncil)} 
-                                                errorMessage={formikInputGroup.touched.zoomCouncil && formikInputGroup.errors.zoomCouncil} 
-                                            />
+                                            <div className='mb-5'>
+                                                <InputCustom
+                                                    id={"nameCouncil"}
+                                                    label="Tên phòng hội đồng"
+                                                    name={"nameCouncil"}
+                                                    value={formikInputGroup.values.nameCouncil} 
+                                                    onChange={formikInputGroup.handleChange}
+                                                    onBlur={formikInputGroup.handleBlur}
+                                                    isError={formikInputGroup.touched.nameCouncil && Boolean(formikInputGroup.errors.nameCouncil)} 
+                                                    errorMessage={formikInputGroup.touched.nameCouncil && formikInputGroup.errors.nameCouncil} 
+                                                />
+                                            </div>
+                                            <div className='mb-5'>
+                                                <InputCustom
+                                                    id={"zoomCouncil"}
+                                                    label="Địa điểm bảo vệ hội đồng"
+                                                    name={"zoomCouncil"}
+                                                    value={formikInputGroup.values.zoomCouncil} 
+                                                    onChange={formikInputGroup.handleChange}
+                                                    onBlur={formikInputGroup.handleBlur}
+                                                    isError={formikInputGroup.touched.zoomCouncil && Boolean(formikInputGroup.errors.zoomCouncil)} 
+                                                    errorMessage={formikInputGroup.touched.zoomCouncil && formikInputGroup.errors.zoomCouncil} 
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex justify-end mt-8">
