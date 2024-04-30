@@ -1,39 +1,26 @@
-import { Button, MenuItem, Modal, TextField, Tooltip } from "@mui/material";
-import { useFormik } from "formik";
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import InputSelectCustom from "~/components/InputSelectCustom";
+import { Button, Modal, Tooltip } from "@mui/material";
+import { DataGrid, GridColDef, GridRowParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { useFormik } from "formik";
+import { Delete } from "mdi-material-ui";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Delete } from "mdi-material-ui";
-import LoadingData from "~/components/LoadingData";
-import { getListClassification } from "~/services/classificationApi";
-import { IResponse } from "~/types/IResponse";
-import { ISemester } from "~/types/ISemesterType";
-import { IClassificationType } from "~/types/IClassificationType";
-import { getListMajor } from "~/services/majorApi";
-import { IMajorType } from "~/types/IMajorType";
-import { DataGrid, GridColDef, GridPaginationModel, GridRowParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useNavigate, useParams } from 'react-router-dom';
-import ModalCustom from "~/components/Modal";
 import { toast } from "react-toastify";
-import { ITeacher } from "~/types/ITeacherType";
-import { deleteTeacher, getListTeacher } from "~/services/teacherApi";
+import LoadingData from "~/components/LoadingData";
+import { IResponse } from "~/types/IResponse";
 // import RegisterTeacher from "./input";
-import BoxWrapper from "~/components/BoxWrap";
-import { AssignGroupReviewTeaching, addGroupReview, assginGroupReviewToTeaching, deleteGroupReview, getListReviewOutline, getListReviewOutlineSemester, getListTeachingGroupOutline, updateGroupReview } from "~/services/groupReviewOutlineApi";
-import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
+import Add from "@mui/icons-material/Add";
+import Edit from "@mui/icons-material/Edit";
 import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
-import { formatDateTypeDateOnly } from "~/ultis/common";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import Edit from "@mui/icons-material/Edit";
+import { AssignGroupReviewTeaching, AutoSplitGroup, addGroupReview, assginGroupReviewToTeaching, deleteGroupReview, getListReviewOutlineSemester, getListTeachingGroupOutline, updateGroupReview } from "~/services/groupReviewOutlineApi";
+import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
 import { ITeaching } from "~/types/ITeachingType";
-import { randomId } from "@mui/x-data-grid-generator";
-import Add from "@mui/icons-material/Add";
+import { formatDateTypeDateOnly } from "~/ultis/common";
+import Loading from '~/components/Loading';
 
 
 const validationSchema = yup.object({
@@ -57,6 +44,7 @@ function GroupOutlineReview() {
         isDelete: 0,
         createdDate: new Date()
     });
+    const [loading,setLoading] = useState(false)
     const [totalTeacher, setTotalTeacher] = useState(0);
     const apiRefTeacher = useGridApiRef();
     const [toggleAutoAssign,setToggleAutoAssign] = useState(false);
@@ -385,6 +373,10 @@ function GroupOutlineReview() {
 
     return (
             <div className="p-4 overflow-scroll max-h-screen">
+                {
+                    loading &&
+                    <Loading />
+                }
                     { <div>
 
                         {/* Danh sách tìm kiếm */}
@@ -421,7 +413,26 @@ function GroupOutlineReview() {
                                 slots={{ toolbar: ()=> <> <GridToolbarContainer>
                                         <GridToolbarColumnsButton />
                                         <GridToolbarFilterButton  />
-                                        <Button startIcon={<CalculateIcon />}>Tự động chia</Button>
+                                        <Button onClick={()=>{
+                                            const idSemester = id;
+                                            if(!idSemester){
+                                                toast.warning("Học kỳ không hợp lệ")
+                                                return
+                                            }
+                                            setLoading(true)
+                                            AutoSplitGroup(idSemester || "")
+                                            .then(x=>{
+                                                if(x.success){
+                                                    toast.success("Chia nhóm xét duyệt thành công !");
+                                                    hanleFetchApiGroupList();
+                                                }else{
+                                                    toast.warning(x.msg);
+                                                }
+                                            })
+                                            .finally(()=>{
+                                                setLoading(false)
+                                            })
+                                        }} startIcon={<CalculateIcon />}>Tự động chia</Button>
                                         <Button variant='text' startIcon={<Add />} onClick={()=>{
                                             formikInputGroup.values.nameGroupReviewOutline = ""
                                             setOpenModalInputGroup(true)
@@ -601,6 +612,7 @@ function GroupOutlineReview() {
                                         if(res.success){
                                             toast.success(res.msg)
                                             handleFetchApiTeacherList();
+                                            hanleFetchApiGroupList();
                                         }else{
                                             toast.error(res.msg)
                                         }

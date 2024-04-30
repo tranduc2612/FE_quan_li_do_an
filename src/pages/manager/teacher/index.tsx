@@ -134,7 +134,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
             }
         },
         {
-            field: 'education',
+            field: 'educationName',
             headerName: 'Học vị',
             width: 150,
             editable: true,
@@ -219,6 +219,7 @@ function TeacherManager({setCurrentPage}:IPageProps) {
                 return {
                   id: rows.length * paginationModel.page + index + 1,
                   ...data,
+                  ...data?.education
                 }
             })
             const totalItem = res.returnObj.totalItem;

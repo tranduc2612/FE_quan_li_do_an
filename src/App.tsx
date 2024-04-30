@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { ADMIN_ROUTER, PRIVATE_ROUTER, PUBLIC_ROUTER, STUDENT_ROUTER, TEACHER_ROUTER } from "./routes"
+import { ADMIN_ROUTER, FIRSTTIME_ROUTER, PRIVATE_ROUTER, PUBLIC_ROUTER, STUDENT_ROUTER, TEACHER_ROUTER } from "./routes"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useAppSelector } from "./redux/hook";
 import { isLogin,inforUser } from "./redux/slices/authSlice";
@@ -11,28 +11,29 @@ function App() {
   const isLoginUser = useAppSelector(isLogin);
   const info = useAppSelector(inforUser);
   console.log(info)
+  console.log(info?.isFirstTime)
+
   return (
     <>
       <Router>
         <Routes>
-          {PUBLIC_ROUTER.map((item, index) => {
+          
+
+          {(isLoginUser && info?.isFirstTime != 1) && PRIVATE_ROUTER.map((item, index) => {
             const Page = item.page;
-            const Layout = item.layout;
+            const Layout = item.layout || DefaultLayout;
             return <Route
               key={index}
               path={item.path}
               element={
-                isLoginUser ?
-                  <Navigate to={"/profile/"+info?.userName} />
-                  :
-                  <Layout>
-                    <Page />
-                  </Layout>
+                <Layout>
+                  <Page />
+                </Layout>
+
               }
             />
           })}
-
-          {(isLoginUser) && PRIVATE_ROUTER.map((item, index) => {
+        {(isLoginUser && info?.role === "STUDENT" && info?.isFirstTime === 1) && FIRSTTIME_ROUTER.map((item, index) => {
             const Page = item.page;
             const Layout = item.layout || DefaultLayout;
             return <Route
@@ -47,7 +48,7 @@ function App() {
             />
           })}
 
-          {(isLoginUser && info?.role === "STUDENT") && STUDENT_ROUTER.map((item, index) => {
+          {(isLoginUser && info?.role === "STUDENT" && info?.isFirstTime === 0) && STUDENT_ROUTER.map((item, index) => {
             const Page = item.page;
             const Layout = item.layout || DefaultLayout;
             return <Route
@@ -88,6 +89,27 @@ function App() {
                   <Page />
                 </Layout>
 
+              }
+            />
+          })}
+
+          {PUBLIC_ROUTER.map((item, index) => {
+            const Page = item.page;
+            const Layout = item.layout;
+            return <Route
+              key={index}
+              path={item.path}
+              element={
+                isLoginUser ?
+                <>
+                  {
+                    info?.role === "STUDENT" && info?.isFirstTime === 1 ?  <Navigate to={"/register-firsttime"} /> : <Navigate to={"/profile/"+info?.userName} />
+                  }
+                </>
+                  :
+                  <Layout>
+                    <Page />
+                  </Layout>
               }
             />
           })}

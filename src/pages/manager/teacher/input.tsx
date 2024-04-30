@@ -95,7 +95,6 @@ function RegisterTeacher({setSwitchPageInput,switchPageInput,userSelect,handleFe
                 dob: new Date(dateOfBirth.$y,dateOfBirth.$M,dateOfBirth.$D+1),
                 phone: values.phone,
                 email: values.email,
-                avatar: "",
                 createdAt: new Date(),
                 createdBy: infoUser?.userName || "",
                 status: values.status,

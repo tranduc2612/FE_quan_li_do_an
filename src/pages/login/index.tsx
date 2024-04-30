@@ -100,16 +100,18 @@ function LoginPage() {
                 </div>
 
                 <form className="form flex justify-center flex-col w-full mt-5 mb-5" onSubmit={formik.handleSubmit} key={uuid}>
-                    <InputCustom
-                        id={"username"}
-                        label="Tài khoản"
-                        name={"username"}
-                        value={formik.values.username} 
-                        isError={formik.touched.username && Boolean(formik.errors.username)} 
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        errorMessage={formik.touched.username && formik.errors.username} 
-                    />
+                    <div className="mb-5">
+                        <InputCustom
+                            id={"username"}
+                            label="Tài khoản"
+                            name={"username"}
+                            value={formik.values.username} 
+                            isError={formik.touched.username && Boolean(formik.errors.username)} 
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            errorMessage={formik.touched.username && formik.errors.username} 
+                        />
+                    </div>
 
                     <InputCustom
                         id={"password"}

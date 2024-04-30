@@ -20,6 +20,8 @@ export interface IStudent {
     statusProject?:string,// thêm vào đây để lấy cho dễ
     gender?:number,
     isDelete?:string,
+    userNameMentorRegister?:string,
+    isFirstTime?:number,
     semesterId?:string, //Thêm vào đây để có những form gửi lên thì cần ID học kỳ, chứ update thì ko lấy được thằng này đâu vì API ko trả về
     major?: IMajorType,
     project?: IProjecType,

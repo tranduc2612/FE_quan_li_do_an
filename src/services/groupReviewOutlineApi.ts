@@ -82,6 +82,13 @@ export const assginGroupReviewToProjectOutline = async (dataReq: AssignGroupRevi
     return data;
 }
 
+export const AutoSplitGroup = async (semesterId: string): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.post(`/GroupReviewOutline/automation-split-group?semesterId=${semesterId}`,{
+        // ...dataReq
+    });
+    return data;
+}
+
 export const addGroupReview = async (dataReq: IGroupReviewOutline): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.post("/GroupReviewOutline/add-group-review-outline",{
         ...dataReq

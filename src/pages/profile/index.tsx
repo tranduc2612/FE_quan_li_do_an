@@ -26,6 +26,7 @@ import { IScheduleWeek } from "~/types/IScheduleWeek";
 import { ISemester } from "~/types/ISemesterType";
 import { getSemester } from "~/services/semesterApi";
 import { toast } from "react-toastify";
+import RenderStatusProject from "~/components/RenderStatusProject";
 
 const keyPost = '/api/user/123';
 const cx = classNames.bind(style);
@@ -343,7 +344,8 @@ function Profile() {
 
                                 <div className={"col-span-3 m-2"}>
                                     <b>Trạng thái làm đồ án:</b> 
-                                    <span className={"text-text-color ms-2"}>chưa bảo vệ</span> 
+                                    <RenderStatusProject code={project?.statusProject} />
+                                    {/* <span className={"text-text-color ms-2"}>chưa bảo vệ</span>  */}
                                 </div>
                             </div>
                             <div className="flex justify-end" onClick={()=>navigate("/outline/"+profile?.userName)}>

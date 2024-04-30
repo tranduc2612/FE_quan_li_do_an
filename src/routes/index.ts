@@ -22,6 +22,7 @@ import InputReviewCommentor from "~/pages/review-template/commentator/input"
 import DetailCouncil from "~/pages/semester/detail/council/detail"
 import TeacherCouncil from "~/pages/council/teacher"
 import TeacherGroupReview from "~/pages/group-review-outline"
+import FirstTimePage from "~/pages/FirsTimePage"
 
 export const PUBLIC_ROUTER = [
     {
@@ -34,6 +35,14 @@ export const PUBLIC_ROUTER = [
         page: ForgetPass,
         layout: AuthLayout
     },    
+]
+
+export const FIRSTTIME_ROUTER = [
+    {
+        path:"/register-firsttime",
+        page: FirstTimePage,
+        layout: AuthLayout
+    },   
 ]
 
 export const PRIVATE_ROUTER = [

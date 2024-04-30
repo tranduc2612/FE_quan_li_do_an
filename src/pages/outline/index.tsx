@@ -249,7 +249,7 @@ function OutlinePage() {
                                     : <></>
                                 }
                                 {
-                                    data?.userNameNavigation?.userNameMentor === info?.userName || id === info?.userName &&
+                                    (data?.userNameNavigation?.userNameMentor === info?.userName || id === info?.userName) && info?.statusProject === "DOING" &&
                                     <Button onClick={()=>{
                                         getFileWordOutline(info?.userName)
                                         .then((res:any)=>{
@@ -394,9 +394,14 @@ function OutlinePage() {
                             {
                                 info?.userName === id ? <>
                                     <div className="flex justify-center">
-                                        <Button onClick={handleCreateProjectOutline} variant="contained" startIcon={<Add />}>
-                                                Tạo đề cương đồ án
-                                        </Button>
+                                        {
+                                            info?.statusProject === "START" ?
+                                            <Button onClick={handleCreateProjectOutline} variant="contained" startIcon={<Add />}>
+                                                    Tạo đề cương đồ án
+                                            </Button>
+                                            :
+                                            <h1 className="text-2xl">Sinh viên này không đủ điều kiện làm đồ án</h1>
+                                        }
                                     </div>            
                                 </> : <>
                                     <h1 className="text-2xl">Sinh viên này chưa tạo đề cương đồ án</h1>

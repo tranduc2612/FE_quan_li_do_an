@@ -30,6 +30,13 @@ export const assignTeacherMentor = async (userNameStudent:string,userNameTeacher
     return data;
 }
 
+export const autoTeacherMentor = async (req: {semesterId: string}): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.post(`/Project/auto-assign-mentor?semesterId=${req.semesterId}`,{
+        ...req
+    });
+    return data;
+}
+
 export const assignCommentator = async (userNameStudent?:string,userNameTeacher?:string): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.post(`/Project/assign-commentator?username_student=${userNameStudent}&username_teacher=${userNameTeacher}`,{
         

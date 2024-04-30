@@ -26,7 +26,10 @@ export interface IUser {
     isAdmin?:number,
     isDelete?: number,
     status?:string,
+    userNameMentorRegister?:string,
+    isFirstTime?:number,
     project?:IProjecType,
     major?: IMajorType,
     council?: ICouncil,
+    statusProject?: string,
 }

@@ -76,6 +76,13 @@ export const addCouncil = async (dataReq: ICouncilSemester): Promise<IResponse<a
     return data;
 }
 
+export const AutoSplitCouncil = async (semesterId: string,currentUser: string): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.post(`/Council/auto-assign-council?semesterId=${semesterId}&currentUsername=${currentUser}`,{
+        // ...dataReq
+    });
+    return data;
+}
+
 export const updateCouncil = async (dataReq: ICouncilSemester): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.put("/Council/update-council",{
         ...dataReq

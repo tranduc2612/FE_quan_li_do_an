@@ -79,7 +79,8 @@ function ProfileInput() {
           school_year:"",
           address:"",
           userName:"",
-          avatar: ""
+          avatar: "",
+          registerMentor: ""
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
@@ -176,7 +177,8 @@ function ProfileInput() {
                             class_name: req.project?.userNameNavigation?.className || "",
                             school_year: req.project?.userNameNavigation?.schoolYearName || "",
                             address: req.project?.userNameNavigation?.address || "",
-                            avatar: req.project?.userNameNavigation?.avatar || ""
+                            avatar: req.project?.userNameNavigation?.avatar || "",
+                            registerMentor: req?.userNameMentorRegister || ""
                         })
                     }
                     if(req?.role === "TEACHER" || req?.role === "ADMIN"){
@@ -191,7 +193,8 @@ function ProfileInput() {
                             class_name: req.className || "",
                             school_year: req.schoolYearName || "",
                             address: req.address || "",
-                            avatar: req.project?.userNameNavigation?.avatar || ""
+                            avatar: req.project?.userNameNavigation?.avatar || "",
+                            registerMentor: req?.userNameMentorRegister || ""
                         })
                     }
                     setProfile(req)
@@ -386,6 +389,7 @@ function ProfileInput() {
                                                                 errorMessage={formik.touched.student_code && formik.errors.student_code} 
                                                             />
                                                         </div>
+
                                                         <div className={"col-span-3 m-2"}>
                                                             <InputCustom
                                                                 id="class_name" 
@@ -400,19 +404,6 @@ function ProfileInput() {
                                                             />
                                                         </div>
                                                         <div className={"col-span-3 m-2"}>
-                                                            <InputCustom
-                                                                id="school_year" 
-                                                                label={"Khóa"} 
-                                                                name={"school_year"}
-                                                                disabled={true}
-                                                                value={formik.values.school_year} 
-                                                                isError={formik.touched.school_year && Boolean(formik.errors.school_year)} 
-                                                                onChange={formik.handleChange}
-                                                                onBlur={formik.handleBlur}
-                                                                errorMessage={formik.touched.school_year && formik.errors.school_year} 
-                                                            />
-                                                        </div>
-                                                        <div className={"col-span-3 m-2"}>
                                                             <InputSelectCustom
                                                             id={"major"}
                                                             name={"major"}
@@ -421,6 +412,7 @@ function ProfileInput() {
                                                             placeholder="Chuyên ngành"
                                                             label="Chuyên ngành"
                                                             onBlur={undefined}
+                                                            disabled
                                                             >
                                                                 <MenuItem value={""}>Tất cả</MenuItem>
                                                                 {
@@ -430,25 +422,23 @@ function ProfileInput() {
                                                                 }
                                                             </InputSelectCustom>
                                                         </div>
+
+                                                        
+
+                                                        <div className={"col-span-3 m-2"}>
+                                                            <InputCustom
+                                                                id="registerMentor" 
+                                                                label={"Mã giảng viên đăng ký"} 
+                                                                name={"registerMentor"}
+                                                                disabled={true}
+                                                                value={formik.values.registerMentor} 
+                                                                isError={formik.touched.registerMentor && Boolean(formik.errors.registerMentor)} 
+                                                                onChange={formik.handleChange}
+                                                                onBlur={formik.handleBlur}
+                                                                errorMessage={formik.touched.registerMentor && formik.errors.registerMentor} 
+                                                            />
+                                                        </div>
             
-                                                        {/* <div className={"col-span-3 m-2"}>
-                                                            <InputSelectCustom
-                                                                id={"status_project"}
-                                                                name={"status_project"}
-                                                                value={statusProjectValue}
-                                                                placeholder="Trạng thái đồ án"
-                                                                label="Trạng thái đồ án"
-                                                                onChange={(value:any) => {
-                                                                    setStatusProjectValue(value.target.value);
-                                                                } } 
-                                                                onBlur={undefined}
-                                                            >
-                                                                <MenuItem value={"0"}>Bảo lưu</MenuItem>
-                                                                <MenuItem value={"1"}>Đang làm đồ án</MenuItem>
-                                                                <MenuItem value={"2"}>Đã bảo vệ</MenuItem>
-                                                                <MenuItem value={"3"}>Chưa bảo vệ</MenuItem>
-                                                            </InputSelectCustom>
-                                                        </div> */}
                                                     </div>
                                                 </div>
                                                 :

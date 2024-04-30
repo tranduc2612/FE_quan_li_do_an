@@ -77,23 +77,8 @@ function SemesterPage() {
             }
         },
         {
-            field: 'createdBy',
-            headerName: 'Người tạo',
-            width: 160,
-            editable: true,
-            renderCell:({row})=>{
-                return <>{row?.createdByNavigation?.fullName}</>
-            }
-        },
-        {
-            field: 'totalStudent',
-            headerName: 'Tổng số sinh viên',
-            width: 160,
-            editable: true,
-        },
-        {
             field: 'totalProjectAmount',
-            headerName: 'Tổng số đồ án',
+            headerName: 'Tổng số sinh viên',
             width: 160,
             editable: true,
         },
@@ -129,6 +114,12 @@ function SemesterPage() {
             renderCell:({row})=>{
                 return <>{RenderStatusTime(isCurrentTimeInRange(new Date(row?.fromDate),new Date(row?.toDate)))}</>
             }
+        },
+        {
+            field: 'createdBy',
+            headerName: 'Người tạo',
+            width: 160,
+            editable: true,
         },
     ];
 

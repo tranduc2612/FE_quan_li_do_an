@@ -218,7 +218,7 @@ function SideBar() {
             }}>
                 <div className="flex items-center flex-col justify-items-center sidebar_item p-2 text-xs text-nowrap font-semibold text-[#333] hover:text-primary-blue">
                 {/* <img className={"w-10 h-10 mb-3 rounded-full object-cover"} src={images.image.anh_demo} alt="" /> */}
-                    <Avatar alt="Remy Sharp" src={avatar} />
+                    <Avatar alt={info?.fullName} src={avatar} />
                     <span className="text-center mt-3">
                         Đăng xuất
                     </span>

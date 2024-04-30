@@ -16,11 +16,12 @@ import * as yup from 'yup';
 import InputCustom from "~/components/InputCustom";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
-import { AssignCouncilTeaching, addCouncil, assginCouncilToTeaching, deleteCouncil, lstCouncilSemester, updateCouncil } from "~/services/councilApi";
+import { AssignCouncilTeaching, AutoSplitCouncil, addCouncil, assginCouncilToTeaching, deleteCouncil, lstCouncilSemester, updateCouncil } from "~/services/councilApi";
 import { AssignGroupReviewTeaching, assginGroupReviewToTeaching, getListTeachingGroupOutline } from "~/services/groupReviewOutlineApi";
 import { ICouncil, ICouncilSemester } from "~/types/ICouncil";
 import { ITeaching } from "~/types/ITeachingType";
 import { formatDateTypeDateOnly } from "~/ultis/common";
+import Loading from '~/components/Loading';
 
 
 const validationSchema = yup.object({
@@ -56,7 +57,7 @@ function CouncilSemester() {
     const [openModalDelete, setOpenModalDelete] = useState(false);
     const [total, setTotal] = useState(0);
     const [loadingData,setLoadingData] = useState(false);
-
+    const [loading,setLoading] = useState(false)
 
     const columns: GridColDef[] = [
         {
@@ -283,7 +284,11 @@ function CouncilSemester() {
     }
 
     return (
-            <div className="p-4 overflow-scroll max-h-screen">
+            <div className="p-4 overflow-scroll overflow-x-hidden max-h-screen">
+                {
+                    loading &&
+                    <Loading />
+                }
                     { <div>
 
                         {/* Danh sách tìm kiếm */}
@@ -320,7 +325,27 @@ function CouncilSemester() {
                                 slots={{ toolbar: ()=> <> <GridToolbarContainer>
                                         <GridToolbarColumnsButton />
                                         <GridToolbarFilterButton  />
-                                        <Button startIcon={<CalculateIcon />}>Tự động chia</Button>
+                                        <Button onClick={()=>{
+                                            const idSemester = id;
+                                            if(!idSemester){
+                                                toast.warning("Học kỳ không hợp lệ")
+                                                return
+                                            }
+                                            setLoading(true)
+                                            AutoSplitCouncil(idSemester || "",info?.userName || "")
+                                            .then(x=>{
+                                                if(x.success){
+                                                    toast.success("Chia hội đồng thành công !");
+                                                    hanleFetchApiCouncilList();
+
+                                                }else{
+                                                    toast.warning(x.msg);
+                                                }
+                                            })
+                                            .finally(()=>{
+                                                setLoading(false)
+                                            })
+                                        }} startIcon={<CalculateIcon />}>Tự động chia</Button>
                                         <Button variant='text' startIcon={<Add />} onClick={()=>{
                                             formikInputGroup.values.nameCouncil = ""
                                             setOpenModalInputCouncil(true)
