@@ -14,7 +14,7 @@ import { inforUser } from "~/redux/slices/authSlice";
 import { AssignCouncilProject, AssignCouncilTeaching, assginCouncilToProject, assginCouncilToTeaching, excelListProjectCouncil, getCouncil, getListProjectCouncil, getListTeachingCouncil } from "~/services/councilApi";
 import { assignCommentator } from '~/services/projectApi';
 import { ICouncil } from "~/types/ICouncil";
-import { IProjecType } from '~/types/IProjectType';
+import { IProject } from '~/types/IProjectType';
 import { ITeaching } from "~/types/ITeachingType";
 import RenderStatusProject from '~/components/RenderStatusProject';
 
@@ -449,7 +449,7 @@ function DetailCouncil() {
             await getListProjectCouncil({
                 semesterId: idSemester
             })
-            .then((res:IResponse<IProjecType[]>)=>{
+            .then((res:IResponse<IProject[]>)=>{
               console.log(res)
               if(res.success && res.returnObj) {
                 const dataMap = res.returnObj;
@@ -474,7 +474,7 @@ function DetailCouncil() {
                     const lstTeachingsUserName = lstTeachingInCouncil.map(x=>x.userNameTeacher)
                     console.log(lstTeachingsUserName)
 
-                    const lstNotInCouncil = [...newMap].filter((x:IProjecType)=>!lstTeachingsUserName.includes(x.userNameMentor) && x.userNameMentor != null).sort(function(a:IProjecType, b:IProjecType) {
+                    const lstNotInCouncil = [...newMap].filter((x:IProject)=>!lstTeachingsUserName.includes(x.userNameMentor) && x.userNameMentor != null).sort(function(a:IProject, b:IProject) {
                         if (a?.councilId === idCouncil && b?.councilId !== idCouncil) {
                           return -1; // a nằm trước b
                         }

@@ -1,4 +1,4 @@
-import { IProjecType } from "./IProjectType";
+import { IProject } from "./IProjectType";
 import { ISemester } from "./ISemesterType";
 
 export interface IStudent {
@@ -24,7 +24,7 @@ export interface IStudent {
     isFirstTime?:number,
     semesterId?:string, //Thêm vào đây để có những form gửi lên thì cần ID học kỳ, chứ update thì ko lấy được thằng này đâu vì API ko trả về
     major?: IMajorType,
-    project?: IProjecType,
+    project?: IProject,
     gpa?:string
     
 }

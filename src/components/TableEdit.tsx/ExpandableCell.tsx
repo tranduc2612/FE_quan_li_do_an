@@ -1,7 +1,5 @@
-import { GridRenderCellParams } from "@mui/x-data-grid";
-import { Link } from "mdi-material-ui";
 import * as React from 'react';
-function ExpandableCell({ value,length }: any) {
+function ExpandableCell({ value }: any) {
     const [expanded, setExpanded] = React.useState(false);
   
     return (

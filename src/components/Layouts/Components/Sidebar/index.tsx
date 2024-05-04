@@ -1,13 +1,14 @@
-import { BookClock, Account, NewspaperVariantMultipleOutline,BookMultipleOutline,Cog,School,AccountSchool, ApplicationOutline, MessageDraw } from 'mdi-material-ui'
+import Avatar from '@mui/material/Avatar';
+import { randomId } from '@mui/x-data-grid-generator';
+import { Account, AccountSchool, ApplicationOutline, BookClock, BookMultipleOutline, Cog, MessageDraw, NewspaperVariantMultipleOutline, School } from 'mdi-material-ui';
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import images from '~/assets';
 import { useAppDispatch, useAppSelector } from '~/redux/hook';
 import { inforUser, logout } from '~/redux/slices/authSlice';
-import Avatar from '@mui/material/Avatar';
-import { useEffect, useState } from 'react';
-import { randomId } from '@mui/x-data-grid-generator';
-import { IUser } from '~/types/IUser';
+import { getListSemester } from '~/services/semesterApi';
 import { getFileAvatar } from '~/services/userApi';
+import { IResponse } from '~/types/IResponse';
+import { ISemester } from '~/types/ISemesterType';
 
 
 type ISideBar_Type = {
@@ -23,6 +24,7 @@ function SideBar() {
     const info = useAppSelector(inforUser)
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [lastestSemester,setLastestSemester] = useState<string>();
     const [avatar,setAvatar] = useState<any>();
     const handleLogout = () => {
         dispatch(logout())
@@ -36,9 +38,24 @@ function SideBar() {
             setAvatar(imgUrl);
         })
     }
+
+    const handleFetchApiSemester= () =>{
+        getListSemester(
+            {
+                semesterId: "",
+                nameSemester: ""
+            }
+        )
+        .then((res:IResponse<ISemester[]>)=>{
+            if(res.success && res.returnObj && res.returnObj.length > 0){
+                setLastestSemester(res.returnObj[0].semesterId ? res.returnObj[0].semesterId : "");
+            }
+        })
+    }
     
     useEffect(()=>{
-        fetchApiAvatar()
+        fetchApiAvatar();
+        handleFetchApiSemester();
     },[info])
 
     const SIDEBAR_ALL:ISideBar_Type[] = [
@@ -83,7 +100,7 @@ function SideBar() {
     const SIDEBAR_TEACHER:ISideBar_Type[] = [
         {
             id: randomId(),
-            url:'/manager-student-mentor',
+            url:'/manager-student-mentor/'+lastestSemester,
             title:"Sinh viên hướng dẫn",
             icon: AccountSchool,
             role: "TEACHER",
@@ -99,7 +116,7 @@ function SideBar() {
         },
         {
             id: randomId(),
-            url:'/teacher/council',
+            url:'/teacher/council/'+lastestSemester,
             title:"Hội đồng bảo vệ",
             icon: ApplicationOutline,
             role: "TEACHER",

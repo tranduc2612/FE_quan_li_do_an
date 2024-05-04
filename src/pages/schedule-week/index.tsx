@@ -22,7 +22,7 @@ function ScheduleWeek() {
     const navigate = useNavigate();
     const {idSemester} = useParams();
     const [loading,setLoading] = useState(true);
-    const info = useAppSelector(inforUser);
+    const currentUser = useAppSelector(inforUser);
     const [semester,setSemester] = useState<ISemester>();
     const [scheduleNow,setScheduleNow] = useState<IScheduleWeek[]>([])
     const [schedulePast,setSchedulePast] = useState<IScheduleWeek[]>([])
@@ -56,12 +56,12 @@ function ScheduleWeek() {
 
     const handleFetchApiData = ()=>{
         let userFind = "";
-        if(info?.role === "TEACHER"){
-            userFind = info?.userName || "";
+        if(currentUser?.role === "TEACHER"){
+            userFind = currentUser?.userName || "";
         }
-        console.log(info)
-        if(info?.role === "STUDENT"){
-            const teacherMentor = info?.project?.userNameMentorNavigation;
+        console.log(currentUser)
+        if(currentUser?.role === "STUDENT"){
+            const teacherMentor = currentUser?.project?.userNameMentorNavigation;
             if(teacherMentor){
                 userFind = teacherMentor?.userName || "";
             }
@@ -107,9 +107,12 @@ function ScheduleWeek() {
                             <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
                                 Quay lại
                             </Button>
-                            <Button onClick={()=>{navigate("/schedule-week/input/"+idSemester)}} variant="contained" startIcon={<Add />}>
-                                Thêm mới lịch
-                            </Button>
+                            {
+                                currentUser?.role === "TEACHER" &&
+                                <Button onClick={()=>{navigate("/schedule-week/input/"+idSemester)}} variant="contained" startIcon={<Add />}>
+                                    Thêm mới lịch
+                                </Button>
+                            }
                         </div>
                         <h2 className={"font-bold text-primary-blue text-xl mb-3"}>
                             Danh sách lịch báo cáo tuần
@@ -140,7 +143,7 @@ function ScheduleWeek() {
                                     scheduleNow && scheduleNow.map((item)=>(
                                         <ScheduleItem 
                                             key={item?.scheduleWeekId}
-                                            link={info?.role === "STUDENT"? "/schedule-week/detail/"+item?.scheduleWeekId+"/"+info?.userName :"/schedule-week/detail/"+item?.scheduleWeekId} 
+                                            link={currentUser?.role === "STUDENT"? "/schedule-week/detail/"+item?.scheduleWeekId+"/"+currentUser?.userName :"/schedule-week/detail/"+item?.scheduleWeekId} 
                                             active={true} 
                                             className={"mb-5"} 
                                             header={item?.content || ""} 
@@ -160,7 +163,7 @@ function ScheduleWeek() {
                                     schedulePast && schedulePast.map((item)=>(
                                         <ScheduleItem 
                                             key={item?.scheduleWeekId}
-                                            link={info?.role === "STUDENT"? "/schedule-week/detail/"+item?.scheduleWeekId+"/"+info?.userName :"/schedule-week/detail/"+item?.scheduleWeekId} 
+                                            link={currentUser?.role === "STUDENT"? "/schedule-week/detail/"+item?.scheduleWeekId+"/"+currentUser?.userName :"/schedule-week/detail/"+item?.scheduleWeekId} 
                                             active={false} 
                                             className={""}
                                             header={item?.content || ""} 
@@ -180,7 +183,7 @@ function ScheduleWeek() {
                                     scheduleFuture && scheduleFuture.map((item)=>(
                                         <ScheduleItem 
                                             key={item?.scheduleWeekId}
-                                            link={info?.role === "STUDENT"? "/schedule-week/detail/"+item?.scheduleWeekId+"/"+info?.userName :"/schedule-week/detail/"+item?.scheduleWeekId} 
+                                            link={currentUser?.role === "STUDENT"? "/schedule-week/detail/"+item?.scheduleWeekId+"/"+currentUser?.userName :"/schedule-week/detail/"+item?.scheduleWeekId} 
                                             active={false} 
                                             className={""}
                                             header={item?.content || ""} 

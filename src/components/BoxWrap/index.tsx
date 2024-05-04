@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-import { NoteMultiple } from 'mdi-material-ui'
 import IChildType from "~/types/IchildrenType";
 
 

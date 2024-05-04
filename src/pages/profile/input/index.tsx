@@ -19,7 +19,7 @@ import { updateStudent } from "~/services/studentApi";
 import { updateTeacher } from "~/services/teacherApi";
 import { GetProfileUser, changeAvatar, getFileAvatar } from "~/services/userApi";
 import { IMajorType } from "~/types/IMajorType";
-import { IProjecType } from "~/types/IProjectType";
+import { IProject } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
 import { IStudent } from "~/types/IStudentType";
 import { ITeacher } from "~/types/ITeacherType";
@@ -61,7 +61,7 @@ function ProfileInput() {
     const [loading,setLoading] = useState(true);
     const dispatch = useAppDispatch();
     const [profile,setProfile] = useState<IUser>();
-    const [project,setProject] = useState<IProjecType>();
+    const [project,setProject] = useState<IProject>();
     const [majorOptions,setMajorOptions] = useState<IMajorType[]>();
     const infoUser = useAppSelector(inforUser);
     const inputRef = useRef<any>();

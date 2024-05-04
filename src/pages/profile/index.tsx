@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { GetProfileUser, changePassword, changePasswordModel } from "~/services/userApi";
 import { ICouncil } from "~/types/ICouncil";
-import { IProjecType } from "~/types/IProjectType";
+import { IProject } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
 import { IUser } from "~/types/IUser";
 import { dateShowNotification, formatDateTypeDateOnly, isCurrentTimeInRange, renderGender, renderRole, renderStatusAccount } from "~/ultis/common";
@@ -56,7 +56,7 @@ function Profile() {
     const [loading,setLoading] = useState(false);
     const [council,setCouncil] = useState<ICouncil>();
     const [profile,setProfile] = useState<IUser>();
-    const [project,setProject] = useState<IProjecType>()
+    const [project,setProject] = useState<IProject>()
     const info = useAppSelector(inforUser)
     const { id } = useParams()
     const navigate = useNavigate();
@@ -322,14 +322,14 @@ function Profile() {
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Điểm tổng kết:</b> 
+                                    <b>Điểm tổng kết: </b> 
                                     {project?.scoreFinal}
                                 </div>
 
                                 
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Giáo viên hướng dẫn:</b> 
+                                    <b>Giáo viên hướng dẫn: </b> 
                                     {
                                         project?.userNameMentorNavigation ? project?.userNameMentorNavigation?.fullName : <span className={"text-red-600"}>Chưa có</span>
                                     }
@@ -343,7 +343,7 @@ function Profile() {
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
-                                    <b>Trạng thái làm đồ án:</b> 
+                                    <b>Trạng thái làm đồ án: </b> 
                                     <RenderStatusProject code={project?.statusProject} />
                                     {/* <span className={"text-text-color ms-2"}>chưa bảo vệ</span>  */}
                                 </div>

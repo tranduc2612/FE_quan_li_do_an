@@ -1,6 +1,5 @@
-import React from "react";
-import BoxWrapper from "../BoxWrap";
 import { EnumPage, IPageAdmin } from "~/pages/manager";
+import BoxWrapper from "../BoxWrap";
 
 
 

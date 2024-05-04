@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { TrashCanOutline,Pencil } from 'mdi-material-ui'
-import IChildType from "~/types/IchildrenType";
 
 interface IProps{
     header: string,

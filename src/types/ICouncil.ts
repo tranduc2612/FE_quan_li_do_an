@@ -1,4 +1,4 @@
-import { IProjecType } from "./IProjectType";
+import { IProject } from "./IProjectType";
 import { ISemester } from "./ISemesterType";
 import { ITeaching } from "./ITeachingType";
 
@@ -10,7 +10,7 @@ export interface ICouncil{
     createdDate?: Date | string,
     isDelete?: number,
     semesterId?: string,
-    projects?: IProjecType[],
+    projects?: IProject[],
     semester?: ISemester,
     teachings?: ITeaching[],
 }

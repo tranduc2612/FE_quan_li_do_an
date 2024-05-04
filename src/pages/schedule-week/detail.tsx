@@ -37,7 +37,7 @@ const VisuallyHiddenInput = styled('input')({
   });
 
 function ScheduleWeekDetail() {
-    const info = useAppSelector(inforUser)
+    const currentUser = useAppSelector(inforUser)
     const {id,idStudent} = useParams();
     const navigate = useNavigate();
     const [scheduleWeekData,setScheduleWeekData] = useState<IScheduleWeek>();
@@ -103,7 +103,7 @@ function ScheduleWeekDetail() {
                                 Quay lại
                         </Button>
                         {
-                            scheduleWeekData?.createdBy === info?.userName && 
+                            scheduleWeekData?.createdBy === currentUser?.userName && 
                             <div className="flex">
                                 <span className="flex items-center cursor-pointer p-2 rounded-full text-3xl me-2 hover:bg-gray-200"
                                     onClick={()=>{
@@ -157,7 +157,7 @@ function ScheduleWeekDetail() {
                                 </div>
                                 <MiniBox className="" header={
                                     <>
-                                        {info?.role === "STUDENT" && idStudent && info?.project?.userNameMentorNavigation?.userName === scheduleWeekData?.createdBy ? <>
+                                        {currentUser?.role === "STUDENT" && idStudent && currentUser?.project?.userNameMentorNavigation?.userName === scheduleWeekData?.createdBy ? <>
                                             <div className="flex">
                                                 <div className="mx-2">
                                                 <Button
@@ -207,23 +207,26 @@ function ScheduleWeekDetail() {
                                                 </Button>
                                                 </div>
                                                 <div className="mx-2">
-                                                    <Button color="error" variant="outlined" startIcon={<Delete />} onClick={()=>{
-                                                        const form = new FormData();
-                                                        form.append("scheduleWeekId",id || "");
-                                                        form.append("userNameProject",idStudent || "");
-                                                        form.append("function","D");
-                                                        handleScheduleWeekDetail(form)
-                                                        .then((res:any)=>{
-                                                            console.log(res)
-                                                            if(res.data.success){
-                                                                console.log("runn")
-                                                                setDetail(res.data.returnObj)
-                                                                toast.success(res.data.msg)
-                                                            }else{
-                                                                toast.error(res.data.msg)
-                                                            }
-                                                        })
-                                                    }}>Xóa</Button>
+                                                    {
+                                                        currentUser?.role === "STUDENT" && currentUser?.userName === detail?.userNameProject &&
+                                                        <Button color="error" variant="outlined" startIcon={<Delete />} onClick={()=>{
+                                                            const form = new FormData();
+                                                            form.append("scheduleWeekId",id || "");
+                                                            form.append("userNameProject",idStudent || "");
+                                                            form.append("function","D");
+                                                            handleScheduleWeekDetail(form)
+                                                            .then((res:any)=>{
+                                                                console.log(res)
+                                                                if(res.data.success){
+                                                                    console.log("runn")
+                                                                    setDetail(res.data.returnObj)
+                                                                    toast.success(res.data.msg)
+                                                                }else{
+                                                                    toast.error(res.data.msg)
+                                                                }
+                                                            })
+                                                        }}>Xóa</Button>
+                                                    }
                                                 </div>
                                             </div>
                                         </> : 
@@ -326,7 +329,7 @@ function ScheduleWeekDetail() {
                                     :
                                     <>
                                         {
-                                            info?.role === "TEACHER" && info?.userName === scheduleWeekData?.createdBy && 
+                                            currentUser?.role === "TEACHER" && currentUser?.userName === scheduleWeekData?.createdBy && 
                                             <div className="col-span-1" onClick={()=>setSwitchEdit(true)}>
                                                 <Edit className="text-blue-600 cursor-pointer" />
                                             </div>

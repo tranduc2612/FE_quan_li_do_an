@@ -1,6 +1,6 @@
 import { ICommentType } from "./IComment";
 import { IGroupReviewOutline } from "./IGroupReviewOutline";
-import { IProjecType } from "./IProjectType";
+import { IProject } from "./IProjectType";
 import { ITeacher } from "./ITeacherType";
 
 export interface IProjectOutline{
@@ -11,8 +11,9 @@ export interface IProjectOutline{
         expectResult?:string,
         contentProject?:string,
         groupReviewOutlineId?:string,
+        semesterId?:string,
         comments?: ICommentType[],
         groupReviewOutline?:IGroupReviewOutline,
-        userNameNavigation?: IProjecType,
+        userNameNavigation?: IProject,
 
  }

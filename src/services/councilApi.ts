@@ -2,7 +2,7 @@ import { Fetcher } from "swr";
 import request from "~/services/axios";
 import { IPosts } from "~/types/IBlogType";
 import { ICouncil, ICouncilSemester } from "~/types/ICouncil";
-import { IProjecType } from "~/types/IProjectType";
+import { IProject } from "~/types/IProjectType";
 import { IReqList } from "~/types/IReqList";
 import { IResponse } from "~/types/IResponse";
 import { ITeaching } from "~/types/ITeachingType";
@@ -36,8 +36,8 @@ export const getTeaching = async (username?: string,semesterId?: string): Promis
     return data;
 }
 
-export const getListProjectCouncil = async (dataReq: ListProjectCouncil): Promise<IResponse<IProjecType[]>> => {
-    const data: IResponse<IProjecType[]> = await request.post("/Council/get-list-project-council",{
+export const getListProjectCouncil = async (dataReq: ListProjectCouncil): Promise<IResponse<IProject[]>> => {
+    const data: IResponse<IProject[]> = await request.post("/Council/get-list-project-council",{
         ...dataReq
     });
     return data;

@@ -15,7 +15,7 @@ import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { AssignGroupReviewProjectOutline, assginGroupReviewToProjectOutline, getGroupReview, getListProjectByGroupReview } from "~/services/groupReviewOutlineApi";
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
-import { IProjecType } from "~/types/IProjectType";
+import { IProject } from "~/types/IProjectType";
 import { ITeaching } from "~/types/ITeachingType";
 
 
@@ -271,7 +271,7 @@ function GroupReviewOutlineDetail() {
                 // nameProject: formik.values.nameProjectSearch,
                 // UserName: formik.values.userNameSearch
             })
-            .then((res:IResponse<IProjecType[]>)=>{
+            .then((res:IResponse<IProject[]>)=>{
               console.log(res)
               if(res.success && res.returnObj) {
                 const dataMap = res.returnObj;
@@ -282,7 +282,7 @@ function GroupReviewOutlineDetail() {
                     setLstProjectNotInGroup([])
                 }else{
                     // lấy danh sách đồ án trên trang chính
-                    const lstInGroup = dataMap.filter(x=>x?.projectOutline?.groupReviewOutlineId == idGroup).map((data:IProjecType,index:any)=>{
+                    const lstInGroup = dataMap.filter(x=>x?.projectOutline?.groupReviewOutlineId == idGroup).map((data:IProject,index:any)=>{
                         return {
                           id: index+1, 
                           ...data,
@@ -297,7 +297,7 @@ function GroupReviewOutlineDetail() {
                     // lấy ở danh sách check
                     const arrTeachingUsername = teachings.map(x=>x.userNameTeacher);
                     console.log(arrTeachingUsername)
-                    const lstNotInGroup = dataMap.filter((data:IProjecType,index:any)=>!arrTeachingUsername.includes(data?.userNameMentor) && data?.userNameMentor != null).map((data:IProjecType,index:any)=>{
+                    const lstNotInGroup = dataMap.filter((data:IProject,index:any)=>!arrTeachingUsername.includes(data?.userNameMentor) && data?.userNameMentor != null).map((data:IProject,index:any)=>{
                         return {
                             id: index+1,
                             ...data,

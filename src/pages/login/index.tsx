@@ -116,7 +116,7 @@ function LoginPage() {
                     <InputCustom
                         id={"password"}
                         label="Mật khẩu"
-                        // type="password"
+                        type="password"
                         name={"password"}
                         value={formik.values.password} 
                         isError={formik.touched.password && Boolean(formik.errors.password)} 
@@ -135,7 +135,7 @@ function LoginPage() {
                             <FormControlLabel value="TEACHER" control={<Radio />} label="Giảng viên" />
                         </RadioGroup>
                     </div>
-                    <Link to="/forget-password" className="mb-6 self-end">Quên mật khẩu</Link>
+                    <Link to="/forget-password" className="mb-6 self-end hover:underline">Quên mật khẩu</Link>
                     <Button variant="contained" type="submit">Đăng nhập</Button>
                 </form>
             </div>

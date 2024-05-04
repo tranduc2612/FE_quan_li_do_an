@@ -1,9 +1,6 @@
-import Navbar from "../Components/Navbar";
-import { ReactElement } from "react"
+import { ReactElement } from "react";
 import SideBar from "../Components/Sidebar";
 import "./layout.module.scss";
-import { useAppSelector } from "~/redux/hook";
-import { inforUser } from "~/redux/slices/authSlice";
 
 
 type IProps = {
@@ -11,7 +8,6 @@ type IProps = {
 }
 
 function ManagerLayout({ children }: IProps) {
-    const infoUser = useAppSelector(inforUser);
 
     return (<>
         <div className="grid grid-cols-22">
@@ -19,7 +15,7 @@ function ManagerLayout({ children }: IProps) {
                 <SideBar />
             </div>
             <div className="content container h-full min-w-full col-span-21 z-50">
-                <div className="pb-8 px-4 mt-10 overflow-scroll h-screen">
+                <div className="pb-8 px-4 overflow-scroll h-screen">
                     {children}
                 </div>
             </div>

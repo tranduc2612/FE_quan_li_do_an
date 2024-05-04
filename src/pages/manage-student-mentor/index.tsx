@@ -2,7 +2,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Button, MenuItem, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useFormik } from "formik";
-import { Account, BookClock, Download } from 'mdi-material-ui';
+import { Account, BookClock, Download, DownloadBox, MessageDraw } from 'mdi-material-ui';
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
@@ -15,7 +15,7 @@ import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { getListProjectByUsernameMentor } from '~/services/projectApi';
 import { getListSemester } from '~/services/semesterApi';
-import { IProjecType } from '~/types/IProjectType';
+import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { ISemester } from '~/types/ISemesterType';
 import { formatDateTypeDateOnly } from '~/ultis/common';
@@ -37,12 +37,13 @@ function ManageStudentMentor() {
     const [rows,setRows] = useState<any>([]);
     const info = useAppSelector(inforUser);
     const navigate = useNavigate();
+    const {semesterId} = useParams();
     const apiRef = useGridApiRef();
     const [total, setTotal] = useState(0);
     const [semesterOption,setSemesterOption] = useState<ISemester[]>([])
     const [loadingData,setLoadingData] = useState(true);
     const initialData = {
-        semester:""
+        semester: semesterId
     }
     const formik = useFormik({
         initialValues: initialData,
@@ -58,62 +59,75 @@ function ManageStudentMentor() {
             width: 80,
             maxWidth: 60,
             flex: 1,
-            editable: true,
+            editable: false,
         },
-        // {
-        //     field: 'action',
-        //     headerName: 'Chức năng',
-        //     width: 200,
-        //     editable: true,
-        //     renderCell:({row})=>{
-        //         return <>
-        //             {/* <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
-        //                     e.stopPropagation();
-        //             }}>
-        //                 <Tooltip title="Trang cá nhân">
-        //                     <Account />
-        //                 </Tooltip>
-        //             </div> */}
-        //             <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
-        //                     e.stopPropagation();
-        //             }}>
-        //                 <Tooltip title="Xem lịch tuần">
-        //                     <BookClock />
-        //                 </Tooltip>
-        //             </div>
-                    
-        //         </>
-        //     }
-        // },
+        {
+            field: 'action',
+            headerName: 'Chức năng',
+            width: 180,
+            editable: false,
+            renderCell:({row})=>{
+                return <>
+                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
+                            e.stopPropagation();
+                            if(row?.userName){
+                                navigate(`/profile/${row?.userName}`);
+                            }
+                    }}>
+                        <Tooltip title="Trang cá nhân">
+                            <Account />
+                        </Tooltip>
+                    </div>
+                    {
+                        row?.hashKeyMentor &&
+                        <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-lime-600" onClick={(e)=>{
+                                e.stopPropagation();
+                                navigate(`/review-mentor/${row?.hashKeyMentor || "false"}`);
+                        }}>
+                            <Tooltip title="Đánh giá">
+                                <MessageDraw />
+                            </Tooltip>
+                        </div>
+                    }
+
+                    {
+                        row?.nameFileFinal && 
+                        <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-rose-600" onClick={(e)=>{
+                            e.stopPropagation();
+                            navigate(`/review-mentor/${row?.hashKeyMentor || "false"}`);
+                        }}>
+                            <Tooltip title="Báo cáo tổng kết">
+                                <DownloadBox />
+                            </Tooltip>
+                        </div>
+                    }
+
+                </>
+            }
+        },
         {
             field: 'userName',
             headerName: 'Tên tài khoản',
             width: 300,
-            editable: true,
+            editable: false,
         },
         {
             field: 'studentCode',
             headerName: 'Mã sinh viên',
             width: 200,
-            editable: true,
+            editable: false,
         },
         {
             field: 'fullName',
             headerName: 'Họ và tên',
             width: 200,
-            editable: true,
-        },
-        {
-            field: 'address',
-            headerName: 'Địa chỉ',
-            width: 200,
-            editable: true
+            editable: false,
         },
         {
             field: 'dob',
             headerName: 'Ngày sinh',
             width: 100,
-            editable: true,
+            editable: false,
             renderCell: ({row})=>{
                 return <>{formatDateTypeDateOnly(row?.dob)}</>
             }
@@ -122,45 +136,54 @@ function ManageStudentMentor() {
             field: 'scoreMentor',
             headerName: 'Điểm giáo viên hướng dẫn',
             width: 200,
-            editable: true
+            editable: false,
+            align:"center"
         },
-        {
-            field: 'scoreCommentator',
-            headerName: 'Điểm giáo viên phẩn biện',
-            width: 200,
-            editable: true
-        },
-        {
-            field: 'scoreFinal',
-            headerName: 'Điểm tổng kết',
-            width: 200,
-            editable: true
-        },
-        
+        // {
+        //     field: 'scoreCommentator',
+        //     headerName: 'Điểm giáo viên phẩn biện',
+        //     width: 200,
+        //     editable: false,
+        //     align:"center"
+        // },
+        // {
+        //     field: 'scoreFinal',
+        //     headerName: 'Điểm tổng kết',
+        //     width: 200,
+        //     editable: false,
+        //     align:"center"
+
+        // },
         {
             field: 'projectOutline',
             headerName: 'Trạng thái đề cương',
             width: 250,
-            editable: true,
+            editable: false,
             renderCell: ({row})=>{
                 return <>{row?.projectOutline ? <span className="text-green-600">Đã đăng ký</span> :<span className="text-red-600">Chưa đăng ký</span>}</>
+            }
+        },
+        {
+            field: 'nameFileFinal',
+            headerName: 'Trạng thái báo cáo',
+            width: 250,
+            editable: false,
+            renderCell: ({row})=>{
+                return <>{row?.nameFileFinal ? <span className="text-green-600">Đã nộp</span> :<span className="text-red-600">Chưa nộp</span>}</>
             }
         },
         {
             field: 'statusProject',
             headerName: 'Trạng thái đồ án',
             width: 150,
-            editable: true,
+            editable: false,
             renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
-        },
-        {
-            field: 'status',
-            headerName: 'Trạng thái tài khoản',
-            width: 150,
-            editable: true
         },
     ];
     useEffect(()=>{
+        if(formik.values.semester){
+            navigate(`/manager-student-mentor/${formik.values.semester}`);
+        }
         hanleFetchApi();
     },[formik.values.semester])
 
@@ -169,12 +192,12 @@ function ManageStudentMentor() {
     },[])
 
     const hanleFetchApi = async () => {
-        if(formik.values.semester.length > 0){
+        if(formik.values.semester !== undefined){
             setLoadingData(true)
             getListProjectByUsernameMentor(info?.userName, formik.values.semester)
-            .then((res:IResponse<IProjecType[]>)=>{
+            .then((res:IResponse<IProject[]>)=>{
                 if(res.success && res.returnObj.length > 0){
-                    const newMap = res.returnObj.map((data:IProjecType,index:any)=>{
+                    const newMap = res.returnObj.map((data:IProject,index:any)=>{
                         return {
                           id: index+1,
                           ...data,
@@ -206,8 +229,9 @@ function ManageStudentMentor() {
             }
         )
         .then((res:IResponse<ISemester[]>)=>{
+            console.log(res)
             if(res.success && res.returnObj && res.returnObj.length > 0){
-                formik.values.semester = res.returnObj[0].semesterId ? res.returnObj[0].semesterId : "";
+                // formik.values.semester = res.returnObj[0].semesterId ? res.returnObj[0].semesterId : "";
                 setSemesterOption(res.returnObj);
             }
         })
@@ -266,13 +290,11 @@ function ManageStudentMentor() {
                                             onCellClick={({row})=>{
                                                 // const idSemester = id;
                                                 // const idGroup = row?.groupReviewOutlineId;
-                                                if(row?.userName){
-                                                    navigate(`/profile/${row?.userName}`);
-                                                }
+                                                
                                             }}
                                             initialState={{
                                             pagination: {
-                                                paginationModel: { page: 0, pageSize: 10 },
+                                                paginationModel: { page: 0, pageSize: 5 },
                                             },
                                             }}
                                             

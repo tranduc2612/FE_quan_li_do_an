@@ -87,23 +87,13 @@ export const PRIVATE_ROUTER = [
         layout: DefaultLayout
     },
     {
-        path:"/review-mentor/",
+        path:"/review-mentor/:key",
         page: DetailReviewMentor,
         layout: DefaultLayout
     },
     {
-        path:"input/review-mentor/",
-        page: InputReviewMentor,
-        layout: DefaultLayout
-    },
-    {
-        path:"/review-commentator/",
+        path:"/review-commentator/:key",
         page: DetailReviewCommentor,
-        layout: DefaultLayout
-    },
-    {
-        path:"input/review-commentator/",
-        page: InputReviewCommentor,
         layout: DefaultLayout
     },
 ]
@@ -129,7 +119,7 @@ export const TEACHER_ROUTER = [
         layout: DefaultLayout
     },
     {
-        path:"/manager-student-mentor",
+        path:"/manager-student-mentor/:semesterId",
         page: ManageStudentMentor,
         layout: DefaultLayout
     },
@@ -144,13 +134,23 @@ export const TEACHER_ROUTER = [
         layout: DefaultLayout
     },
     {
-        path:"/teacher/council",
+        path:"/teacher/council/:idSemester",
         page: TeacherCouncil,
         layout: DefaultLayout
     },
     {
         path:"/teacher/group-review",
         page: TeacherGroupReview,
+        layout: DefaultLayout
+    },
+    {
+        path:"/input/review-mentor/:key",
+        page: InputReviewMentor,
+        layout: DefaultLayout
+    },
+    {
+        path:"/input/review-commentator/:key",
+        page: InputReviewCommentor,
         layout: DefaultLayout
     },
 ]

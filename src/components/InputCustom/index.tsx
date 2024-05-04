@@ -114,7 +114,7 @@ function InputCustom({
             
         </CssTextField>
         {
-            type === "password" ? <div className="absolute right-5 top-3 cursor-pointer text-blue-600" onClick={handleClickShowPassword}>
+            type === "password" ? <div className="absolute right-5 top-3 cursor-pointer text-gray-500" onClick={handleClickShowPassword}>
                 {
                     showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />
                 }

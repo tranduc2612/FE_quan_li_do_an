@@ -1,9 +1,9 @@
 import { Button, MenuItem, Modal, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useFormik } from "formik";
-import { Account, BookClock, ClipboardEdit, Download } from 'mdi-material-ui';
+import { Account, BookClock, ClipboardEdit, Download, MessageDraw } from 'mdi-material-ui';
 import { useEffect, useState } from "react";
-import { Form, useNavigate } from 'react-router-dom';
+import { Form, useNavigate, useParams } from 'react-router-dom';
 import BoxWrapper from '~/components/BoxWrap';
 import HeaderPageTitle from '~/components/HeaderPageTitle';
 import InputCustom from "~/components/InputCustom";
@@ -13,16 +13,18 @@ import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { excelListProjectCouncil, getListProjectCouncil, getTeaching } from '~/services/councilApi';
 import { getListSemester } from '~/services/semesterApi';
-import { IProjecType } from '~/types/IProjectType';
+import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { ISemester } from '~/types/ISemesterType';
 import { ITeaching } from '~/types/ITeachingType';
-import { formatDateTypeDateOnly, renderRoleInCouncil } from '~/ultis/common';
+import { formatDateTypeDateOnly, isCurrentTimeInRange, renderRoleInCouncil } from '~/ultis/common';
 import * as yup from 'yup';
 import { ScoreType, updateScore } from "~/services/projectApi";
 import { toast } from "react-toastify";
 import ExpandableCell from "~/components/TableEdit.tsx/ExpandableCell";
 import RenderStatusProject from "~/components/RenderStatusProject";
+import { getListScheduleSemester } from "~/services/scheduleSemesterApi";
+import { IScheduleSemester } from "~/types/IScheduleSemester";
 
 
 const validationSchema = yup.object({
@@ -38,7 +40,8 @@ const validationSchema = yup.object({
 
 function TeacherCouncil() {
     const [rows,setRows] = useState<any>([]);
-    const info = useAppSelector(inforUser);
+    const {idSemester} = useParams();
+    const currentUser = useAppSelector(inforUser);
     const [detailTeaching,setDetailTeaching] = useState<ITeaching>();
     const [selectedProject,setSelectedProject] = useState<any>();
     const navigate = useNavigate();
@@ -46,10 +49,10 @@ function TeacherCouncil() {
     const [semesterOption,setSemesterOption] = useState<ISemester[]>([])
     const [loadingData,setLoadingData] = useState(false);
     const [openModal,setOpenModal] = useState(false);
-
+    const [isUpdateScore,setIsUpdateScore] = useState(false);
     const formik = useFormik({
         initialValues: {
-            semester:"",
+            semester: idSemester,
             score: "",
             comment:"",
             role: ""
@@ -94,6 +97,7 @@ function TeacherCouncil() {
             width: 200,
             editable: false,
             renderCell:({row})=>{
+                console.log(row)
                 return <>   
                     <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-blue-500" onClick={(e)=>{
                             e.stopPropagation();
@@ -105,63 +109,76 @@ function TeacherCouncil() {
                             <Account />
                         </Tooltip>
                     </div>
-                    <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
-                            e.stopPropagation();
-                            setSelectedProject(row);
-                            console.log(detailTeaching?.positionInCouncil)
-                            if(detailTeaching?.positionInCouncil){
-                            //     // formik.errors.comment = "";
-                            //     // formik.errors.score = "";
-                                // formik.values.role = detailTeaching?.positionInCouncil
-                                if(detailTeaching?.positionInCouncil === "CT"){
-                                    formik.setValues({
-                                        ...formik.values,
-                                        score: row?.scoreCt?.toString()?.replace(".",","),
-                                        comment: row?.commentCt || "",
-                                        role: detailTeaching?.positionInCouncil
-                                    })
+                    {
+                        isUpdateScore &&
+                        <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-yellow-500" onClick={(e)=>{
+                                e.stopPropagation();
+                                setSelectedProject(row);
+                                console.log(detailTeaching?.positionInCouncil)
+                                if(detailTeaching?.positionInCouncil){
+                                //     // formik.errors.comment = "";
+                                //     // formik.errors.score = "";
+                                    // formik.values.role = detailTeaching?.positionInCouncil
+                                    if(detailTeaching?.positionInCouncil === "CT"){
+                                        formik.setValues({
+                                            ...formik.values,
+                                            score: row?.scoreCt?.toString()?.replace(".",","),
+                                            comment: row?.commentCt || "",
+                                            role: detailTeaching?.positionInCouncil
+                                        })
+                                    }
+                                    if(detailTeaching?.positionInCouncil === "TK"){
+                                        formik.setValues({
+                                            ...formik.values,
+                                            score: row?.scoreTk?.toString()?.replace(".",","),
+                                            comment: row?.commentTk || "",
+                                            role: detailTeaching?.positionInCouncil
+                                        })
+                                    }
+                                    if(detailTeaching?.positionInCouncil === "UV1"){
+                                        console.log(row?.scoreUv1)
+                                        formik.setValues({
+                                            ...formik.values,
+                                            score: row?.scoreUv1?.toString()?.replace(".",","),
+                                            comment: row?.commentUv1 || "",
+                                            role: detailTeaching?.positionInCouncil
+                                        })
+                                    }
+                                    if(detailTeaching?.positionInCouncil === "UV2"){
+                                        formik.setValues({
+                                            ...formik.values,
+                                            score: row?.scoreUv2?.toString()?.replace(".",","),
+                                            comment: row?.commentUv2 || "",
+                                            role: detailTeaching?.positionInCouncil
+                                        })
+                                    }
+                                    if(detailTeaching?.positionInCouncil === "UV3"){
+                                        formik.setValues({
+                                            ...formik.values,
+                                            score: row?.scoreUv3?.toString()?.replace(".",","),
+                                            comment: row?.commentUv3 || "",
+                                            role: detailTeaching?.positionInCouncil
+                                        })
+                                    }
+                                    setOpenModal(true);
                                 }
-                                if(detailTeaching?.positionInCouncil === "TK"){
-                                    formik.setValues({
-                                        ...formik.values,
-                                        score: row?.scoreTk?.toString()?.replace(".",","),
-                                        comment: row?.commentTk || "",
-                                        role: detailTeaching?.positionInCouncil
-                                    })
-                                }
-                                if(detailTeaching?.positionInCouncil === "UV1"){
-                                    console.log(row?.scoreUv1)
-                                    formik.setValues({
-                                        ...formik.values,
-                                        score: row?.scoreUv1?.toString()?.replace(".",","),
-                                        comment: row?.commentUv1 || "",
-                                        role: detailTeaching?.positionInCouncil
-                                    })
-                                }
-                                if(detailTeaching?.positionInCouncil === "UV2"){
-                                    formik.setValues({
-                                        ...formik.values,
-                                        score: row?.scoreUv2?.toString()?.replace(".",","),
-                                        comment: row?.commentUv2 || "",
-                                        role: detailTeaching?.positionInCouncil
-                                    })
-                                }
-                                if(detailTeaching?.positionInCouncil === "UV3"){
-                                    formik.setValues({
-                                        ...formik.values,
-                                        score: row?.scoreUv3?.toString()?.replace(".",","),
-                                        comment: row?.commentUv3 || "",
-                                        role: detailTeaching?.positionInCouncil
-                                    })
-                                }
-                                setOpenModal(true);
-                            }
-                    }}>
-                        <Tooltip title="Cập nhật điểm">
-                            <ClipboardEdit />
-                        </Tooltip>
-                    </div>
-                    
+                        }}>
+                            <Tooltip title="Cập nhật điểm">
+                                <ClipboardEdit />
+                            </Tooltip>
+                        </div>
+                    }
+                    {
+                        row?.userNameCommentator === currentUser?.userName &&
+                        <div className="cursor-pointer p-3 hover:bg-slate-300 rounded-full text-lime-600" onClick={(e)=>{
+                                e.stopPropagation();
+                                navigate(`/review-commentator/${row?.hashKeyCommentator || "false"}`);
+                        }}>
+                            <Tooltip title="Đánh giá">
+                                <MessageDraw />
+                            </Tooltip>
+                        </div>
+                    }
                 </>
             }
         },
@@ -254,12 +271,12 @@ function TeacherCouncil() {
         //     width: 200,
         //     editable: false
         // },
-        // {
-        //     field: 'scoreCommentator',
-        //     headerName: 'Điểm giáo viên phẩn biện',
-        //     width: 200,
-        //     editable: false
-        // },
+        {
+            field: 'userNameCommentator',
+            headerName: 'Giáo viên phản biện',
+            width: 200,
+            editable: false
+        },
         {
             field: 'scoreFinal',
             headerName: 'Điểm tổng kết',
@@ -285,10 +302,11 @@ function TeacherCouncil() {
         },
     ];
     useEffect(()=>{
-        // hanleFetchApi();
-        if(formik.values.semester.length > 0){
-            handleFetchApiTeaching();
+        if(formik.values.semester){
+            navigate(`/teacher/council/${formik.values.semester}`);
         }
+        handleFetchApiTeaching();
+        callCheckScheduleSemester();
 
     },[formik.values.semester])
 
@@ -301,10 +319,10 @@ function TeacherCouncil() {
             await getListProjectCouncil({
                 semesterId: formik.values.semester
             })
-            .then((res:IResponse<IProjecType[]>)=>{
+            .then((res:IResponse<IProject[]>)=>{
                 console.log(res.success)
                 if(res.success && res.returnObj.length > 0){
-                    const newMap = res.returnObj.filter(x=>x?.councilId == idCouncil).map((data:IProjecType,index:any)=>{
+                    const newMap = res.returnObj.filter(x=>x?.councilId == idCouncil).map((data:IProject,index:any)=>{
                         return {
                           id: index+1,
                           ...data,
@@ -328,7 +346,7 @@ function TeacherCouncil() {
     }
 
     const handleFetchApiTeaching = async () =>{
-        getTeaching(info?.userName, formik.values.semester)
+        getTeaching(currentUser?.userName, formik.values.semester)
         .then((res:IResponse<ITeaching>)=>{
             if(res.returnObj){
                 const detail = res.returnObj;
@@ -344,6 +362,30 @@ function TeacherCouncil() {
         })
     }
 
+    const callCheckScheduleSemester = () =>{
+        getListScheduleSemester(formik.values.semester || "")
+        .then((res: IResponse<IScheduleSemester[]>)=>{
+            if(res.success){
+                const scheduleList = res.returnObj;
+                const initialRowsData:any = [];
+                console.log(scheduleList);
+                if(scheduleList.length > 0){
+                    const schduleScore = scheduleList.find(item => item?.typeSchedule === "SCHEDULE_FINAL_SCORE");
+
+                    if(schduleScore){
+                        const check = isCurrentTimeInRange(new Date(schduleScore?.fromDate || ""),new Date(schduleScore?.toDate || ""))
+
+                        if(check === 0){
+                            setIsUpdateScore(true);
+                        }else{
+                            setIsUpdateScore(false);
+                        }
+                    }
+                }
+            }
+        })
+    }
+
     const handleFetchApiSemesterOption = () =>{
         getListSemester(
             {
@@ -353,7 +395,6 @@ function TeacherCouncil() {
         )
         .then((res:IResponse<ISemester[]>)=>{
             if(res.success && res.returnObj && res.returnObj.length > 0){
-                formik.values.semester = res.returnObj[0].semesterId ? res.returnObj[0].semesterId : "";
                 setSemesterOption(res.returnObj);
             }
         })
@@ -426,7 +467,7 @@ function TeacherCouncil() {
                                     }}
                                     initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 10 },
+                                        paginationModel: { page: 0, pageSize: 5 },
                                     },
                                     }}
                                     getRowHeight={() => 'auto'}

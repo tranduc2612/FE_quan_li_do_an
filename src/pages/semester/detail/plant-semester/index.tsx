@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, MenuItem, Select } from "@mui/material";
 import { DataGrid, GridActionsCellItem, GridColDef, GridEventListener, GridPreProcessEditCellProps, GridRenderCellParams, GridRowEditStopReasons, GridRowId, GridRowModel, GridRowModes, GridRowModesModel, GridRowsProp, GridToolbar, GridToolbarContainer, viVN } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
@@ -20,6 +20,7 @@ import CustomEditComponent from "~/components/TableEdit.tsx/TextLines";
 import ExpandableCell from "~/components/TableEdit.tsx/ExpandableCell";
 import { validateFromDateAndToDate } from "~/ultis/common";
 
+import { useGridApiContext } from "@mui/x-data-grid";
 
 const roles = ['Market', 'Finance', 'Development'];
 const randomRole = () => {
@@ -50,6 +51,15 @@ const randomRole = () => {
 //   }
 // ];
 
+const SCHEDULE_TYPE = [
+  { label: 'Lịch thông báo', value: 'SCHEDULE_NORMAL' },
+  { label: 'Lịch chốt đề cương', value: 'SCHEDULE_FOR_OUTLINE' },
+  { label: 'Lịch nhận xét điểm GVHD', value: 'SCHEDULE_FOR_MENTOR' },
+  { label: 'Lịch nhận xét điểm GVPB', value: 'SCHEDULE_FOR_COMMENTATOR' },
+  { label: 'Lịch nộp báo cáo tổng kết', value: 'SCHEDULE_FINAL_FILE' },
+  { label: 'Lịch chấm điểm tổng kết', value: 'SCHEDULE_FINAL_SCORE' }
+]
+
 export interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
   setRowModesModel: (
@@ -65,6 +75,7 @@ const [rows, setRows] = useState<GridRowsProp>([]);
 const [flagEdit,setFlagEdit] = useState(false);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const info = useAppSelector(inforUser);
+  const [scheduleOption,setScheduleOption] = useState(SCHEDULE_TYPE)
   console.log(info);
   let { id } = useParams();
 
@@ -77,21 +88,24 @@ const [flagEdit,setFlagEdit] = useState(false);
                 const initialRowsData:any = [];
                 console.log(scheduleList);
                 if(scheduleList.length > 0){
+                    let scheduleTypeLeft = [...SCHEDULE_TYPE];
                     scheduleList.map((item)=>{
-                        console.log(item.scheduleSemesterId)
+                        console.log(item.typeSchedule)
+                        
                         const value: any = {
                             id: item.scheduleSemesterId,
                             fromDate: item?.fromDate ? new Date(item?.fromDate) : new Date(),
                             toDate: item?.toDate ? new Date(item?.toDate) : new Date(),
-                            typeSchedule: "Market", 
+                            typeSchedule: item?.typeSchedule, 
                             createdByName: item?.createdByNavigation?.fullName,
                             implementer: item?.implementer,
                             content: item?.content,
                             note: item?.note
                         }
+                        scheduleTypeLeft = scheduleTypeLeft.filter(type=>type.value !== item.typeSchedule)
                         initialRowsData.push(value);
                     })
-
+                    setScheduleOption(scheduleTypeLeft)
                     setRows([...initialRowsData])
 
                 }
@@ -117,7 +131,7 @@ const [flagEdit,setFlagEdit] = useState(false);
       const req: IScheduleSemester = {
           fromDate: prevDate,
           toDate: currentDate,
-          typeSchedule: "Market", 
+          typeSchedule: "SCHEDULE_NORMAL", 
           semesterId: idSemester,
           createdBy: info?.userName,
           implementer: "",
@@ -128,6 +142,8 @@ const [flagEdit,setFlagEdit] = useState(false);
           .then((res:IResponse<string>) =>{
             if(res.success){
                 const idSchedule = res.returnObj;
+                
+
                 setRows((oldRows) => [...oldRows, { id: idSchedule , ...req,createdByName: info?.fullName, isNew: true }]);
                 setRowModesModel((oldModel) => ({
                     ...oldModel,
@@ -166,6 +182,15 @@ const [flagEdit,setFlagEdit] = useState(false);
     deleteScheduleSemester(id)
         .then((res:IResponse<any>)=>{
             if(res.success){
+                const dataFind = rows.find((row) => row.id === id);
+                // setScheduleOption(SCHEDULE_TYPE.find(item=>item.value != updatedRow?.typeSchedule))
+                const TypeSchedule = SCHEDULE_TYPE.find(item=>item.value == dataFind?.typeSchedule)
+                if(TypeSchedule){
+                  setScheduleOption([
+                    ...scheduleOption,
+                    TypeSchedule
+                  ])
+                }
                 setRows(rows.filter((row) => row.id !== id));
                 toast.success(res.msg);
             }else{
@@ -215,9 +240,11 @@ const [flagEdit,setFlagEdit] = useState(false);
         note: updatedRow?.note,
     }
 
+
     updateScheduleSemester(req)
         .then((res:IResponse<any>)=>{
             if(res.success){
+                setScheduleOption(scheduleOption.filter(item=>item.value != updatedRow?.typeSchedule))
                 toast.success(res.msg)
             }else{
                 toast.error(res.msg)
@@ -232,10 +259,56 @@ const [flagEdit,setFlagEdit] = useState(false);
   };
 
     const columns: GridColDef[] = [
+      {
+        field: 'actions',
+        type: 'actions',
+        headerName: 'Thao tác',
+        width: 100,
+        cellClassName: 'actions',
+        getActions: ({ id }) => {
+          const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+  
+          if (isInEditMode) {
+            return [
+              <GridActionsCellItem
+                icon={<SaveIcon />}
+                label="Save"
+                sx={{
+                  color: 'primary.main',
+                }}
+                onClick={handleSaveClick(id)}
+              />,
+              <GridActionsCellItem
+                icon={<CancelIcon />}
+                label="Cancel"
+                className="textPrimary"
+                onClick={handleCancelClick(id)}
+                color="inherit"
+              />,
+            ];
+          }
+  
+          return [
+            <GridActionsCellItem
+              icon={<EditIcon />}
+              label="Edit"
+              className="textPrimary"
+              onClick={handleEditClick(id)}
+              color="inherit"
+            />,
+            <GridActionsCellItem
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={handleDeleteClick(id)}
+              color="inherit"
+            />,
+          ];
+        },
+      },
         {
           field: 'content',
           headerName: 'Nội dung công việc',
-          width: 400,
+          width: 300,
           align: 'left',
           headerAlign: 'left',
           editable: true,
@@ -247,7 +320,7 @@ const [flagEdit,setFlagEdit] = useState(false);
           field: 'fromDate',
           headerName: 'Từ ngày',
           type: 'dateTime',
-          width: 250,
+          width: 150,
           editable: true,
         //   preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
         //     let check = false;
@@ -265,7 +338,7 @@ const [flagEdit,setFlagEdit] = useState(false);
             field: 'toDate',
             headerName: 'Đến ngày',
             type: 'dateTime',
-            width: 250,
+            width: 150,
             editable: true,
             // preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
             //     let check = false;
@@ -288,61 +361,42 @@ const [flagEdit,setFlagEdit] = useState(false);
           width: 220,
           editable: true,
           type: 'singleSelect',
-          valueOptions: [
-              { label: 'Lịch chốt đề cương', value: 'DC' },
-              { label: 'Lịch chốt điểm GVHD', value: 'GVHD' },
-              { label: 'Lịch chốt điểm GVPB', value: 'GVHPB' },
-              { label: 'Lịch chốt điểm Khoa', value: 'KHOA' }
-          ],
-      },
+          
+          valueOptions: ({ row })=>{
+            if(scheduleOption.length === SCHEDULE_TYPE.length){
+              return SCHEDULE_TYPE
+            }
+            const findSchedule = SCHEDULE_TYPE.find(x=>x.value === row?.typeSchedule);
+            if(findSchedule){
+              return [findSchedule,...scheduleOption]
+            }
+            return [...scheduleOption]
+          } ,
+          // renderEditCell: ({row,id,field}) => {
+          //   return <Select
+          //   labelId="demo-simple-select-label"
+          //   id="demo-simple-select"
+          //   value={row?.typeSchedule}
+          //   label="Age"
+          //   fullWidth
+          //   onChange={(event)=>
+          //     {
+          //     const newValue = event.target.value;
+          //     apiRef.current.setEditCellValue({ id, field, value: newValue });
+          //   }}
+          // >
+          //   {
+          //     scheduleOption?.map((item)=><MenuItem value={item.value}>{item.label}</MenuItem>)
+          //   }
+          //   {/* <MenuItem value={10}>Ten</MenuItem>
+          //   <MenuItem value={20}>Twenty</MenuItem>
+          //   <MenuItem value={30}>Thirty</MenuItem> */}
+          // </Select>
+          // }
+        },
         { field: 'note', headerName: 'Ghi chú', width: 180, editable: true },
         { field: 'createdByName', headerName: 'Người tạo', width: 180, editable: false },
-        {
-          field: 'actions',
-          type: 'actions',
-          headerName: 'Thao tác',
-          width: 100,
-          cellClassName: 'actions',
-          getActions: ({ id }) => {
-            const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-    
-            if (isInEditMode) {
-              return [
-                <GridActionsCellItem
-                  icon={<SaveIcon />}
-                  label="Save"
-                  sx={{
-                    color: 'primary.main',
-                  }}
-                  onClick={handleSaveClick(id)}
-                />,
-                <GridActionsCellItem
-                  icon={<CancelIcon />}
-                  label="Cancel"
-                  className="textPrimary"
-                  onClick={handleCancelClick(id)}
-                  color="inherit"
-                />,
-              ];
-            }
-    
-            return [
-              <GridActionsCellItem
-                icon={<EditIcon />}
-                label="Edit"
-                className="textPrimary"
-                onClick={handleEditClick(id)}
-                color="inherit"
-              />,
-              <GridActionsCellItem
-                icon={<DeleteIcon />}
-                label="Delete"
-                onClick={handleDeleteClick(id)}
-                color="inherit"
-              />,
-            ];
-          },
-        },
+        
       ];
 
     return ( <div className="px-8 overflow-scroll max-h-full">

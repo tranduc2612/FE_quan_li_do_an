@@ -16,15 +16,17 @@ import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { addCommentOutline, checkPermission, deleteCommentOutline, getListCommentOutline, updateCommentOutline } from "~/services/commentOutlineApi";
 import { getFileWordOutline, getProjectOutline } from "~/services/projectOutlineApi";
+import { getListScheduleSemester } from "~/services/scheduleSemesterApi";
 import { getFileAvatar } from "~/services/userApi";
 import { ICommentType } from "~/types/IComment";
 import { IProjectOutline } from "~/types/IProjectOutline";
 import { IResponse } from "~/types/IResponse";
-import { formatDateTypeDateOnly } from "~/ultis/common";
+import { IScheduleSemester } from "~/types/IScheduleSemester";
+import { formatDateTypeDateOnly, isCurrentTimeInRange } from "~/ultis/common";
 
 function OutlinePage() {
     const navigate = useNavigate();
-    const info = useAppSelector(inforUser)
+    const currentUser = useAppSelector(inforUser)
     const {id} = useParams();
     const [rows,setRows] = useState<any>([]);
     const [allowComment,setAllowComment] = useState(false)
@@ -35,8 +37,7 @@ function OutlinePage() {
     const [loading,setLoading] = useState(true);
     const [data,setData]= useState<IProjectOutline>();
     const apiRef = useGridApiRef();
-    
-
+    const [isUpdateOutline,setIsUpdateOutline] = useState(false);
     const columns: GridColDef[] = [
         {
             field: 'stt',
@@ -88,7 +89,7 @@ function OutlinePage() {
           </>
         },
     ];
-
+    
     useEffect(()=>{
     if(id){
         setLoading(true)
@@ -119,15 +120,19 @@ function OutlinePage() {
                         techProject: JSON.parse(res.returnObj.techProject)
                     }
                 }
-                setData(resData);
+                console.log(resData)
+                setData({
+                    ...resData,
+                    semesterId: resData?.userNameNavigation?.semesterId
+                });
                 if(res.returnObj.plantOutline){
                     const plant = JSON.parse(res.returnObj.plantOutline);
                     console.log(plant)
                     setRows(plant)
                     setTotal(plant.length)
                 }
-                if(info?.userName && res.returnObj?.userNameNavigation?.semesterId){
-                    checkPermission(id, info?.userName, res.returnObj?.userNameNavigation?.semesterId)
+                if(currentUser?.userName && res.returnObj?.userNameNavigation?.semesterId){
+                    checkPermission(id, currentUser?.userName, res.returnObj?.userNameNavigation?.semesterId)
                     .then((res:IResponse<any>)=>{
                         if(res.success){
                             setAllowComment(true);
@@ -159,6 +164,8 @@ function OutlinePage() {
             setLoading(false)
         })
 
+        callCheckScheduleSemester()
+
         fetchApiAvatar();
 
     }
@@ -184,10 +191,10 @@ function OutlinePage() {
     }
 
     const handleAddComment = () =>{
-        if(id && info?.userName && commentText.length > 0){
+        if(id && currentUser?.userName && commentText.length > 0){
             const req: ICommentType = {
                 contentComment: commentText,
-                createdBy: info?.userName,
+                createdBy: currentUser?.userName,
                 userName: id
             }
             addCommentOutline(req)
@@ -204,7 +211,7 @@ function OutlinePage() {
     }
 
     const fetchApiAvatar = ()=>{
-        getFileAvatar("TEACHER",info?.userName)
+        getFileAvatar("TEACHER",currentUser?.userName)
         .then((response:any)=>{
             const blob = response.data;
             const imgUrl = URL.createObjectURL(blob);
@@ -226,6 +233,30 @@ function OutlinePage() {
         }
     }
 
+    const callCheckScheduleSemester = () =>{
+        if(data?.semesterId){
+            getListScheduleSemester(data?.semesterId)
+            .then((res: IResponse<IScheduleSemester[]>)=>{
+                if(res.success){
+                    const scheduleList = res.returnObj;
+                    if(scheduleList.length > 0){
+                        const schduleScore = scheduleList.find(item => item?.typeSchedule === "SCHEDULE_FOR_OUTLINE");
+    
+                        if(schduleScore){
+                            const check = isCurrentTimeInRange(new Date(schduleScore?.fromDate || ""),new Date(schduleScore?.toDate || ""))
+    
+                            if(check === 0){
+                                setIsUpdateOutline(true);
+                            }else{
+                                setIsUpdateOutline(false);
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+
     return ( <>
     {
         loading ? 
@@ -242,20 +273,20 @@ function OutlinePage() {
                             </Button>
                             <div className="flex">
                                 {
-                                    data && info?.userName === id ? 
+                                    data && currentUser?.userName === id && isUpdateOutline ? 
                                     <div className="flex items-center p-2 rounded-full text-3xl mx-5 hover:bg-gray-200" onClick={()=>{navigate("/outline/input/"+id)}}>
                                         <Pencil className="text-primary-blue cursor-pointer" />
                                     </div>
                                     : <></>
                                 }
                                 {
-                                    (data?.userNameNavigation?.userNameMentor === info?.userName || id === info?.userName) && info?.statusProject === "DOING" &&
+                                    (data?.userNameNavigation?.userNameMentor === currentUser?.userName || id === currentUser?.userName) && currentUser?.statusProject === "DOING" &&
                                     <Button onClick={()=>{
-                                        getFileWordOutline(info?.userName)
+                                        getFileWordOutline(currentUser?.userName)
                                         .then((res:any)=>{
-                                            if(info?.userName){
+                                            if(currentUser?.userName){
                                                 const link = document.createElement('a');
-                                                const fileName = `DeCuong_${info?.userName}.docx`;
+                                                const fileName = `DeCuong_${currentUser?.userName}.docx`;
                                                 link.setAttribute('download', fileName);
                                                 link.href = URL.createObjectURL(new Blob([res]));
                                                 document.body.appendChild(link);
@@ -392,10 +423,10 @@ function OutlinePage() {
 
                             </> : <>
                             {
-                                info?.userName === id ? <>
+                                currentUser?.userName === id ? <>
                                     <div className="flex justify-center">
                                         {
-                                            info?.statusProject === "START" ?
+                                            currentUser?.statusProject === "START" ?
                                             <Button onClick={handleCreateProjectOutline} variant="contained" startIcon={<Add />}>
                                                     Tạo đề cương đồ án
                                             </Button>

@@ -2,8 +2,9 @@ import { Fetcher } from "swr";
 import request from "~/services/axios";
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
 import { IProjectOutline } from "~/types/IProjectOutline";
-import { IProjecType } from "~/types/IProjectType";
+import { IProject } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
+import { ITeacher } from "~/types/ITeacherType";
 import { ITeaching } from "~/types/ITeachingType";
 import { IBaseList } from "~/types/IbaseList";
 
@@ -47,8 +48,8 @@ export const getListProjectOutline = async (dataReq:ReqListProjectOutlineModel):
     return data;
 }
 
-export const getListProjectByGroupReview = async (dataReq:ReqListProjectOutlineModel): Promise<IResponse<IProjecType[]>> => {
-    const data: IResponse<IProjecType[]> = await request.post("/Project/get-list-project-by-group-review",{
+export const getListProjectByGroupReview = async (dataReq:ReqListProjectOutlineModel): Promise<IResponse<IProject[]>> => {
+    const data: IResponse<IProject[]> = await request.post("/Project/get-list-project-by-group-review",{
         ...dataReq
     });
     return data;
@@ -56,6 +57,13 @@ export const getListProjectByGroupReview = async (dataReq:ReqListProjectOutlineM
 
 export const getGroupReview = async (id: string): Promise<IResponse<IGroupReviewOutline>> => {
     const data: IResponse<IGroupReviewOutline> = await request.get("/GroupReviewOutline/get-group-review-outline-by-id?id="+id,{
+        
+    });
+    return data;
+}
+
+export const getTeachingByGroupReview = async (id: string): Promise<IResponse<ITeaching[]>> => {
+    const data: IResponse<ITeaching[]> = await request.get("/GroupReviewOutline/get-list-teaching-by-group-id?id="+id,{
         
     });
     return data;

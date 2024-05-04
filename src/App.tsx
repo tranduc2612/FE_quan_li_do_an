@@ -1,11 +1,10 @@
-import { ReactElement, useEffect, useState } from "react";
-import { ADMIN_ROUTER, FIRSTTIME_ROUTER, PRIVATE_ROUTER, PUBLIC_ROUTER, STUDENT_ROUTER, TEACHER_ROUTER } from "./routes"
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import { useAppSelector } from "./redux/hook";
-import { isLogin,inforUser } from "./redux/slices/authSlice";
-import NotFound from "./pages/notfound";
+import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
 import { DefaultLayout } from "./components/Layouts";
-import { ToastContainer, toast } from 'react-toastify';
+import NotFound from "./pages/notfound";
+import { useAppSelector } from "./redux/hook";
+import { inforUser, isLogin } from "./redux/slices/authSlice";
+import { ADMIN_ROUTER, FIRSTTIME_ROUTER, PRIVATE_ROUTER, PUBLIC_ROUTER, STUDENT_ROUTER, TEACHER_ROUTER } from "./routes";
 
 function App() {
   const isLoginUser = useAppSelector(isLogin);

@@ -1,5 +1,5 @@
-import { MenuItem, Tooltip } from "@mui/material";
-import { DataGrid, GridColDef, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
+import { Button, MenuItem, Modal, Tooltip } from "@mui/material";
+import { DataGrid, GridColDef, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, useGridApiRef, viVN } from "@mui/x-data-grid";
 import { useFormik } from "formik";
 import { Account, File } from 'mdi-material-ui';
 import { useEffect, useState } from "react";
@@ -13,11 +13,12 @@ import RenderStatusProject from "~/components/RenderStatusProject";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { getTeaching } from '~/services/councilApi';
-import { getListProjectByGroupReview } from "~/services/groupReviewOutlineApi";
+import { getGroupReview, getListProjectByGroupReview, getTeachingByGroupReview } from "~/services/groupReviewOutlineApi";
 import { getListSemester } from '~/services/semesterApi';
-import { IProjecType } from '~/types/IProjectType';
+import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { ISemester } from '~/types/ISemesterType';
+import { ITeacher } from "~/types/ITeacherType";
 import { ITeaching } from '~/types/ITeachingType';
 
 
@@ -39,10 +40,11 @@ function TeacherGroupReview() {
     const [selectedProject,setSelectedProject] = useState<any>();
     const navigate = useNavigate();
     const apiRef = useGridApiRef();
+    const apiRefTeacher = useGridApiRef();
     const [semesterOption,setSemesterOption] = useState<ISemester[]>([])
     const [loadingData,setLoadingData] = useState(false);
-    const [openModal,setOpenModal] = useState(false);
-
+    const [modalTeachingInGroup,setModalTeachingInGroup] = useState(false);
+    const [teachingInGroup,setTeachingInGroup] = useState<any>();
     const formik = useFormik({
         initialValues: {
             semester:"",
@@ -134,6 +136,44 @@ function TeacherGroupReview() {
             renderCell:({row})=><RenderStatusProject code={row?.statusProject} />
         },
     ];
+
+    const columnsTeacher: GridColDef[] =[
+        {
+            field: 'id',
+            headerName: 'STT',
+            width: 80,
+            maxWidth: 60,
+            flex: 1,
+            editable: true,
+        },
+        
+        {
+            field: 'userName',
+            headerName: 'Tên tài khoản',
+            width: 250,
+            editable: true,
+        },
+        {
+            field: 'fullName',
+            headerName: 'Họ và tên',
+            width: 200,
+            editable: true,
+        },
+        {
+            field: 'email',
+            headerName: 'Email',
+            width: 200,
+            editable: true,
+        },
+        {
+            field: 'phone',
+            headerName: 'Số điện thoại',
+            width: 160,
+            editable: true,
+        },
+    ]
+
+
     useEffect(()=>{
         // hanleFetchApi();
         if(formik.values.semester.length > 0){
@@ -152,9 +192,9 @@ function TeacherGroupReview() {
                 semesterId: formik.values.semester,
                 groupReviewOutlineId: idGroup
             })
-            .then((res:IResponse<IProjecType[]>)=>{
+            .then((res:IResponse<IProject[]>)=>{
                 if(res.success && res.returnObj.length > 0){
-                    const newMap = res.returnObj.map((data:IProjecType,index:any)=>{
+                    const newMap = res.returnObj.map((data:IProject,index:any)=>{
                         return {
                           id: index+1,
                           ...data,
@@ -186,7 +226,25 @@ function TeacherGroupReview() {
                 setDetailTeaching(detail);
                 console.log(res)
                 if(detail.groupReviewOutlineId){
-                    hanleFetchApiProjects(detail.groupReviewOutlineId)
+                    hanleFetchApiProjects(detail.groupReviewOutlineId);
+                    getTeachingByGroupReview(detail.groupReviewOutlineId)
+                    .then(res=>{
+                        if(res.returnObj){
+                            const mapper = res?.returnObj.map((item,index)=>{
+                                return {
+                                    id: index+1,
+                                    ...item,
+                                    ...item?.userNameTeacherNavigation
+                                }
+                            })
+                            setTeachingInGroup(mapper)
+                        }else{
+                            setTeachingInGroup([])
+                        }
+                    })
+                    .catch(res=>{
+
+                    })
                 }else{
                     setRows([])
                 }
@@ -271,7 +329,7 @@ function TeacherGroupReview() {
                                     }}
                                     initialState={{
                                     pagination: {
-                                        paginationModel: { page: 0, pageSize: 10 },
+                                        paginationModel: { page: 0, pageSize: 5 },
                                     },
                                     }}
                                     getRowHeight={() => 'auto'}
@@ -280,6 +338,11 @@ function TeacherGroupReview() {
                                     slots={{ toolbar: ()=> <> <GridToolbarContainer>
                                                 <GridToolbarColumnsButton />
                                                 <GridToolbarFilterButton  />
+                                                <Button variant='text' startIcon={<Account />} onClick={()=>{
+                                                    setModalTeachingInGroup(true)
+                                                }}>
+                                                    Danh sách giảng viên trong nhóm
+                                                </Button>
                                         </GridToolbarContainer></> }}
                                     slotProps={{
                                         toolbar: {
@@ -295,6 +358,63 @@ function TeacherGroupReview() {
                 }
                 </div>
             </BoxWrapper>
+
+            <Modal
+                        open={modalTeachingInGroup}
+                        onClose={()=>setModalTeachingInGroup(false)}
+                        aria-labelledby="modal-modal-title-mentor-assign"
+                        aria-describedby="modal-modal-description-mentor-assign"
+                    >
+                        <div className="p-5 rounded-xl bg-white w-3/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
+                            Danh sách giảng viên trong nhóm xét duyệt
+                        </h2>
+                            <div className="mt-5">
+                                {
+                                    loadingData ? <LoadingData /> : 
+                                    <DataGrid
+                                    apiRef={apiRefTeacher}
+                                    rows={teachingInGroup}
+                                    loading={loadingData}
+                                    columns={columnsTeacher}
+                                    localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
+                                    initialState={{
+                                        pagination: {
+                                            paginationModel: {
+                                                page: 0, 
+                                                pageSize: 5 
+                                            },
+                                        },
+                                    }}
+                                    slots={{ toolbar: ()=> <> <GridToolbarContainer>
+                                        <GridToolbarColumnsButton />
+                                        <GridToolbarFilterButton  />
+                                    </GridToolbarContainer></> }}
+                                    slotProps={{
+                                        toolbar: {
+                                            printOptions: { disableToolbarButton: true },
+                                            csvOptions: { disableToolbarButton: true },
+                                        }}
+                                    }
+                                    pageSizeOptions={[5]}
+                                />
+                                }
+                                
+                            </div>
+
+                            <div className="mt-5 flex justify-end" >
+                                <div className="mx-3">
+                                    <Button variant="outlined" onClick={()=>{
+                                        setModalTeachingInGroup(false)
+                                    }}
+                                    >Đóng</Button>
+                                </div>
+
+                                
+                            </div>
+                            
+                        </div>
+                    </Modal>
         </>
     );
 }

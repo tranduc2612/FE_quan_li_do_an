@@ -11,14 +11,40 @@ export interface changePasswordModel {
     role?: string
 }
 
+export interface checkForgotPassword {
+    userName?: string,
+    role?: string
+}
+
+export interface responseCheck {
+    typeError:string,
+    messageError: string,
+    data?: IUser
+}
+
+
 export const GetProfileUser = async (username:string): Promise<IResponse<IUser>> => {
     const data: IResponse<IUser> = await request.get("/Auth/get-profile?username="+username,{
     });
     return data;
 }
 
+export const CheckInfoUser = async (req?:checkForgotPassword): Promise<IResponse<responseCheck>> => {
+    const data: IResponse<responseCheck> = await request.post("/Auth/check-user",{
+        ...req
+    });
+    return data;
+}
+
 export const changePassword = async (dataReq:changePasswordModel): Promise<IResponse<any>> => {
     const data: IResponse<any> = await request.post("/Auth/change-password",{
+        ...dataReq
+    });
+    return data;
+}
+
+export const forgotPassword = async (dataReq:changePasswordModel): Promise<IResponse<any>> => {
+    const data: IResponse<any> = await request.post("/Auth/forgot-password",{
         ...dataReq
     });
     return data;

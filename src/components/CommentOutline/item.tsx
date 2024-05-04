@@ -1,7 +1,6 @@
 import { Avatar, TextField } from "@mui/material";
 import { Check, Delete, Pencil } from "mdi-material-ui";
 import { useEffect, useState } from "react";
-import images from "~/assets";
 import { useAppSelector } from "~/redux/hook";
 import { inforUser } from "~/redux/slices/authSlice";
 import { getFileAvatar } from "~/services/userApi";

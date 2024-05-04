@@ -14,4 +14,5 @@ export interface IScheduleSemester{
         note?:string,
         createdByNavigation?:ITeacher,
         semester?:ISemester,
+        statusSend?:string
 }

@@ -22,7 +22,7 @@ function SemesterPage() {
     const [rows,setRows] = useState<any>([]);
     const navigate = useNavigate();
     const [paginationModel, setPaginationModel] = useState({
-        pageSize: 10,
+        pageSize: 5,
         page: 0,
         pageMax: -1
     });
@@ -256,7 +256,7 @@ function SemesterPage() {
                                                     onClick={()=>{
                                                         setPaginationModel({
                                                             page: 0,
-                                                            pageSize: 10,
+                                                            pageSize: 5,
                                                             pageMax: -1
                                                         })
                                                     }}

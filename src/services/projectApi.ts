@@ -1,7 +1,9 @@
+import axios from "axios";
 import { Fetcher } from "swr";
 import request from "~/services/axios";
-import { IProjecType } from "~/types/IProjectType";
+import { IProject } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
+import { BASE_URL } from "~/ultis/contants";
 
 export interface ScoreType {
     userName?: string,
@@ -17,8 +19,22 @@ export interface IReqKeyHash {
 
 }
 
-export const getListProjectByUsernameMentor = async (userNameTeacher?:string,semesterId?:string): Promise<IResponse<IProjecType[]>> => {
-    const data: IResponse<IProjecType[]> = await request.get(`/Project/get-list-project-by-mentor?username_teacher=${userNameTeacher}&semesterId=${semesterId}`);
+export const getListProjectByUsername = async (userName?:string): Promise<IResponse<IProject>> => {
+    const data: IResponse<IProject> = await request.get(`/Project/get-project-by-username?username=${userName}`);
+    return data;
+}
+
+
+
+export const getListProjectByUsernameMentor = async (userNameTeacher?:string,semesterId?:string): Promise<IResponse<IProject[]>> => {
+    const data: IResponse<IProject[]> = await request.get(`/Project/get-list-project-by-mentor?username_teacher=${userNameTeacher}&semesterId=${semesterId}`);
+    return data;
+}
+
+export const handleUploadFileFinal = async (dataReq:FormData): Promise<IResponse<IProject>> => {
+    const data: IResponse<IProject> = await axios.post(`${BASE_URL}Project/handle-upload-file-final-project`,
+    dataReq,
+    { headers: { "Content-Type": "multipart/form-data" } });
     return data;
 }
 
@@ -51,8 +67,8 @@ export const updateScore = async (req:ScoreType): Promise<IResponse<any>> => {
     return data;
 }
 
-export const GetProjectByHashKey = async (req:IReqKeyHash): Promise<IResponse<IProjecType>> => {
-    const data: IResponse<IProjecType> = await request.post("/Project/get-info-review-by-hash-key",{
+export const GetProjectByHashKey = async (req:IReqKeyHash): Promise<IResponse<IProject>> => {
+    const data: IResponse<IProject> = await request.post("/Project/get-info-review-by-hash-key",{
         ...req
     });
     return data;
@@ -63,6 +79,15 @@ export const downloadFileWord = async (req:IReqKeyHash): Promise<any> => {
     {
         ...req
     },
+    {
+        responseType: 'blob'
+    }
+    )
+    return data;
+}
+
+export const dowloadFileProjectFinal = async (userName:string): Promise<Blob> => {
+    const data: Blob = await request.get(`/Project/dowload-file-project-final?Username=${userName}`,
     {
         responseType: 'blob'
     }

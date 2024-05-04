@@ -4,7 +4,7 @@ import { ITeacher } from "./ITeacherType";
 import { IProjectOutline } from "./IProjectOutline";
 
 
-export interface IProjecType{
+export interface IProject{
     scoreFinal?: string,
     scoreUv1?: string,
     scoreMentor?: string,
@@ -21,6 +21,11 @@ export interface IProjecType{
     scoreTk?: string,
     commentTk?: string,
     semesterId?:string,
+
+    nameFileFinal?: string,
+    sizeFileFinal?: string,
+    typeFileFinal?:string,
+
     councilId?:string,
     statusProject?:string,
     commentGroupReviewOutline?: string,
@@ -32,5 +37,7 @@ export interface IProjecType{
     semester?: ISemester,
     userNameNavigation?:IStudent,
     projectOutline?:IProjectOutline,
+    hashKeyMentor?:string,
+    hashKeyCommentator?:string,
     council?:ICouncil
  }

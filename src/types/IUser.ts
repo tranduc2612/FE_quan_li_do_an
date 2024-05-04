@@ -1,6 +1,6 @@
 import { ICouncil } from "./ICouncil";
 import { IMajorType } from "./IMajorType";
-import { IProjecType } from "./IProjectType";
+import { IProject } from "./IProjectType";
 
 export interface IUser {
     id?: string,
@@ -28,7 +28,7 @@ export interface IUser {
     status?:string,
     userNameMentorRegister?:string,
     isFirstTime?:number,
-    project?:IProjecType,
+    project?:IProject,
     major?: IMajorType,
     council?: ICouncil,
     statusProject?: string,
