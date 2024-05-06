@@ -266,3 +266,12 @@ export function dateShowNotification(fromDate:any, toDate:any){
 export const validateFileType = (fileType:string) => {
     return fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/gif';
 };
+
+export const roundedNumber = (number:any)=>{
+    const convertNumber = Number(number);
+    if(!convertNumber){
+        return 0
+    }
+
+    return convertNumber.toFixed(2);
+}

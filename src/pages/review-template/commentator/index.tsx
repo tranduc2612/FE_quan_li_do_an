@@ -15,6 +15,7 @@ import { GetProjectByHashKey, IReqKeyHash, downloadFileWord } from '~/services/p
 import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { IStudent } from '~/types/IStudentType';
+import { roundedNumber } from '~/ultis/common';
 
 function DetailReviewCommentor() {
     const info = useAppSelector(inforUser)
@@ -152,7 +153,7 @@ function DetailReviewCommentor() {
 
                                 <div className={"grid grid-cols-9 mt-2"}>
                                     <div className={"col-span-9 m-2"}>
-                                        <b>Điểm:&#160;</b> <span className={"text-primary-blue"}>{project?.scoreCommentator}</span>
+                                        <b>Điểm:&#160;</b> <span className={"text-primary-blue"}>{roundedNumber(project?.scoreCommentator)}</span>
                                     </div>
 
                                     <div className={"col-span-9 m-2"}>

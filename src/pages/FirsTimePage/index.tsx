@@ -10,7 +10,7 @@ import Loading from "~/components/Loading";
 import { useAppDispatch, useAppSelector } from "~/redux/hook";
 import { changeInfo, errorLogging, inforUser, isError, isLogin, logging, login } from "~/redux/slices/authSlice";
 import Slider from "react-slick";
-import { formatDateTypeDateOnly } from "~/ultis/common";
+import { formatDateTypeDateOnly, roundedNumber } from "~/ultis/common";
 import InputSelectCustom from "~/components/InputSelectCustom";
 import { IMajorType } from "~/types/IMajorType";
 import { getListMajor } from "~/services/majorApi";
@@ -43,6 +43,12 @@ const validationSchema = yup.object({
     address: yup
         .string()
         .required('Địa chỉ không được để trống'),
+    major: yup
+        .string()
+        .required('Chuyên ngành không được để trống'),
+    registerMentor: yup
+        .string()
+        .required('Nguyện vọng giảng viên không được để trống'),
   });
 
 function FirstTimePage() {
@@ -143,9 +149,9 @@ function FirstTimePage() {
             email:currentUser?.email,
             address:currentUser?.address,
             gender: 0,
-            major:currentUser?.major ? currentUser?.major?.majorId : "",
-            gpa: currentUser?.gpa,
-            registerMentor: currentUser?.userNameMentorRegister ? currentUser?.userNameMentorRegister : "",
+            major:currentUser?.major ? currentUser?.major?.majorId : "CNPM",
+            gpa: roundedNumber(currentUser?.gpa),
+            registerMentor: currentUser?.userNameMentorRegister ? currentUser?.userNameMentorRegister : "hoangvanthong",
             statusProject: currentUser?.project?.statusProject
         },
         validationSchema: validationSchema,
@@ -226,12 +232,19 @@ function FirstTimePage() {
 
     return (<div className={`w-screen h-screen relative flex flex-col justify-center items-center`}>
         <div className={`shadow-default rounded-md relative bg-white z-50 p-3 px-5 w-2/5 h-auto overflow-y-scroll overflow-x-hidden`}>
-                <div className="flex justify-between">
+
+                <div className="title mt-5 mb-5 text-center text-2xl">
+                    {/* <h2>Welcome to UTC! 👋🏻</h2> */}
+                    <h1 className="font-bold text-black">ĐĂNG KÝ THÔNG TIN ĐỒ ÁN</h1>
+                </div>
+
+                <div className="flex justify-between mb-5">
                     <div>
                         {
                             paging != 0 &&
-                            <span className="hover:bg-slate-200 rounded-full cursor-pointer p-2"  onClick={()=>{previous()}}>
-                                <ArrowLeft />
+                            <span className=""  onClick={()=>{previous()}}>
+                                {/* <ArrowLeft /> */}
+                                <Button variant="contained">Quay lại</Button>
                             </span>
                         }
                     </div>
@@ -239,16 +252,11 @@ function FirstTimePage() {
                     <div>
                         {
                             paging != 2 &&
-                            <span className="hover:bg-slate-200 rounded-full cursor-pointer p-2" onClick={()=>{next()}}>
-                                <ArrowRight />
+                            <span className="" onClick={()=>{next()}}>
+                                <Button variant="contained">Tiếp theo</Button>
                             </span>
                         }
                     </div>
-                </div>
-
-                <div className="title mt-5 mb-5 text-center text-2xl">
-                    {/* <h2>Welcome to UTC! 👋🏻</h2> */}
-                    <h1 className="font-bold">ĐĂNG KÝ THÔNG TIN ĐỒ ÁN</h1>
                 </div>
 
                 

@@ -17,7 +17,7 @@ import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { ISemester } from '~/types/ISemesterType';
 import { ITeaching } from '~/types/ITeachingType';
-import { formatDateTypeDateOnly, isCurrentTimeInRange, renderRoleInCouncil } from '~/ultis/common';
+import { formatDateTypeDateOnly, isCurrentTimeInRange, renderRoleInCouncil, roundedNumber } from '~/ultis/common';
 import * as yup from 'yup';
 import { ScoreType, updateScore } from "~/services/projectApi";
 import { toast } from "react-toastify";
@@ -206,7 +206,8 @@ function TeacherCouncil() {
             headerName: 'Chủ tịch',
             width: 100,
             editable: false,
-            align: 'center'
+            align: 'center',
+            renderCell: ({row}) => roundedNumber(row?.scoreCt),
         },
         {
             field: 'commentCt',
@@ -220,50 +221,62 @@ function TeacherCouncil() {
             headerName: 'Thư ký',
             width: 100,
             editable: false,
-            align: 'center'
+            align: 'center',
+            renderCell: ({row}) => roundedNumber(row?.scoreTk),
         },
         {
             field: 'commentTk',
             headerName: 'Đánh giá',
             width: 300,
-            editable: false
+            editable: false,
+            renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
         },
         {
             field: 'scoreUv1',
             headerName: 'Ủy viên 1',
             width: 100,
-            editable: false
+            editable: false,
+            renderCell: ({row}) => roundedNumber(row?.scoreUv1),
+
         },
         {
             field: 'commentUv1',
             headerName: 'Ủy viên 1',
             width: 300,
-            editable: false
+            editable: false,
+            renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
+
         },
         {
             field: 'scoreUv2',
             headerName: 'Ủy viên 2',
             width: 100,
-            editable: false
-
+            editable: false,
+            renderCell: ({row}) => roundedNumber(row?.scoreUv2),
         },
         {
             field: 'commentUv2',
             headerName: 'Ủy viên 2',
             width: 300,
-            editable: false
+            editable: false,
+            renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
+
         },
         {
             field: 'scoreUv3',
             headerName: 'Ủy viên 3',
             width: 100,
-            editable: false
+            editable: false,
+            renderCell: ({row}) => roundedNumber(row?.scoreUv3),
+
         },
         {
             field: 'commentUv3',
             headerName: 'Ủy viên 3',
             width: 300,
-            editable: false
+            editable: false,
+            renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />,
+
         },
         // {
         //     field: 'scoreMentor',
@@ -281,7 +294,9 @@ function TeacherCouncil() {
             field: 'scoreFinal',
             headerName: 'Điểm tổng kết',
             width: 200,
-            editable: false
+            editable: false,
+            renderCell: ({row}) => roundedNumber(row?.scoreFinal),
+            
         },
         
         // {

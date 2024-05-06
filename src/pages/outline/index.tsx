@@ -1,7 +1,7 @@
 import Add from "@mui/icons-material/Add";
 import { Avatar, Button, TextField } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef, viVN } from "@mui/x-data-grid";
-import { ChevronLeft, Pencil, PrinterCheck, Send } from "mdi-material-ui";
+import { Check, CheckAll, ChevronLeft, Pencil, PrinterCheck, Send } from "mdi-material-ui";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -17,11 +17,13 @@ import { inforUser } from "~/redux/slices/authSlice";
 import { addCommentOutline, checkPermission, deleteCommentOutline, getListCommentOutline, updateCommentOutline } from "~/services/commentOutlineApi";
 import { getFileWordOutline, getProjectOutline } from "~/services/projectOutlineApi";
 import { getListScheduleSemester } from "~/services/scheduleSemesterApi";
+import { updateStudent } from "~/services/studentApi";
 import { getFileAvatar } from "~/services/userApi";
 import { ICommentType } from "~/types/IComment";
 import { IProjectOutline } from "~/types/IProjectOutline";
 import { IResponse } from "~/types/IResponse";
 import { IScheduleSemester } from "~/types/IScheduleSemester";
+import { IStudent } from "~/types/IStudentType";
 import { formatDateTypeDateOnly, isCurrentTimeInRange } from "~/ultis/common";
 
 function OutlinePage() {
@@ -93,63 +95,7 @@ function OutlinePage() {
     useEffect(()=>{
     if(id){
         setLoading(true)
-        getProjectOutline(id)
-        .then((res:IResponse<IProjectOutline>)=>{
-            
-            if(res.success && res.returnObj){
-                let resData = res.returnObj;
-                if(res.returnObj.contentProject){
-                    resData = {
-                        ...resData,
-                        contentProject: JSON.parse(res.returnObj.contentProject)
-                    }
-                }
-
-                if(res.returnObj.expectResult){
-
-                    resData = {
-                        ...resData,
-                        expectResult: JSON.parse(res.returnObj.expectResult)
-                    }
-
-                }
-
-                if(res.returnObj.techProject){
-                    resData = {
-                        ...resData,
-                        techProject: JSON.parse(res.returnObj.techProject)
-                    }
-                }
-                console.log(resData)
-                setData({
-                    ...resData,
-                    semesterId: resData?.userNameNavigation?.semesterId
-                });
-                if(res.returnObj.plantOutline){
-                    const plant = JSON.parse(res.returnObj.plantOutline);
-                    console.log(plant)
-                    setRows(plant)
-                    setTotal(plant.length)
-                }
-                if(currentUser?.userName && res.returnObj?.userNameNavigation?.semesterId){
-                    checkPermission(id, currentUser?.userName, res.returnObj?.userNameNavigation?.semesterId)
-                    .then((res:IResponse<any>)=>{
-                        if(res.success){
-                            setAllowComment(true);
-                        }
-                    })
-                    .catch((err)=>{
-                        console.log(err)
-                    })
-                }
-            }
-        })
-        .catch(()=>{
-            setLoading(true)
-        })
-        .finally(()=>{
-            setLoading(false)
-        })
+        handleCallProjectOutlineId()
 
         getListCommentOutline(id)
         .then((res:IResponse<ICommentType[]>)=>{
@@ -171,6 +117,68 @@ function OutlinePage() {
     }
 
     },[])
+
+    const handleCallProjectOutlineId = ()=>{
+        if(id){
+            getProjectOutline(id)
+            .then((res:IResponse<IProjectOutline>)=>{
+                
+                if(res.success && res.returnObj){
+                    let resData = res.returnObj;
+                    if(res.returnObj.contentProject){
+                        resData = {
+                            ...resData,
+                            contentProject: JSON.parse(res.returnObj.contentProject)
+                        }
+                    }
+    
+                    if(res.returnObj.expectResult){
+    
+                        resData = {
+                            ...resData,
+                            expectResult: JSON.parse(res.returnObj.expectResult)
+                        }
+    
+                    }
+    
+                    if(res.returnObj.techProject){
+                        resData = {
+                            ...resData,
+                            techProject: JSON.parse(res.returnObj.techProject)
+                        }
+                    }
+                    console.log(resData)
+                    setData({
+                        ...resData,
+                        semesterId: resData?.userNameNavigation?.semesterId
+                    });
+                    if(res.returnObj.plantOutline){
+                        const plant = JSON.parse(res.returnObj.plantOutline);
+                        console.log(plant)
+                        setRows(plant)
+                        setTotal(plant.length)
+                    }
+                    if(currentUser?.userName && res.returnObj?.userNameNavigation?.semesterId){
+                        checkPermission(id, currentUser?.userName, res.returnObj?.userNameNavigation?.semesterId)
+                        .then((res:IResponse<any>)=>{
+                            if(res.success){
+                                setAllowComment(true);
+                            }
+                        })
+                        .catch((err)=>{
+                            console.log(err)
+                        })
+                    }
+                }
+            })
+            .catch(()=>{
+                setLoading(true)
+            })
+            .finally(()=>{
+                setLoading(false)
+            })
+        }
+    }
 
     const handleCreateProjectOutline = ()=>{
         navigate("/outline/input")
@@ -257,6 +265,22 @@ function OutlinePage() {
         }
     }
 
+    const handleAcceptProtect = async ()=>{
+        const dataSubmit: IStudent = {
+            userName: data?.userName,
+            statusProject: "ACCEPT",
+        }
+        const update = await updateStudent({
+            ...dataSubmit
+        });
+        if(update.success){
+            handleCallProjectOutlineId()
+            toast.success(update.msg)
+        }else{
+            console.log(update)
+        }
+    }
+
     return ( <>
     {
         loading ? 
@@ -277,6 +301,13 @@ function OutlinePage() {
                                     <div className="flex items-center p-2 rounded-full text-3xl mx-5 hover:bg-gray-200" onClick={()=>{navigate("/outline/input/"+id)}}>
                                         <Pencil className="text-primary-blue cursor-pointer" />
                                     </div>
+                                    : <></>
+                                }
+                                {
+                                    data?.userNameNavigation?.statusProject === "DOING" && data?.userNameNavigation?.userNameMentor === currentUser?.userName ? 
+                                        <Button variant="contained" startIcon={<Check />} onClick={handleAcceptProtect}>
+                                                Chấp nhận
+                                        </Button>
                                     : <></>
                                 }
                                 {

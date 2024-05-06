@@ -31,7 +31,7 @@ import { ISemester } from "~/types/ISemesterType";
 import { IStudent } from "~/types/IStudentType";
 import { ITeacher } from "~/types/ITeacherType";
 import { IBaseList } from "~/types/IbaseList";
-import { renderStatusAccount } from "~/ultis/common";
+import { renderStatusAccount, roundedNumber } from "~/ultis/common";
 import { IPageProps } from "../index";
 import RegisterStudent from "./input";
 const VisuallyHiddenInput = styled('input')({
@@ -206,6 +206,9 @@ function StudentManager({setCurrentPage}:IPageProps) {
             headerName: 'GPA',
             width: 100,
             editable: true,
+            renderCell:({row})=>{
+                return <>{roundedNumber(row?.gpa)}</>
+            }
         },
         // {
         //     field: 'semester',

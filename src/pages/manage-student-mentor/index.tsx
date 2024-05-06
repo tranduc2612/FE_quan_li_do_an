@@ -18,7 +18,7 @@ import { getListSemester } from '~/services/semesterApi';
 import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { ISemester } from '~/types/ISemesterType';
-import { formatDateTypeDateOnly } from '~/ultis/common';
+import { formatDateTypeDateOnly, roundedNumber } from '~/ultis/common';
 
 
 const validationSchema = yup.object({
@@ -137,7 +137,10 @@ function ManageStudentMentor() {
             headerName: 'Điểm giáo viên hướng dẫn',
             width: 200,
             editable: false,
-            align:"center"
+            align:"center",
+            renderCell: ({row})=>{
+                return <>{roundedNumber(row?.scoreMentor)}</>
+            }
         },
         // {
         //     field: 'scoreCommentator',

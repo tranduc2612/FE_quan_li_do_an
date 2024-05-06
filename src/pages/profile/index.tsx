@@ -17,7 +17,7 @@ import { ICouncil } from "~/types/ICouncil";
 import { IProject } from "~/types/IProjectType";
 import { IResponse } from "~/types/IResponse";
 import { IUser } from "~/types/IUser";
-import { dateShowNotification, formatDateTypeDateOnly, isCurrentTimeInRange, renderGender, renderRole, renderStatusAccount } from "~/ultis/common";
+import { dateShowNotification, formatDateTypeDateOnly, isCurrentTimeInRange, renderGender, renderRole, renderStatusAccount, roundedNumber } from "~/ultis/common";
 import style from "./profile.module.scss";
 import LoadingData from "~/components/LoadingData";
 import ScheduleItem from "~/components/BoxItemPlant";
@@ -313,7 +313,7 @@ function Profile() {
                             <div className={"grid grid-cols-9 mt-2"}>
                                 <div className={"col-span-3 m-2"}>
                                     <b>Điểm giáo viên hướng dẫn: </b> 
-                                    {project?.scoreMentor}
+                                    {roundedNumber(project?.scoreMentor)}
                                 </div>
 
                                 <div className={"col-span-3 m-2"}>
@@ -323,7 +323,7 @@ function Profile() {
 
                                 <div className={"col-span-3 m-2"}>
                                     <b>Điểm tổng kết: </b> 
-                                    {project?.scoreFinal}
+                                    {roundedNumber(project?.scoreFinal)}
                                 </div>
 
                                 
@@ -458,7 +458,7 @@ function Profile() {
                             </div>
                             {/* Chủ tịch */}
                             <div className={"m-2 col-span-2"}>
-                                <b>Điểm: </b> {project?.scoreCt}
+                                <b>Điểm: </b> {roundedNumber(project?.scoreCt)}
                             </div>
                             <div className={"col-span-8"}>
                                 <b>Nhận xét: </b>
@@ -472,7 +472,7 @@ function Profile() {
                             </div>
                             {/* Thư ký */}
                             <div className={"m-2 col-span-2"}>
-                                <b>Điểm: </b> {project?.scoreTk}
+                                <b>Điểm: </b> {roundedNumber(project?.scoreTk)}
                             </div>
                             <div className={"col-span-8"}>
                                 <b>Nhận xét: </b>
@@ -486,7 +486,7 @@ function Profile() {
                             </div>
                             {/* Ủy viên 1 */}
                             <div className={"m-2 col-span-2"}>
-                                <b>Điểm: </b> {project?.scoreUv1}
+                                <b>Điểm: </b> {roundedNumber(project?.scoreUv1)}
                             </div>
                             <div className={"col-span-8"}>
                                 <b>Nhận xét: </b>
@@ -500,7 +500,7 @@ function Profile() {
                             </div>
                             {/* Ủy viên 2 */}
                             <div className={"m-2 col-span-2"}>
-                                <b>Điểm: </b> {project?.scoreUv2}
+                                <b>Điểm: </b> {roundedNumber(project?.scoreUv2)}
                             </div>
                             <div className={"col-span-8"}>
                                 <b>Nhận xét: </b>
@@ -514,7 +514,7 @@ function Profile() {
                             </div>
                             {/* Ủy viên 3 */}
                             <div className={"m-2 col-span-2"}>
-                                <b>Điểm: </b> {project?.scoreUv3}
+                                <b>Điểm: </b> {roundedNumber(project?.scoreUv3)}
                             </div>
                             <div className={"col-span-8"}>
                                 <b>Nhận xét: </b>

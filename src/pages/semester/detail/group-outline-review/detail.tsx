@@ -17,6 +17,7 @@ import { AssignGroupReviewProjectOutline, assginGroupReviewToProjectOutline, get
 import { IGroupReviewOutline } from "~/types/IGroupReviewOutline";
 import { IProject } from "~/types/IProjectType";
 import { ITeaching } from "~/types/ITeachingType";
+import HeaderPageTitle from '~/components/HeaderPageTitle';
 
 
 function GroupReviewOutlineDetail() {
@@ -24,7 +25,7 @@ function GroupReviewOutlineDetail() {
     const [totalLstProjectInGroup, setTotalLstProjectInGroup] = useState(0);
     const [lstProjectNotInGroup,setLstProjectNotInGroup] = useState<any>([]);
     const [totalLstProjectNotInGroup, setTotalLstProjectNotInGroup] = useState(0);
-
+    
     const {idGroup,idSemester} = useParams();
     const info = useAppSelector(inforUser);
     const navigate = useNavigate();
@@ -49,6 +50,7 @@ function GroupReviewOutlineDetail() {
         pageMax:-1
     });
     const [teachings,setTeachings] = useState<ITeaching[]>([])
+    const [teachingsTotal,setTeachingsTotal] = useState(0)
     const apiRef = useGridApiRef();
     const [loadingData,setLoadingData] = useState(false);
     const initialData = {
@@ -252,6 +254,9 @@ function GroupReviewOutlineDetail() {
                 if(res.success && res.returnObj){
                     setGroupSelected(res.returnObj)
                     setTeachings(res.returnObj.teachings || [])
+                    if(res.returnObj.teachings){
+                        setTeachingsTotal(res.returnObj.teachings?.length || 0)
+                    }
                 }
             })
             .catch(()=>{
@@ -272,10 +277,8 @@ function GroupReviewOutlineDetail() {
                 // UserName: formik.values.userNameSearch
             })
             .then((res:IResponse<IProject[]>)=>{
-              console.log(res)
               if(res.success && res.returnObj) {
                 const dataMap = res.returnObj;
-                
                 if(dataMap.length <= 0) {
                     setTotalLstProjectInGroup(0)
                     setLstProjectInGroup([])
@@ -400,172 +403,181 @@ function GroupReviewOutlineDetail() {
     };
 
     return (
-        <BoxWrapper className="">
-            {loadingData ? <LoadingData /> : <>
-                <div className="p-4 pt-0">
-                    <div className="mb-5">
-                        <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
-                                Quay lại
-                        </Button>
-                    </div>
-                    <h2 className={"font-bold text-primary-blue text-xl mb-4"}>
-                        Chi tiết nhóm xét duyệt
-                    </h2>
-                    <div className={"grid grid-cols-8 mb-5"}>
-                        <div className={"col-span-8 my-1"}>
-                            <b>Tên phòng:</b> <span className={"text-text-color"}>{groupSelected?.nameGroupReviewOutline}</span> 
+        <>
+            <HeaderPageTitle pageName="Chi tiết nhóm xét duyệt" pageChild={groupSelected.nameGroupReviewOutline}/>
+            <BoxWrapper className="">
+                {loadingData ? <LoadingData /> : <>
+                    <div className="p-4 pt-0">
+                        <div className="mb-5">
+                            <Button onClick={()=>{navigate(-1)}} variant="outlined" startIcon={<ChevronLeft />}>
+                                    Quay lại
+                            </Button>
                         </div>
-                    </div>
-                    <div>
-                        
-
-                        {/* Danh sách tìm kiếm */}
-                        <div className="mt-5">
-                            <DataGrid
-                                apiRef={apiRef}
-                                sx={{
-                                    // disable cell selection style
-                                    '.MuiDataGrid-cell:focus': {
-                                    outline: 'none'
-                                    },
-                                    // pointer cursor on ALL rows
-                                    '& .MuiDataGrid-row:hover': {
-                                    cursor: 'pointer'
-                                    }
-                                }}
-                                checkboxSelection={false}
-                                rows={lstProjectInGroup}
-                                columns={columns}
-                                // rowCount={totalLstProjectInGroup}
-                                localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                onPaginationModelChange={handlePaginationModelChange}
-                                onCellClick={({row})=>{
-                                    if(row?.userName){
-                                        navigate("/profile/"+row?.userName)
-                                    }
-                                }}
-                                slots={{ toolbar: ()=> <> <GridToolbarContainer>
-                                    <GridToolbarColumnsButton />
-                                    <GridToolbarFilterButton  />
-                                    <Button variant="text" startIcon={<Pencil />} onClick={()=>{
-                                        setOpenModalAddStudent(true)
-                                    }}>
-                                        Chỉnh sửa sinh viên
-                                    </Button>
-                                    {/* <Button variant="text" startIcon={<Printer />} onClick={()=>{
-
-                                    }}>
-                                        In danh sách sinh viên
-                                    </Button>
-                                    <Button variant="text" startIcon={<Printer />} onClick={()=>{
-                                    
-                                    }}>
-                                        In danh sách giảng viên
-                                    </Button> */}
-                                </GridToolbarContainer></> }}
-                                initialState={{
-                                pagination: {
-                                    paginationModel: { page: paginationModel.page, pageSize: paginationModel.pageSize },
-                                },
-                                }}
-                                pageSizeOptions={[10]}
-                            />
-                        </div>
-                    </div>
-                        
-
-                        <Modal
-                            open={openModalAddStudent}
-                            onClose={()=>setOpenModalAddStudent(false)}
-                            aria-labelledby="modal-modal-title-mentor-assign"
-                            aria-describedby="modal-modal-description-mentor-assign"
-                        >
-                            <div className="p-5 rounded-xl bg-white w-3/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
-                                Thêm sinh viên vào nhóm xét duyệt
-                            </h2>
-                                <div className="mt-5">
-                                    {
-                                        loadingData ? <LoadingData /> : 
-                                        <DataGrid
-                                        apiRef={apiRefStudent}
-                                        rows={lstProjectNotInGroup}
-                                        loading={loadingData}
-                                        columns={columnsProjectOutline}
-                                        // rowCount={totalLstProjectNotInGroup}
-                                        checkboxSelection={true}
-                                        isRowSelectable={(params: GridRowParams) => params.row?.groupReviewOutlineId == idGroup || !params.row?.groupReviewOutlineId}
-                                        rowSelectionModel={rowsStudentChecked}
-                                        onRowSelectionModelChange={setRowsStudentChecked}
-                                        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-                                        onPaginationModelChange={handlePaginationModelChangeTeacher}
-                                        initialState={{
-                                            pagination: {
-                                                paginationModel: {
-                                                    page: paginationModelTeacher.page, 
-                                                    pageSize: paginationModelTeacher.pageSize 
-                                                },
-                                            },
-                                        }}
-                                        slots={{ toolbar: GridToolbar }}
-                                        slotProps={{
-                                            toolbar: {
-                                                printOptions: { disableToolbarButton: true },
-                                                csvOptions: { disableToolbarButton: true },
-                                            }}
-                                        }
-                                        pageSizeOptions={[5]}
-                                    />
-                                    }
-                                    
-                                </div>
-
-                                <div className="mt-5 flex justify-end" >
-                                    <div className="mx-3">
-                                        <Button variant="outlined" onClick={()=>{
-                                            setOpenModalAddStudent(false)
-                                        }}
-                                        >Đóng</Button>
-                                    </div>
-                                    <Button variant="contained" onClick={()=>{
-                                        const lstUsername:string[] = [];
-                                        apiRefStudent.current.getSelectedRows().forEach((item)=>{
-                                            lstUsername.push(item?.userName.toString())
-                                        })
-                                        console.log(lstUsername)
-                                        const req: AssignGroupReviewProjectOutline ={
-                                            groupReviewOutlineId: groupSelected.groupReviewOutlineId,
-                                            usernameProjectOutline: lstUsername,
-                                            semesterTeachingId: idSemester
-                                        }
-                                        assginGroupReviewToProjectOutline(req)
-                                        .then((res:IResponse<any>)=>{
-                                            if(res.success){
-                                                toast.success(res.msg)
-                                                handleFetchApiProjectOutlineAll();
-                                                hanleFetchApi();
-                                            }else{
-                                                toast.error(res.msg)
-                                            }
-                                        })
-                                        .catch(()=>{
-                                            toast.error("Lỗi mạng")
-                                        })
-                                        .finally(()=>{
-                                            setOpenModalAddStudent(false)
-                                        })
-                                    }
-                                }
-                                >Lưu</Button>
-
-                                    
-                                </div>
-                                
+                        <h2 className={"font-bold text-primary-blue text-xl mb-4"}>
+                            Chi tiết nhóm xét duyệt
+                        </h2>
+                        <div className={"grid grid-cols-8 mb-5"}>
+                            <div className={"col-span-8 my-1"}>
+                                <b>Tên nhóm:</b> <span className={"text-text-color"}>{groupSelected?.nameGroupReviewOutline}</span> 
                             </div>
-                        </Modal>
-                </div>
-            </>}
-        </BoxWrapper>
+                            <div className={"col-span-8 my-1"}>
+                                <b>Số lượng giảng viên trong nhóm:</b> <span className={"text-text-color"}>{teachingsTotal}</span> 
+                            </div>
+                            <div className={"col-span-8 my-1"}>
+                                <b>Số lượng sinh viên trong nhóm:</b> <span className={"text-text-color"}>{totalLstProjectInGroup}</span> 
+                            </div>
+                        </div>
+                        <div>
+                            
+
+                            {/* Danh sách tìm kiếm */}
+                            <div className="mt-5">
+                                <DataGrid
+                                    apiRef={apiRef}
+                                    sx={{
+                                        // disable cell selection style
+                                        '.MuiDataGrid-cell:focus': {
+                                        outline: 'none'
+                                        },
+                                        // pointer cursor on ALL rows
+                                        '& .MuiDataGrid-row:hover': {
+                                        cursor: 'pointer'
+                                        }
+                                    }}
+                                    checkboxSelection={false}
+                                    rows={lstProjectInGroup}
+                                    columns={columns}
+                                    // rowCount={totalLstProjectInGroup}
+                                    localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
+                                    onPaginationModelChange={handlePaginationModelChange}
+                                    onCellClick={({row})=>{
+                                        if(row?.userName){
+                                            navigate("/profile/"+row?.userName)
+                                        }
+                                    }}
+                                    slots={{ toolbar: ()=> <> <GridToolbarContainer>
+                                        <GridToolbarColumnsButton />
+                                        <GridToolbarFilterButton  />
+                                        <Button variant="text" startIcon={<Pencil />} onClick={()=>{
+                                            setOpenModalAddStudent(true)
+                                        }}>
+                                            Chỉnh sửa sinh viên
+                                        </Button>
+                                        {/* <Button variant="text" startIcon={<Printer />} onClick={()=>{
+
+                                        }}>
+                                            In danh sách sinh viên
+                                        </Button>
+                                        <Button variant="text" startIcon={<Printer />} onClick={()=>{
+                                        
+                                        }}>
+                                            In danh sách giảng viên
+                                        </Button> */}
+                                    </GridToolbarContainer></> }}
+                                    initialState={{
+                                    pagination: {
+                                        paginationModel: { page: paginationModel.page, pageSize: paginationModel.pageSize },
+                                    },
+                                    }}
+                                    pageSizeOptions={[10]}
+                                />
+                            </div>
+                        </div>
+                            
+
+                            <Modal
+                                open={openModalAddStudent}
+                                onClose={()=>setOpenModalAddStudent(false)}
+                                aria-labelledby="modal-modal-title-mentor-assign"
+                                aria-describedby="modal-modal-description-mentor-assign"
+                            >
+                                <div className="p-5 rounded-xl bg-white w-3/4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                <h2 className={"font-bold text-primary-blue text-xl mb-5"}>
+                                    Thêm sinh viên vào nhóm xét duyệt
+                                </h2>
+                                    <div className="mt-5">
+                                        {
+                                            loadingData ? <LoadingData /> : 
+                                            <DataGrid
+                                            apiRef={apiRefStudent}
+                                            rows={lstProjectNotInGroup}
+                                            loading={loadingData}
+                                            columns={columnsProjectOutline}
+                                            // rowCount={totalLstProjectNotInGroup}
+                                            checkboxSelection={true}
+                                            isRowSelectable={(params: GridRowParams) => params.row?.groupReviewOutlineId == idGroup || !params.row?.groupReviewOutlineId}
+                                            rowSelectionModel={rowsStudentChecked}
+                                            onRowSelectionModelChange={setRowsStudentChecked}
+                                            localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
+                                            onPaginationModelChange={handlePaginationModelChangeTeacher}
+                                            initialState={{
+                                                pagination: {
+                                                    paginationModel: {
+                                                        page: paginationModelTeacher.page, 
+                                                        pageSize: paginationModelTeacher.pageSize 
+                                                    },
+                                                },
+                                            }}
+                                            slots={{ toolbar: GridToolbar }}
+                                            slotProps={{
+                                                toolbar: {
+                                                    printOptions: { disableToolbarButton: true },
+                                                    csvOptions: { disableToolbarButton: true },
+                                                }}
+                                            }
+                                            pageSizeOptions={[5]}
+                                        />
+                                        }
+                                        
+                                    </div>
+
+                                    <div className="mt-5 flex justify-end" >
+                                        <div className="mx-3">
+                                            <Button variant="outlined" onClick={()=>{
+                                                setOpenModalAddStudent(false)
+                                            }}
+                                            >Đóng</Button>
+                                        </div>
+                                        <Button variant="contained" onClick={()=>{
+                                            const lstUsername:string[] = [];
+                                            apiRefStudent.current.getSelectedRows().forEach((item)=>{
+                                                lstUsername.push(item?.userName.toString())
+                                            })
+                                            console.log(lstUsername)
+                                            const req: AssignGroupReviewProjectOutline ={
+                                                groupReviewOutlineId: groupSelected.groupReviewOutlineId,
+                                                usernameProjectOutline: lstUsername,
+                                                semesterTeachingId: idSemester
+                                            }
+                                            assginGroupReviewToProjectOutline(req)
+                                            .then((res:IResponse<any>)=>{
+                                                if(res.success){
+                                                    toast.success(res.msg)
+                                                    handleFetchApiProjectOutlineAll();
+                                                    hanleFetchApi();
+                                                }else{
+                                                    toast.error(res.msg)
+                                                }
+                                            })
+                                            .catch(()=>{
+                                                toast.error("Lỗi mạng")
+                                            })
+                                            .finally(()=>{
+                                                setOpenModalAddStudent(false)
+                                            })
+                                        }
+                                    }
+                                    >Lưu</Button>
+
+                                        
+                                    </div>
+                                    
+                                </div>
+                            </Modal>
+                    </div>
+                </>}
+            </BoxWrapper>
+        </>
     );
 }
 

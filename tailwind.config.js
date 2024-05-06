@@ -20,6 +20,7 @@ export default {
         'text-color':"#333"
       },
       gridColumn: {
+        'span-20': 'span 20 / span 20',
         'span-21': 'span 21 / span 21',
         'span-22': 'span 22 / span 22',
         'span-23': 'span 23 / span 23',
@@ -31,6 +32,7 @@ export default {
         '23': 'repeat(23, minmax(0, 1fr))',
         '22': 'repeat(22, minmax(0, 1fr))',
         '21': 'repeat(21, minmax(0, 1fr))',
+        '20': 'repeat(20, minmax(0, 1fr))',
 
       }
     },

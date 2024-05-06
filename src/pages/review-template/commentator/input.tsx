@@ -20,6 +20,7 @@ import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { IScheduleSemester } from '~/types/IScheduleSemester';
 import { IStudent } from '~/types/IStudentType';
+import { roundedNumber } from '~/ultis/common';
 
 const validationSchema = yup.object({
     comment: yup
@@ -83,7 +84,7 @@ function InputReviewCommentor() {
                     if(req){
                         setProject(req)
                         formik.setValues({
-                            score: req?.scoreCommentator ? req?.scoreCommentator?.toString()?.replace(".",",") : "",
+                            score: req?.scoreCommentator ? roundedNumber(req?.scoreCommentator).toString()?.replace(".",",") : "",
                             comment: req?.commentCommentator ? JSON.parse(req?.commentCommentator) : "1. Bố cục và hình thức (2 điểm)\n\n2. Nội dung (3 điểm)\n3. Sản phầm đồ án (phần mềm, bài lab, …) (5 điểm)"
                         })
 

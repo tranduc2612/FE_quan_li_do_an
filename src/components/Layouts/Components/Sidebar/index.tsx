@@ -156,7 +156,7 @@ function SideBar() {
                             <div  className={`sidebar_list flex justify-center items-center w-full max-h-20 min-h-20 mb-2 cursor-pointer ${isActive ?"bg-light-blue":"" } relative after:content-[''] after:absolute ${isActive ?"after:bg-[#19A7CE]":"" } after:h-full after:rounded-sm after:w-1 after:left-0 after:top-0`}>
                                 <div className={`flex items-center flex-col justify-items-center sidebar_item p-1 text-xs font-semibold text-[#333] hover:text-primary-blue ${isActive ?"text-primary-blue":"" }`}>
                                     <IconItem />
-                                    <span className="text-center mt-1">
+                                    <span className="text-center mt-1 hidden lg:inline">
                                         {item.title}
                                     </span>
                                 </div>
@@ -176,7 +176,7 @@ function SideBar() {
                             <div  className={`sidebar_list flex justify-center items-center w-full max-h-20 min-h-20 mb-2 cursor-pointer ${isActive ?"bg-light-blue":"" } relative after:content-[''] after:absolute ${isActive ?"after:bg-[#19A7CE]":"" } after:h-full after:rounded-sm after:w-1 after:left-0 after:top-0`}>
                                 <div className={`flex items-center flex-col justify-items-center sidebar_item p-1 text-xs font-semibold text-[#333] hover:text-primary-blue ${isActive ?"text-primary-blue":"" }`}>
                                     <IconItem />
-                                    <span className="text-center mt-1">
+                                    <span className="text-center mt-1 hidden lg:inline">
                                         {item.title}
                                     </span>
                                 </div>
@@ -196,7 +196,7 @@ function SideBar() {
                             <div  className={`sidebar_list flex justify-center items-center w-full max-h-20 min-h-20 mb-2 cursor-pointer ${isActive ?"bg-light-blue":"" } relative after:content-[''] after:absolute ${isActive ?"after:bg-[#19A7CE]":"" } after:h-full after:rounded-sm after:w-1 after:left-0 after:top-0`}>
                                 <div className={`flex items-center flex-col justify-items-center sidebar_item p-1 text-xs font-semibold text-[#333] hover:text-primary-blue ${isActive ?"text-primary-blue":"" }`}>
                                     <IconItem />
-                                    <span className="text-center mt-1">
+                                    <span className="text-center mt-1 hidden lg:inline">
                                         {item.title}
                                     </span>
                                 </div>
@@ -216,7 +216,7 @@ function SideBar() {
                             <div  className={`sidebar_list flex justify-center items-center w-full max-h-20 min-h-20 mb-2 cursor-pointer ${isActive ?"bg-light-blue":"" } relative after:content-[''] after:absolute ${isActive ?"after:bg-[#19A7CE]":"" } after:h-full after:rounded-sm after:w-1 after:left-0 after:top-0`}>
                                 <div className={`flex items-center flex-col justify-items-center sidebar_item p-1 text-xs font-semibold text-[#333] hover:text-primary-blue ${isActive ?"text-primary-blue":"" }`}>
                                     <IconItem />
-                                    <span className="text-center mt-1">
+                                    <span className="text-center mt-1 hidden lg:inline">
                                         {item.title}
                                     </span>
                                 </div>

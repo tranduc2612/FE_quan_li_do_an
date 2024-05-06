@@ -3,13 +3,14 @@ import { call, fork, put, take } from 'redux-saga/effects';
 import { ILoginPayload, login, loginFailed, loginSucces, logout } from './slices/authSlice';
 import axios, { AxiosResponse } from 'axios'; // Import AxiosResponse
 import { IUser } from '~/types/IUser';
+import { BASE_URL } from '~/ultis/contants';
 // worker Saga: will be fired on USER_FETCH_REQUESTED actions
 function* logger(action: PayloadAction) {
   console.log('log_saga', action);
 }
 
 const fetchApiAuth = async (payload: ILoginPayload): Promise<AxiosResponse> => {
-  const response = await axios.post('https://localhost:7274/api/Auth/login', { ...payload });
+  const response = await axios.post(BASE_URL+'Auth/login', { ...payload });
   return response;
 };
 

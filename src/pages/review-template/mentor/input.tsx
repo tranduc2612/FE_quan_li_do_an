@@ -20,6 +20,7 @@ import { IProject } from '~/types/IProjectType';
 import { IResponse } from '~/types/IResponse';
 import { IScheduleSemester } from '~/types/IScheduleSemester';
 import { IStudent } from '~/types/IStudentType';
+import { roundedNumber } from '~/ultis/common';
 
 const validationSchema = yup.object({
     comment: yup
@@ -85,7 +86,7 @@ function InputReviewMentor() {
                     if(req){
                         setProject(req)
                         formik.setValues({
-                            score: req?.scoreMentor ? req?.scoreMentor?.toString()?.replace(".",",") : "",
+                            score: req?.scoreMentor ? roundedNumber(req?.scoreMentor).toString()?.replace(".",",") : "",
                             comment: req?.commentMentor ? JSON.parse(req?.commentMentor) : "- Nhận xét chung về tính ý nghĩa thực tiễn của đồ án:\n- Ý thức, thái độ của sinh viên trong quá trình thực hiện đồ án:\n- Kết quả thực hiện đồ án (cần nhận xét cụ thể những kết quả đạt được, chưa làm được):"
                         })
                         const semesterId = req?.semesterId;

@@ -17,6 +17,7 @@ import { ICouncil } from "~/types/ICouncil";
 import { IProject } from '~/types/IProjectType';
 import { ITeaching } from "~/types/ITeachingType";
 import RenderStatusProject from '~/components/RenderStatusProject';
+import { roundedNumber } from '~/ultis/common';
 
 
 function DetailCouncil() {
@@ -140,9 +141,10 @@ function DetailCouncil() {
             headerName: 'Chủ tịch',
             width: 100,
             editable: true,
+
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreCt?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreCt).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -153,7 +155,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreTk?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreTk).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -164,7 +166,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreUv1?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreUv1).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -175,7 +177,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreUv2?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreUv2).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -186,7 +188,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreUv3?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreUv3).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -197,7 +199,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreMentor?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreMentor).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -208,7 +210,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreCommentator?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreCommentator).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -219,7 +221,7 @@ function DetailCouncil() {
             editable: true,
             renderCell:({row})=>{
                 return <>
-                    {row?.scoreFinal?.toString()?.replace(".",",")}  
+                    {roundedNumber(row?.scoreFinal).toString()?.replace(".",",")}  
                 </>
             }
         },
@@ -384,9 +386,11 @@ function DetailCouncil() {
     ]
     useEffect(()=>{
         setLoadingData(true)
-        Promise.all([hanleFetchApi(),handleFetchDetailCouncil(),handleFetchApiTeacherNotInCouncil()])
+        Promise.all([handleFetchDetailCouncil(),handleFetchApiTeacherNotInCouncil()])
         .then((res)=>{
             setLoadingData(false)
+        })
+        .then((res)=>{
         })
         .catch(()=>{
 
@@ -396,6 +400,13 @@ function DetailCouncil() {
 
         })
     },[])
+
+    useEffect(()=>{
+        // phải có giảng viên thì mới cho thêm sinh viên
+        if(lstTeachingInCouncil.length > 0){
+            hanleFetchApi()
+        }
+    },[lstTeachingInCouncil])
 
 
     const handleFetchDetailCouncil = async () =>{
@@ -444,7 +455,6 @@ function DetailCouncil() {
     }
 
     const hanleFetchApi = async () => {
-        console.log(idSemester)
         if(idSemester){
             await getListProjectCouncil({
                 semesterId: idSemester
@@ -485,7 +495,6 @@ function DetailCouncil() {
                       
                         return 0; // Giữ nguyên thứ tự ban đầu
                       })
-                    console.log(lstNotInCouncil)
                     setLstProjectInCouncil([...lstInCouncil])
                     setTotalProjectInCouncil(lstInCouncil.length)
                     setLstProjectNotInCouncil([...lstNotInCouncil])

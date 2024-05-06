@@ -1,18 +1,20 @@
 import classNames from "classnames/bind";
 import style from "./style.module.scss"
 import Button from '@mui/material/Button';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loading from "~/components/Loading";
 const cx = classNames.bind(style);
 function NotFound() {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const id = setTimeout(() => {
             console.log("run-here")
+            navigate("/login")
             setLoading(false);
-        }, 3000)
+        }, 2000)
 
         return () => {
             clearTimeout(id);

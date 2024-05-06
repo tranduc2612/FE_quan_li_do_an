@@ -6,7 +6,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from "react";
-import { formatFullnameToUsername } from "~/ultis/common";
+import { formatFullnameToUsername, roundedNumber } from "~/ultis/common";
 import TimePickerCustom from "~/components/InputTimePicker";
 import { addStudent, updateStudent } from "~/services/studentApi";
 import { IStudent } from "~/types/IStudentType";
@@ -152,7 +152,7 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                 formik.values.status = student.status || ""
                 formik.values.student_code = student.studentCode || ""
                 formik.values.address = student.address || ""
-                formik.values.gpa = student.gpa || ""
+                formik.values.gpa = roundedNumber(student.gpa) || ""
                 formik.values.class = student.className || ""
                 formik.values.schoolYear = student.schoolYearName || ""
                 formik.values.semester = student?.project?.semester?.semesterId || ""
