@@ -110,13 +110,16 @@ function OutlinePage() {
             setLoading(false)
         })
 
-        callCheckScheduleSemester()
 
         fetchApiAvatar();
 
     }
 
     },[])
+
+    useEffect(()=>{
+        callCheckScheduleSemester()
+    },[data])
 
     const handleCallProjectOutlineId = ()=>{
         if(id){
@@ -241,9 +244,9 @@ function OutlinePage() {
         }
     }
 
-    const callCheckScheduleSemester = () =>{
+    const callCheckScheduleSemester = async () =>{
         if(data?.semesterId){
-            getListScheduleSemester(data?.semesterId)
+            await getListScheduleSemester(data?.semesterId)
             .then((res: IResponse<IScheduleSemester[]>)=>{
                 if(res.success){
                     const scheduleList = res.returnObj;
@@ -252,7 +255,6 @@ function OutlinePage() {
     
                         if(schduleScore){
                             const check = isCurrentTimeInRange(new Date(schduleScore?.fromDate || ""),new Date(schduleScore?.toDate || ""))
-    
                             if(check === 0){
                                 setIsUpdateOutline(true);
                             }else{
@@ -280,7 +282,6 @@ function OutlinePage() {
             console.log(update)
         }
     }
-
     return ( <>
     {
         loading ? 
@@ -296,12 +297,12 @@ function OutlinePage() {
                                     Quay lại
                             </Button>
                             <div className="flex">
+                                
                                 {
-                                    data && currentUser?.userName === id && isUpdateOutline ? 
+                                    data && currentUser?.userName === id && isUpdateOutline &&
                                     <div className="flex items-center p-2 rounded-full text-3xl mx-5 hover:bg-gray-200" onClick={()=>{navigate("/outline/input/"+id)}}>
                                         <Pencil className="text-primary-blue cursor-pointer" />
                                     </div>
-                                    : <></>
                                 }
                                 {
                                     data?.userNameNavigation?.statusProject === "DOING" && data?.userNameNavigation?.userNameMentor === currentUser?.userName ? 

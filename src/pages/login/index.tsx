@@ -145,6 +145,20 @@ function LoginPage() {
             isLogging ? <Loading /> : <></>
         }
 
+        <div className="bg-white absolute bottom-10 right-0 w-56 h-56">
+            <div className="admin text-black mb-10">
+                <h1>Admin</h1>
+                <div>Tài khoản: hoangvanthong</div>
+                <div>Mật khẩu: 123456</div>
+            </div>
+
+            <div className="admin text-black">
+                <h1>Sinh viên</h1>
+                <div>Tài khoản: mã học kỳ_mã sinh viên</div>
+                <div>Mật khẩu: ngày/tháng/năm</div>
+            </div>
+        </div>
+
         {/* <button onClick={handleDecrement}>Giảm</button>
         <button onClick={handleIncrement}>Tăng</button>
         <h1>
