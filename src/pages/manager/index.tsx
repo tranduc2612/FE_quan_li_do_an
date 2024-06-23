@@ -51,7 +51,7 @@ function PageMannger() {
         },
         {
             id:EnumPage.EDUCATION,
-            title:"Quản lý học vấn",
+            title:"Quản lý học vị",
             icon: ViewHeadlineIcon,
             page: EducationManage
         },

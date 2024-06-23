@@ -1,0 +1,16 @@
+{
+  "passwordText": "123456",
+  "fullName": "Trần Minh Đức",
+  "dob": "2024-03-07T06:38:56.544Z",
+  "phone": "0367218700",
+  "email": "minhduc@gmail.com",
+  "avatar": "string",
+  "createdAt": "2024-03-07T06:38:56.545Z",
+  "createdBy": "admin",
+  "status": "AUTH",
+  "studentCode": "201210096",
+  "className": "CNTT5",
+  "majorId": "CNPM",
+  "schoolYearName": "K61",
+  "semesterId": "1_2024_2025"
+}

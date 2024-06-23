@@ -78,7 +78,7 @@ function DetailReviewMentor() {
 
                                     <Button onClick={()=>{
                                         const req: IReqKeyHash ={
-                                            key: "E8117C89-9E43-4C3A-9CA1-E97C5AB681F5",
+                                            key: key,
                                             role:"MENTOR"
                                         }  
                                         downloadFileWord(req)

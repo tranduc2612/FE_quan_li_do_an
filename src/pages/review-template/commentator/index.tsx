@@ -72,7 +72,7 @@ function DetailReviewCommentor() {
 
                             <Button onClick={()=>{  
                                 const req: IReqKeyHash ={
-                                    key: "FBE3394A-E02A-4252-8484-F4229A3ADE17",
+                                    key: key,
                                     role:"COMMENTATOR"
                                 }  
                                 downloadFileWord(req)

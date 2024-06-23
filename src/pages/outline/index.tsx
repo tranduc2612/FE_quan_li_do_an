@@ -284,6 +284,7 @@ function OutlinePage() {
     }
     return ( <>
     {
+        
         loading ? 
         <LoadingData />
         :
@@ -312,7 +313,6 @@ function OutlinePage() {
                                     : <></>
                                 }
                                 {
-                                    (data?.userNameNavigation?.userNameMentor === currentUser?.userName || id === currentUser?.userName) && currentUser?.statusProject === "DOING" &&
                                     <Button onClick={()=>{
                                         getFileWordOutline(currentUser?.userName)
                                         .then((res:any)=>{
@@ -452,13 +452,14 @@ function OutlinePage() {
                                     </div>
                                         
                                 </div>
-
+                                        
                             </> : <>
                             {
+                                
                                 currentUser?.userName === id ? <>
                                     <div className="flex justify-center">
                                         {
-                                            currentUser?.statusProject === "START" ?
+                                            currentUser?.project?.statusProject === "START" ?
                                             <Button onClick={handleCreateProjectOutline} variant="contained" startIcon={<Add />}>
                                                     Tạo đề cương đồ án
                                             </Button>

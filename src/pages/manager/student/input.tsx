@@ -242,7 +242,7 @@ function RegisterStudent({setSwitchPageInput,switchPageInput,userSelect,setUserS
                                 placeholder="Học kỳ"
                                 label="Học kỳ"
                                 onBlur={undefined}
-                                readOnly={userSelect?.userName ? true : false}
+                                // readOnly={userSelect?.userName ? true : false}
                                 isError={formik.touched.semester && Boolean(formik.errors.semester)}
                             >
                             {

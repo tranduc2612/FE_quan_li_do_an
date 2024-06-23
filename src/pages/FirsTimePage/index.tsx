@@ -152,7 +152,7 @@ function FirstTimePage() {
             major:currentUser?.major ? currentUser?.major?.majorId : "CNPM",
             gpa: roundedNumber(currentUser?.gpa),
             registerMentor: currentUser?.userNameMentorRegister ? currentUser?.userNameMentorRegister : "hoangvanthong",
-            statusProject: currentUser?.project?.statusProject
+            statusProject: "START"
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
@@ -420,7 +420,7 @@ function FirstTimePage() {
                                         label="Chuyên ngành"
                                         onBlur={undefined}
                                     >
-                                        <MenuItem value={""}>Tất cả</MenuItem>
+                                        {/* <MenuItem value={""}>Tất cả</MenuItem> */}
                                         {
                                             majorOptions && majorOptions.map((x)=>{
                                                 return <MenuItem key={x.majorId} value={x.majorId}>{x.majorName}</MenuItem>
@@ -474,7 +474,7 @@ function FirstTimePage() {
                                         onBlur={undefined}
                                     >
                                         <MenuItem value={"START"}>Có bảo vệ</MenuItem>
-                                        <MenuItem value={"PAUSE"}>Chỉ thực tập</MenuItem>
+                                        <MenuItem value={"INTERN"}>Chỉ thực tập</MenuItem>
                                     </InputSelectCustom>
                                 </div>
 

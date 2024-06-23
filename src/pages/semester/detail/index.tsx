@@ -1,19 +1,17 @@
 import { Button } from "@mui/material";
 import { ChevronLeft } from "mdi-material-ui";
-import { useNavigate } from "react-router-dom";
-import BoxWrapper from "~/components/BoxWrap";
-import HeaderPageTitle from "~/components/HeaderPageTitle";
-import PlantSemester from "./plant-semester";
+import { useNavigate, useParams } from "react-router-dom";
 import AccordionCustom from "~/components/AccordionCustom";
-import Add from "@mui/icons-material/Add";
-import GroupOutlineReview from "./group-outline-review";
+import HeaderPageTitle from "~/components/HeaderPageTitle";
 import CouncilSemester from "./council";
+import GroupOutlineReview from "./group-outline-review";
+import PlantSemester from "./plant-semester";
 
 function DetailSemesterPage() {
     const navigate = useNavigate();
-    
+    const { id } = useParams()
     return ( <>
-        <HeaderPageTitle pageName="Quản lý học kỳ" pageChild="Chi tiết" />
+        <HeaderPageTitle pageName="Quản lý học kỳ" pageChild="Chi tiết" detailChild={id}/>
         {/* <BoxWrapper className={"mb-5"}>
             <>
                 <div className="mb-5">

@@ -18,13 +18,13 @@ import { IMajorType } from "~/types/IMajorType";
 const validationSchema = yup.object({
     educationId: yup
       .string()
-      .required('Mã học vấn không được để trống'),
+      .required('Mã học vị không được để trống'),
       educationName: yup
       .string()
-      .required('Tên học vấn không được để trống'),
+      .required('Tên học vị không được để trống'),
       maxStudentMentor: yup
       .string()
-      .required('Tên học vấn không được để trống')
+      .required('Tên học vị không được để trống')
       .min(1, 'Giá trị phải lớn hơn hoặc bằng 1')
       .max(50, 'Giá trị phải nhỏ hơn hoặc bằng 50')
   });
@@ -100,7 +100,7 @@ function InputEducation({setSwitchPageInput,switchPageInput,educationSelect,hand
                         <div className="col-span-12">
                             <InputCustom
                                 id={"educationId"}
-                                label="Mã học vấn"
+                                label="Mã học vị"
                                 name={"educationId"}
                                 value={formik.values.educationId} 
                                 readOnly={educationSelect?.educationId.length > 0 ? true : false}
@@ -115,7 +115,7 @@ function InputEducation({setSwitchPageInput,switchPageInput,educationSelect,hand
                         <div className="col-span-12">
                             <InputCustom
                                 id={"educationName"}
-                                label="Tên học vấn"
+                                label="Tên học vị"
                                 name={"educationName"}
                                 value={formik.values.educationName} 
                                 isError={formik.touched.educationName && Boolean(formik.errors.educationName)} 

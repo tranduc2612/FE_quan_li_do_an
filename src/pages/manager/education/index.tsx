@@ -68,13 +68,13 @@ function EducationManage({setCurrentPage}:IPageProps) {
         },
         {
             field: 'educationId',
-            headerName: 'Mã học vấn',
+            headerName: 'Mã học vị',
             width: 150,
             editable: true,
         },
         {
             field: 'educationName',
-            headerName: 'Tên học vấn',
+            headerName: 'Tên học vị',
             width: 150,
             editable: true,
         },
@@ -205,7 +205,7 @@ function EducationManage({setCurrentPage}:IPageProps) {
                                             createdBy: ""
                                         })  
                                     }}>
-                                        Thêm mới chuyên ngành
+                                        Thêm mới học vị
                                     </Button>
                         </GridToolbarContainer></> }}
                                 pageSizeOptions={[5, 10]}

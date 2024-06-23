@@ -1,0 +1,375 @@
+use master
+drop database ManagementGraduationProject
+create database ManagementGraduationProject
+use ManagementGraduationProject
+
+create table Classification(
+	ClassifiId nvarchar(50) primary key default NEWID(),
+	TypeCode NVARCHAR(50),
+	Code NVARCHAR(50),
+	Value NVARCHAR(MAX),
+	Role NVARCHAR(50),
+	FileName NVARCHAR(MAX),
+	Url NVARCHAR(MAX)
+)
+
+create table Major(
+	MajorId NVARCHAR(10) primary key,
+	MajorName nvarchar(max),
+)
+
+alter table Major add CreatedAt datetime default GETDATE()
+alter table Major add CreatedBy nvarchar(50)
+
+CREATE TABLE Student (
+	UserName NVARCHAR(50) PRIMARY KEY,
+	Password varbinary(max),
+	FullName NVARCHAR(MAX),
+
+    DOB DATE,
+    Phone NVARCHAR(20),
+    Email NVARCHAR(50),
+    Avatar NVARCHAR(MAX),
+
+	CreatedAt DATETIME DEFAULT GETDATE(),
+    CreatedBy NVARCHAR(50),
+    Status VARCHAR(50) DEFAULT 'AUTH',
+    StudentCode NVARCHAR(30),
+
+    MajorId NVARCHAR(10),
+    ClassName NVARCHAR(50),
+	SchoolYearName NVARCHAR(50),
+	IsDelete int default 0,
+
+	Token NVARCHAR(MAX),
+	PasswordSalt	varbinary(max),
+	RefreshToken	varchar(max),
+	TokenCreated	datetime,
+	tokenExpires	datetime,
+	CONSTRAINT FK_Student_Major FOREIGN KEY (MajorId)
+    REFERENCES Major(MajorId),
+)
+alter table Student add TypeFileAvatar nvarchar(50);
+
+alter table Student add UserNameMentorRegister NVARCHAR(50)
+
+ALTER TABLE Student
+ADD FOREIGN KEY (UserNameMentorRegister) REFERENCES Teacher(UserName);
+
+alter table Student add IsFirstTime int default 1
+
+
+CREATE TABLE Education (
+    EducationId NVARCHAR(50) primary key,
+	EducationName NVARCHAR(max),
+	MaxStudentMentor int,
+)
+
+alter table Education add CreatedAt datetime default GETDATE()
+alter table Education add CreatedBy nvarchar(50)
+
+CREATE TABLE Teacher (
+	UserName NVARCHAR(50) PRIMARY KEY,
+	FullName NVARCHAR(MAX),
+
+	Password varbinary(max),
+    DOB DATE,
+    Phone NVARCHAR(20),
+    Email NVARCHAR(50),
+    Avatar NVARCHAR(MAX),
+
+	CreatedAt DATETIME DEFAULT GETDATE(),
+    CreatedBy NVARCHAR(50),
+    Status VARCHAR(50) DEFAULT 'AUTH',
+	IsAdmin int,
+	IsDelete int default 0,
+
+	Token NVARCHAR(MAX),
+	PasswordSalt	varbinary(max),
+	RefreshToken	varchar(max),
+	TokenCreated	datetime,
+	tokenExpires	datetime,
+	MajorId NVARCHAR(10),
+	CONSTRAINT FK_Teacher_Major FOREIGN KEY (MajorId)
+    REFERENCES Major(MajorId),
+)
+
+alter table Teacher add EducationId NVARCHAR(50)
+
+ALTER TABLE Teacher
+ADD CONSTRAINT FK_Teacher_Education FOREIGN KEY (EducationId) REFERENCES Education(EducationId);
+
+
+
+alter table Teacher add TypeFileAvatar nvarchar(50);
+
+create table Semester(
+	SemesterId nvarchar(50) PRIMARY KEY,
+	NameSemester nvarchar(50),
+	FromDate date,
+	ToDate date,
+	ScheduleSemesterId nvarchar(50)
+)
+
+create table Council(
+	CouncilId nvarchar(50) primary key default NEWID(),
+	CouncilName nvarchar(100),
+	CouncilZoom nvarchar(100),
+	CreatedBy nvarchar(50)
+)
+alter table Council add SemesterId nvarchar(50)
+
+ALTER TABLE Council
+ADD FOREIGN KEY (SemesterId) REFERENCES Semester(SemesterId);
+
+alter table Council add IsDelete int default 0
+alter table Council add CreatedDate datetime default getdate()
+
+create table Project(
+	UserName NVARCHAR(50) PRIMARY KEY,
+	SemesterId nvarchar(50),
+	CouncilId nvarchar(50),
+	UserNameCommentator NVARCHAR(50),
+	UserNameMentor NVARCHAR(50),
+
+	CONSTRAINT FK_Project_Semester FOREIGN KEY (SemesterId)
+    REFERENCES Semester(SemesterId),
+	CONSTRAINT FK_Project_Council FOREIGN KEY (CouncilId)
+    REFERENCES Council(CouncilId),
+	CONSTRAINT FK_Project_Student FOREIGN KEY (UserName)
+    REFERENCES Student(UserName),
+	CONSTRAINT FK_Project_Teacher_Mentor FOREIGN KEY (UserNameMentor)
+    REFERENCES Teacher(UserName),
+	CONSTRAINT FK_Project_Teacher_Commentator FOREIGN KEY (UserNameCommentator)
+    REFERENCES Teacher(UserName),
+)
+
+alter table Project add ScoreMentor float
+alter table Project add CommentMentor nvarchar(max)
+alter table Project add CommentCommentator nvarchar(max)
+alter table Project add ScoreCommentator float
+
+alter table Project add	NameFileFinal nvarchar(max);
+alter table Project add	SizeFileFinal nvarchar(max);
+alter table Project add TypeFileFinal nvarchar(max);
+
+
+alter table Project add ScoreUV1 float
+alter table Project add CommentUV1 nvarchar(max)
+alter table Project add ScoreUV2 float
+alter table Project add CommentUV2 nvarchar(max)
+alter table Project add ScoreUV3 float
+alter table Project add CommentUV3 nvarchar(max)
+alter table Project add ScoreTK float
+alter table Project add CommentTK nvarchar(max)
+alter table Project add ScoreCT float
+alter table Project add CommentCT nvarchar(max)
+alter table Project add HashKeyMentor nvarchar(max)
+alter table Project add HashKeyCommentator nvarchar(max)
+
+alter table Project add ScoreFinal float
+
+
+
+create table GroupReviewOutline(
+	GroupReviewOutlineId nvarchar(50) primary key default NEWID(),
+	NameGroupReviewOutline nvarchar(50),
+	CreatedBy nvarchar(50),
+	CreatedDate datetime default getdate(),
+	
+)
+alter table GroupReviewOutline add SemesterId nvarchar(50)
+
+ALTER TABLE GroupReviewOutline
+ADD FOREIGN KEY (SemesterId) REFERENCES Semester(SemesterId);
+
+ALTER TABLE GroupReviewOutline
+add IsDelete int default 0;
+
+create table ProjectOutline(
+	UserName NVARCHAR(50) PRIMARY KEY,
+	NameProject nvarchar(max),
+	PlantOutline nvarchar(max),
+	TechProject nvarchar(max),
+	ExpectResult nvarchar(max),
+	ContentProject nvarchar(max),
+	GroupReviewOutlineId nvarchar(50),
+	CONSTRAINT FK_ProjectOutline_Project FOREIGN KEY (UserName)
+    REFERENCES Project(UserName),
+	CONSTRAINT FK_ProjectOutline_GroupReviewOutline FOREIGN KEY (GroupReviewOutlineId)
+    REFERENCES GroupReviewOutline(GroupReviewOutlineId)
+)
+
+create table Comment(
+	CommentId nvarchar(50) primary key default NEWID(),
+	ContentComment nvarchar(max),
+	CreatedBy nvarchar(50),
+	CreatedDate datetime default getdate(),
+	UserName NVARCHAR(50),
+	CONSTRAINT FK_Comment_ProjectOutline FOREIGN KEY (UserName)
+    REFERENCES ProjectOutline(UserName),
+	CONSTRAINT FK_Comment_Teacher FOREIGN KEY (CreatedBy)
+    REFERENCES Teacher(UserName)
+)
+
+create table Teaching(
+	UserNameTeacher NVARCHAR(50),
+	SemesterId nvarchar(50),
+	GroupReviewOutlineId nvarchar(50),
+	CouncilId nvarchar(50),
+
+	CONSTRAINT FK_Teaching_Teacher FOREIGN KEY (UserNameTeacher)
+    REFERENCES Teacher(UserName),
+	CONSTRAINT FK_Teaching_Semester FOREIGN KEY (SemesterId)
+    REFERENCES Semester(SemesterId),
+	CONSTRAINT FK_Teaching_GroupReviewOutline FOREIGN KEY (GroupReviewOutlineId)
+    REFERENCES GroupReviewOutline(GroupReviewOutlineId),
+	CONSTRAINT FK_Teaching_Council FOREIGN KEY (CouncilId)
+    REFERENCES Council(CouncilId),
+	PRIMARY KEY (SemesterId,UserNameTeacher)
+)
+alter table Teaching add PositionInCouncil nvarchar(50);
+
+
+create table ScheduleWeek(
+	ScheduleWeekId nvarchar(50) primary key default NEWID(),
+	FromDate datetime,
+	ToDate datetime,
+	CreatedBy nvarchar(50),
+	CreatedDate datetime,
+	SemesterId nvarchar(50),
+	CONSTRAINT FK_ScheduleWeek_Semester FOREIGN KEY (SemesterId)
+    REFERENCES Semester(SemesterId),
+	CONSTRAINT FK_ScheduleWeek_Teacher FOREIGN KEY (CreatedBy)
+    REFERENCES Teacher(UserName),
+)
+
+
+alter table ScheduleWeek add Title nvarchar(max);
+alter table ScheduleWeek add Content nvarchar(max);
+
+
+create table DetailScheduleWeek(
+	ScheduleWeekId nvarchar(50),
+	UserNameProject NVARCHAR(50),
+	Comment nvarchar(max),
+	NameFile nvarchar(max),
+	SizeFile nvarchar(max),
+	CreatedDate date default getdate(),
+	PRIMARY KEY (ScheduleWeekId, UserNameProject),
+	CONSTRAINT FK_DetailScheduleWeek_ScheduleWeek FOREIGN KEY (ScheduleWeekId)
+    REFERENCES ScheduleWeek(ScheduleWeekId),
+	CONSTRAINT FK_DetailScheduleWeek_Project FOREIGN KEY (UserNameProject)
+    REFERENCES Project(UserName),
+)
+
+
+create table ScheduleSemester(
+	ScheduleSemesterId nvarchar(50) primary key default NEWID(),
+	FromDate datetime,
+	ToDate datetime,
+	TypeSchedule nvarchar(50),
+	SemesterId nvarchar(50),
+	CreatedBy nvarchar(50),
+	CreatedDate datetime DEFAULT GETDATE(),
+	CONSTRAINT FK_ScheduleSemester_Semester FOREIGN KEY (SemesterId)
+    REFERENCES Semester(SemesterId),
+	CONSTRAINT FK_ScheduleSemester_Teacher FOREIGN KEY (CreatedBy)
+    REFERENCES Teacher(UserName)
+)
+ALTER TABLE ScheduleSemester
+ADD StatusSend nvarchar(10) default 'W';
+
+ALTER TABLE ScheduleSemester
+ADD Title nvarchar(max);
+
+ALTER TABLE Student
+ADD Gender int;
+
+ALTER TABLE Student
+ADD GPA Float;
+
+ALTER TABLE Student
+ADD Address nvarchar(max);
+
+ALTER TABLE Teacher
+ADD Gender int;
+
+ALTER TABLE Teacher
+ADD Role nvarchar(10) default 'TEACHER';
+
+ALTER TABLE Student
+ADD Role nvarchar(10) default 'STUDENT';
+
+ALTER TABLE Teacher
+ADD Address nvarchar(max);
+
+ALTER TABLE Semester
+ADD CreatedBy NVARCHAR(50);
+
+
+
+ALTER TABLE Semester
+ADD CONSTRAINT fk_Semester_Teacher
+  FOREIGN KEY (CreatedBy)
+  REFERENCES Teacher (UserName);
+
+ALTER TABLE Semester
+ADD IsDelete int Default 0;
+
+ALTER TABLE Semester
+ADD CreatedAt DATETIME DEFAULT GETDATE();
+
+ALTER TABLE ScheduleSemester
+ADD Implementer NVARCHAR(200);
+
+ALTER TABLE ScheduleSemester
+ADD Content NVARCHAR(max);
+
+ALTER TABLE ScheduleSemester
+ADD Note NVARCHAR(max);
+
+ALTER TABLE Project add StatusProject nvarchar(50) DEFAULT 'START';
+
+--ALTER TABLE Project
+--DROP CONSTRAINT DF__Project__StatusP__70DDC3D8
+
+
+insert Semester(SemesterId,NameSemester,FromDate,ToDate) values('1_2024_2025',N'Học kỳ 1 Năm 2024-2025',DATEFROMPARTS(2024, 01, 01),DATEFROMPARTS(2024, 06, 25));
+insert Semester(SemesterId,NameSemester,FromDate,ToDate) values('2_2024_2025',N'Học kỳ 2 Năm 2024-2025',DATEFROMPARTS(2024, 06, 25),DATEFROMPARTS(2024, 12,01));
+
+insert Classification(TypeCode,Code,Value,Role) values('ROLE_SYSTEM','STUDENT',N'Sinh viên','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('ROLE_SYSTEM','TEACHER',N'Giảng viên','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('ROLE_SYSTEM','ADMIN',N'Quản trị viên','ADMIN')
+
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_SYSTEM','AUTH',N'Hoạt dộng','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_SYSTEM','BLOCK',N'Đã khóa','ADMIN')
+
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_PROJECT','PAUSE',N'Bảo lưu','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_PROJECT','DOING',N'Đang làm đồ án','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_PROJECT','ACCEPT',N'Được bảo vệ','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_PROJECT','REJECT',N'Không được bảo vệ','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('STATUS_PROJECT','START',N'Mới tạo','ADMIN')
+
+insert Classification(TypeCode,Code,Value,Role) values('TEMPLATE_FILE','REVIEW_MENTOR',N'Biểu mẫu đánh giá của giảng viên hướng dẫn','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TEMPLATE_FILE','REVIEW_COMMENTATOR',N'Biểu mẫu đánh giá của giảng viên phản biện','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TEMPLATE_FILE','OUTLINE',N'Biểu mẫu đề cương đồ án','ADMIN')
+
+insert Classification(TypeCode,Code,Value,Role) values('TYPE_SCHEDULE','SCHEDULE_NORMAL',N'Lịch thông báo','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TYPE_SCHEDULE','SCHEDULE_FOR_OUTLINE',N'Lịch chốt đề cương','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TYPE_SCHEDULE','SCHEDULE_FOR_MENTOR',N'Chốt điểm GVHD','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TYPE_SCHEDULE','SCHEDULE_FOR_COMMENTATOR',N'Chốt điểm GVPB','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TYPE_SCHEDULE','SCHEDULE_FINAL_FILE',N'Nộp báo cáo cuối cùng','ADMIN')
+insert Classification(TypeCode,Code,Value,Role) values('TYPE_SCHEDULE','SCHEDULE_FINAL_SCORE',N'Chốt điểm tổng kết','ADMIN')
+
+
+insert Major(MajorId,MajorName) values('CNPM',N'Công nghệ phần mềm')
+insert Major(MajorId,MajorName) values('AI',N'Trí tuệ nhân tạo')
+insert Major(MajorId,MajorName) values('GAME',N'Lập trình game')
+insert Major(MajorId,MajorName) values('KHMT',N'Khoa học máy tính')
+insert Major(MajorId,MajorName) values('MANG',N'Mạng và HTTT')
+
+insert Education(EducationId,EducationName,MaxStudentMentor) values('KS',N'Kỹ sư',3)
+insert Education(EducationId,EducationName,MaxStudentMentor) values('ThS',N'Thạc sĩ',5)
+insert Education(EducationId,EducationName,MaxStudentMentor) values('TS',N'Tiến sĩ',7)
+

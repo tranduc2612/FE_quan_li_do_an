@@ -1,0 +1,15 @@
+{
+  "passwordText": "123456",
+  "fullName": "Nguyễn Hiếu Cường",
+  "dob": "2024-03-07T06:38:59.109Z",
+  "phone": "02312312123",
+  "email": "hieucauong@gmail.com",
+  "avatar": "string",
+  "createdAt": "2024-03-07T06:38:59.109Z",
+  "createdBy": "admin",
+  "status": "AUTH",
+  "teacherCode": "111123221",
+  "majorId": "CNPM",
+  "education": "Tiến sĩ",
+  "isAdmin": 0
+}
