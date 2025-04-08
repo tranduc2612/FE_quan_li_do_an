@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 // export const BASE_URL_MEDIA = 'http://14.225.211.124:5000/api/'
-export const BASE_URL_MEDIA = 'https://localhost:7274/api/'
+export const BASE_URL_MEDIA = 'http://localhost:8080/api/'
 
 
 const request = axios.create({
